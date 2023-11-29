@@ -7,7 +7,6 @@ import * as Picker from 'react-native-image-picker';
 const ProfileHeader = (props: any) => {
 
   let uploadImage = async (imageData: any) => {
-    console.log(imageData);
     const formdata = new FormData();
     // formdata.append('image', {
     //   originalName: imageData.fileName,

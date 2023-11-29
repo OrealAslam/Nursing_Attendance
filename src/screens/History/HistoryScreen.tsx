@@ -5,6 +5,8 @@ import HistoryContent from './component/HistoryContent';
 import {get_async_data, get_history} from '../../Helper/AppHelper';
 import {CardContainer} from './historystyles';
 import {useIsFocused} from '@react-navigation/native';
+import StopWatch from '../../components/Stopwatch';
+import moment from 'moment';
 
 const HistoryScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();

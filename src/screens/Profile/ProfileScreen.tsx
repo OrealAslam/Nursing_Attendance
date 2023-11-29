@@ -1,4 +1,4 @@
-import {ScrollView, View, Dimensions} from 'react-native';
+import {ScrollView, View, Dimensions, Alert} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import ProfileHeader from './components/ProfileHeader';
 import MainContent from './components/MainContent';
@@ -41,20 +41,19 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   }, []);
 
   const updateRecord = async () => {
-    console.log(imageData);
-    // await ensure
     const id = await get_async_data('user_id');
     let obj = {
       id: id,
       name: name,
       dob: dob,
       address: address,
-      image: imageData,
+      image: '',
     };
 
-    let res = await update_user_profile(obj);
-
-    console.log('RES', res);
+    let response = await update_user_profile(obj);
+    if(response.status == 'success') {
+      Alert.alert('Updated', 'Profile Updated Successfully');
+    }
   };
 
   return (

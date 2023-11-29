@@ -15,10 +15,11 @@ const StartTimerModel = (props: any) => {
     <View style={styles.container}>
       <View style={styles.modelContainer}>
         <Text style={styles.heading}>
-          Are you sure you want to {props.shiftstatus} the care?
+          Are you sure you want to {props.shiftstatus == 'started' ? 'end' : 'start'} the care?
         </Text>
-        <Text style={[styles.heading, {fontWeight: '500', textTransform: 'capitalize'}]}>
-          {props.shiftstatus} Time: {moment().format('hh:mm A')}
+        <Text style={[styles.heading, {fontWeight: '500'}]}>
+          {props.shiftstatus} Time:{' '}
+          {moment(props.shiftstarttime).format('hh:mm A')}
         </Text>
 
         <View style={styles.buttonContainer}>

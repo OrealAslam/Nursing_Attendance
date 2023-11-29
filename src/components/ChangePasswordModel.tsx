@@ -88,16 +88,21 @@ const ChangePasswordModel = (props: any) => {
         {loader == true ? (
           <ActivityIndicator size={'small'} color={'#000'} />
         ) : (
-          <TouchableOpacity onPress={() => updatePassword()}>
-            <Image
-              style={{
-                alignSelf: 'center',
-                width: buttonWidth,
-                height: 184 * buttonratio,
-              }}
-              source={require('../assets/done.png')}
-            />
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity onPress={() => updatePassword()}>
+              <Image
+                style={{
+                  alignSelf: 'center',
+                  width: buttonWidth,
+                  height: 184 * buttonratio,
+                }}
+                source={require('../assets/done.png')}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>props.setmodel(false)}>
+              <Text style={{textAlign: 'center', marginTop: 5, marginBottom: 5}}>Close</Text>
+            </TouchableOpacity>
+          </>
         )}
 
         <Text style={styles.error}>{message}</Text>
@@ -119,7 +124,7 @@ const styles = StyleSheet.create({
     width: (84 / 100) * width,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingVertical: 30,
+    paddingVertical: 25,
     borderRadius: 12,
   },
   bottomContainer: {
@@ -139,14 +144,14 @@ const styles = StyleSheet.create({
   label: {
     color: '#A1A1A1',
     fontSize: 13,
-    fontWight: '400',
+    fontWeight: '400',
     textTransform: 'capitalize',
     marginBottom: 5,
   },
   inputText: {
     color: '#2A2A2E',
     fontSize: 16,
-    fontSyle: 'normal',
+    fontStyle: 'normal',
     fontWeight: '600',
     textTransform: 'capitalize',
     paddingVertical: 0,
@@ -155,10 +160,10 @@ const styles = StyleSheet.create({
   },
   error: {
     textAlign: 'center',
-    top: 10,
+    top: 5,
     color: '#f00',
     textTransform: 'capitalize',
-    fontSize: 10
+    fontSize: 10,
   },
 });
 export default ChangePasswordModel;

@@ -1,41 +1,124 @@
-import {View, Image, TouchableOpacity, Dimensions, Text} from 'react-native';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Text,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HolidayHeader from './components/HolidayHeader';
-import Calender from './components/Calender';
-import { MainContent } from './holidaystyles';
+import {MainContent} from './holidaystyles';
 import HolidayFooter from './components/HolidayFooter';
+import Calender from '../../components/CalenderComponent/Calender';
+import {leave_request, get_user_leave_request} from '../../Helper/AppHelper';
+import {useIsFocused} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 40;
 const buttonRatio = buttonWidth / 1232;
 
 const HolidayScreen = ({navigation}: {navigation: any}) => {
+  const isFocused = useIsFocused();
   const [submitRequest, setsubmitRequest] = useState('submit');
+  const [loader, setloader] = useState(false);
+  const [calenderloader, setcalenderloader] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const response = await get_user_leave_request();
+      if (response.status == 'success') {
+        global.DateArray = response.data;
+      }
+      setcalenderloader(false);
+    })();
+  }, [isFocused]);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
 
+  const submit_leave_request = async () => {
+    if (global.DateArray.length < 1) {
+      Alert.alert(
+        'Warning',
+        'Select atleast single date to submit leave request',
+      );
+    } else {
+      setloader(true);
+      let response = await leave_request(global.DateArray);
+      if (response.status == 'successfully') {
+        Alert.alert('Success', response.message);
+      }
+      if (response.status == 'error') {
+        Alert.alert(
+          'Error',
+          'Unable to submit holiday request. Try adain later!',
+        );
+        setloader(false);
+      }
+    }
+    setloader(false);
+  };
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <HolidayHeader navigateScreen={navigateScreen} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={MainContent.container}>
+          {/* Actual Calender Here */}
+          {calenderloader == true ? (
+            <ActivityIndicator size={'large'} color={'#666668'} />
+          ) : (
+            <Calender />
+          )}
+        </View>
 
-      <Calender />
-
-      {
-        submitRequest == 'approve' ? (<Text style={MainContent.statusMessage}>Your leave for $ days is Approved</Text>) :
-        submitRequest == 'pending' ? (<Text style={MainContent.statusMessage}>Your request is pending</Text>) : (<Text style={MainContent.statusMessage}>indicate the desired holiday dates</Text>)
-      }
-
-      <TouchableOpacity onPress={() => setsubmitRequest('pending')}>
-        {submitRequest == 'pending' ? (
-          <Image style={{width: buttonWidth, height: 200 * buttonRatio, alignSelf: 'center', marginVertical: 15}} source={require('../../assets/pending.png')} />
+        {submitRequest == 'approve' ? (
+          <Text style={MainContent.statusMessage}>
+            Your leave for $ days is Approved
+          </Text>
+        ) : submitRequest == 'pending' ? (
+          <Text style={MainContent.statusMessage}>Your request is pending</Text>
         ) : (
-          <Image style={{width: buttonWidth, height: 200 * buttonRatio, alignSelf: 'center', marginVertical: 15}} source={require('../../assets/submit.png')} />
+          <Text style={MainContent.statusMessage}>
+            indicate the desired holiday dates
+          </Text>
         )}
-      </TouchableOpacity>
 
-      <HolidayFooter />
+        {loader == true ? (
+          <ActivityIndicator />
+        ) : (
+          <TouchableOpacity onPress={() => submit_leave_request()}>
+            {/* <TouchableOpacity onPress={() => setsubmitRequest('pending')}> */}
+            {/* {submitRequest == 'pending' ? (
+            <Image
+              style={{
+                width: buttonWidth,
+                height: 200 * buttonRatio,
+                alignSelf: 'center',
+                marginVertical: 15,
+              }}
+              source={require('../../assets/pending.png')}
+            />
+          ) : ( */}
+            <Image
+              style={{
+                width: buttonWidth,
+                height: 200 * buttonRatio,
+                alignSelf: 'center',
+                marginVertical: 15,
+              }}
+              source={require('../../assets/submit.png')}
+            />
+            {/* )} */}
+          </TouchableOpacity>
+        )}
+
+        <HolidayFooter />
+      </ScrollView>
     </View>
   );
 };

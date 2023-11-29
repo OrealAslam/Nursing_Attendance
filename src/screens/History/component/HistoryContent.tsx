@@ -1,7 +1,7 @@
 import {View, Text, ScrollView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {CardContainer} from '../historystyles';
-
+import moment from 'moment';
 const HistoryContent = (props: any) => {
   const [historyData, sethistoryData] = useState(props.history);
 
@@ -15,8 +15,8 @@ const HistoryContent = (props: any) => {
         return (
           <View style={CardContainer.card} key={index}>
             <View style={CardContainer.column1}>
-              <Text style={CardContainer.date}>20</Text>
-              <Text style={CardContainer.day}>Wed</Text>
+              <Text style={CardContainer.date}>{moment(item.created_at).format('D')}</Text>
+              <Text style={CardContainer.day}>{moment(item.created_at).format('ddd')}</Text>
             </View>
 
             <View style={CardContainer.column2}>
