@@ -7,6 +7,7 @@ import {CardContainer} from './historystyles';
 import {useIsFocused} from '@react-navigation/native';
 import StopWatch from '../../components/Stopwatch';
 import moment from 'moment';
+import TimerHook from '../../components/TimerHook';
 
 const HistoryScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();

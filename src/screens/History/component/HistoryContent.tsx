@@ -35,7 +35,7 @@ const HistoryContent = (props: any) => {
     <ScrollView
       showsHorizontalScrollIndicator={false}
       style={CardContainer.container}>
-      <Text style={CardContainer.heading}>October 2023</Text>
+      {/* <Text style={CardContainer.heading}>November 2023</Text> */}
       {display_history()}
     </ScrollView>
   );

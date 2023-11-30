@@ -17,7 +17,7 @@ const LEAVE_REQUEST = BASE_URL + 'leave_request';
 const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
 export const UPDATE_PROFILE = BASE_URL + 'update_profile';
 
-export const loginNurse = async (phone: any, password: any) => {
+export const loginNurse = async (phone, password) => {
   let obj = {phone: phone, password: password};
 
   const request = await fetch(LOGIN_NURSE, {
@@ -34,7 +34,7 @@ export const loginNurse = async (phone: any, password: any) => {
   return response;
 };
 
-export const set_async_data = async (name: any, value: any) => {
+export const set_async_data = async (name, value) => {
   try {
     await AsyncStorage.setItem(name, JSON.stringify(value));
     return true;
@@ -43,7 +43,7 @@ export const set_async_data = async (name: any, value: any) => {
   }
 };
 
-export const get_async_data = async (name: any) => {
+export const get_async_data = async name => {
   try {
     const data = await AsyncStorage.getItem(name);
     return data != null ? JSON.parse(data) : null;
@@ -72,7 +72,7 @@ export const editableProfileData = async () => {
   };
 };
 
-export const get_history = async (id: any) => {
+export const get_history = async id => {
   const request = await fetch(GET_HISTORY, {
     method: 'POST',
     headers: {
@@ -86,11 +86,7 @@ export const get_history = async (id: any) => {
   return response;
 };
 
-export const update_password = async (
-  curr_pass: any,
-  new_pass: any,
-  confirm_pass: any,
-) => {
+export const update_password = async (curr_pass, new_pass, confirm_pass) => {
   let staff_id = await get_async_data('user_id');
   let obj = {
     staff_id: staff_id,
@@ -124,7 +120,7 @@ export const get_nurse_status = async () => {
   return response;
 };
 
-export const update_user_profile = async (data: any) => {
+export const update_user_profile = async data => {
   // if (Object.keys(data.image).length > 0) {
   //   const request = await fetch(UPDATE_PROFILE, {
   //     method: 'POST',
@@ -172,12 +168,12 @@ export const get_shift_status = async () => {
 };
 
 export const end_shift = async (
-  leadid: any,
-  attendenceid: any,
-  longitude: any,
-  latitude: any,
-  end_time: any,
-  shift_status: any,
+  leadid,
+  attendenceid,
+  longitude,
+  latitude,
+  end_time,
+  shift_status,
 ) => {
   const user_id = await get_async_data('user_id');
 
@@ -206,12 +202,12 @@ export const end_shift = async (
 };
 
 export const start_shift = async (
-  leadid: any,
-  attendenceid: any,
-  longitude: any,
-  latitude: any,
-  start_time: any,
-  shift_status: any,
+  leadid,
+  attendenceid,
+  longitude,
+  latitude,
+  start_time,
+  shift_status,
 ) => {
   const user_id = await get_async_data('user_id');
 
@@ -239,7 +235,7 @@ export const start_shift = async (
   return resposne;
 };
 
-export const leave_request = async (data: any) => {
+export const leave_request = async data => {
   const staff_id = await get_async_data('user_id');
   let obj = {
     staff_id: staff_id,
@@ -274,17 +270,13 @@ export const get_user_leave_request = async () => {
   return response;
 };
 
-export const formatTimeDifference = (
-  hours: any,
-  minutes: any,
-  seconds: any,
-) => {
+export const formatTimeDifference = (hours, minutes, seconds) => {
   let h = hours.toString();
   let m = minutes.toString();
   let s = seconds.toString();
 
   if (h.length < 2) {
-    h = '0' + String(hours);
+    h = '0' + hours.toString();
   }
   if (m.length < 2) {
     m = '0' + minutes;
@@ -295,7 +287,7 @@ export const formatTimeDifference = (
   return `${h}:${m}:${s}`;
 };
 
-export const parseTimeStringToDate = (timeString: any) => {
+export const parseTimeStringToDate = timeString => {
   // Split the timeString into hours, minutes, and seconds
   const [hours, minutes, seconds] = timeString.split(':').map(Number);
 
@@ -312,7 +304,7 @@ export const parseTimeStringToDate = (timeString: any) => {
   return parsedDate;
 };
 
-export const parseDate = (year: any, month: any, date: any) => {
+export const parseDate = (year, month, date) => {
   let y = year.toString();
   let m = month.toString();
   let d = date.toString();
@@ -333,7 +325,7 @@ export const parseDate = (year: any, month: any, date: any) => {
 
 // CUCTOM DATE PICKER HELPER FUNCTIONS
 
-export const getMonthName = (dateString: any) => {
+export const getMonthName = dateString => {
   const months = [
     'Jan',
     'Feb',
@@ -382,12 +374,12 @@ export const months = [
 
 export const nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-export const addMonth = (month: any) => {
+export const addMonth = month => {
   if (month == 11) {
   }
 };
 
-export const subMonth = (month: any) => {
+export const subMonth = month => {
   if (month == 1) {
   }
 };

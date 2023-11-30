@@ -67,57 +67,28 @@ const HolidayScreen = ({navigation}: {navigation: any}) => {
     <View style={{flex: 1, backgroundColor: '#fff'}}>
       <HolidayHeader navigateScreen={navigateScreen} />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={MainContent.container}>
-          {/* Actual Calender Here */}
-          {calenderloader == true ? (
-            <ActivityIndicator size={'large'} color={'#666668'} />
-          ) : (
-            <Calender />
-          )}
-        </View>
-
-        {submitRequest == 'approve' ? (
-          <Text style={MainContent.statusMessage}>
-            Your leave for $ days is Approved
-          </Text>
-        ) : submitRequest == 'pending' ? (
-          <Text style={MainContent.statusMessage}>Your request is pending</Text>
-        ) : (
-          <Text style={MainContent.statusMessage}>
-            indicate the desired holiday dates
-          </Text>
-        )}
-
-        {loader == true ? (
+        {calenderloader == true ? (
           <ActivityIndicator />
         ) : (
-          <TouchableOpacity onPress={() => submit_leave_request()}>
-            {/* <TouchableOpacity onPress={() => setsubmitRequest('pending')}> */}
-            {/* {submitRequest == 'pending' ? (
-            <Image
-              style={{
-                width: buttonWidth,
-                height: 200 * buttonRatio,
-                alignSelf: 'center',
-                marginVertical: 15,
-              }}
-              source={require('../../assets/pending.png')}
-            />
-          ) : ( */}
-            <Image
-              style={{
-                width: buttonWidth,
-                height: 200 * buttonRatio,
-                alignSelf: 'center',
-                marginVertical: 15,
-              }}
-              source={require('../../assets/submit.png')}
-            />
-            {/* )} */}
-          </TouchableOpacity>
-        )}
+          <>
+            <View style={MainContent.container}>
+              <Calender />
+            </View>
 
-        <HolidayFooter />
+            <TouchableOpacity onPress={() => submit_leave_request()}>
+              <Image
+                style={{
+                  width: buttonWidth,
+                  height: 200 * buttonRatio,
+                  alignSelf: 'center',
+                  marginVertical: 15,
+                }}
+                source={require('../../assets/submit.png')}
+              />
+            </TouchableOpacity>
+            <HolidayFooter />
+          </>
+        )}
       </ScrollView>
     </View>
   );

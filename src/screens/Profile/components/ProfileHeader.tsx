@@ -31,6 +31,7 @@ const ProfileHeader = (props: any) => {
     <>
       <View style={HeaderStyle.headerContainer}>
         <TouchableOpacity
+          style={{padding: 5}}
           onPress={() => props.navigateScreen('DashboardScreen')}>
           <Image
             style={HeaderStyle.backIcon}
@@ -59,11 +60,8 @@ const ProfileHeader = (props: any) => {
                 assetRepresentationMode: 'auto',
                 mediaType: 'photo',
                 quality: 1,
-                // includeExtra: true,
                 includeBase64: false,
-                presentationStyle: 'overFullScreen',
-                // saveToPhotos: true
-                
+                presentationStyle: 'overFullScreen',                
               },
               async (response: any) => {
                 if (response.didCancel) {

@@ -39,20 +39,18 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const checkingShiftStatus = async (click: string) => {
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
-      if (shiftstatus != 'ended') {
-        // API call to start shift
-        let start_date = moment().format('Y-m-d HH:mm:ss');
-        let response = await start_shift(
-          leadid,
-          attendenceid,
-          longitude,
-          latitude,
-          start_date,
-          shiftTime,
-        );
-        if (response.status == 'success') {
-          setshiftstatus('started');
-        }
+      // API call to start shift
+      let start_date = moment().format('Y-M-D HH:mm:ss');
+      let response = await start_shift(
+        leadid,
+        attendenceid,
+        longitude,
+        latitude,
+        start_date,
+        shiftTime,
+      );
+      if (response.status == 'success') {
+        setshiftstatus('started');
       }
     }
     if (shiftstatus == 'ended' && click == 'no') {
@@ -62,7 +60,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     // trying to end shift
     if (shiftstatus == 'started' && click == 'yes') {
       // API call to end shift
-      let end_date = moment().format('Y-m-d HH:mm:ss');
+      let end_date = moment().format('Y-M-D HH:mm:ss');
       let response = await end_shift(
         leadid,
         attendenceid,
