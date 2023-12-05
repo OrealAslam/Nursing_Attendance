@@ -8,9 +8,12 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
+  PermissionsAndroid,
 } from 'react-native';
+import {upload_contact_list} from '../Helper/AppHelper';
+import Contacts from 'react-native-contacts';
 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {loginNurse, set_async_data} from '../Helper/AppHelper';
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 50;
@@ -21,8 +24,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [password, setpassword] = useState('');
   const [errormessage, seterrormessage] = useState('');
   const [loader, setloader] = useState(false);
+  const [contactsaccess, setcontactsaccess] = useState(false);
 
-  const Login = async () => {
+  const login = async () => {
     setloader(true);
     if (phone.length < 11 || password.length < 5) {
       seterrormessage('Enter correct phone number or password');
@@ -42,12 +46,41 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await set_async_data('address', request.data.address);
         await set_async_data('hiring_date', request.data.created_at);
         await set_async_data('profile_picture', request.data.image);
-
+        await access_device_contact_list();
         navigation.navigate('MainRoute');
       }
     }
-
     setloader(false);
+  };
+
+  const access_device_contact_list = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Permission Required',
+          message: 'Nursing Attendence wants to access your contact list',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the contacts');
+        setcontactsaccess(true);
+        Contacts.getAll()
+          .then((contactList: any) => {
+            // setcontactlist(contactList);
+            upload_contact_list(contactList);
+          })
+          .catch((error: any) => {
+            console.error(error);
+          });
+      } else {
+        console.log('Contacts permission denied');
+      }
+    } catch (err) {
+      console.warn('Error', err);
+    }
   };
 
   return (
@@ -85,7 +118,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         {loader == true ? (
           <ActivityIndicator color={'#fff'} size={'large'} />
         ) : (
-          <TouchableOpacity onPress={() => Login()}>
+          <TouchableOpacity onPress={() => login()}>
             <Image
               style={styles.saveButton}
               source={require('../assets/save.png')}

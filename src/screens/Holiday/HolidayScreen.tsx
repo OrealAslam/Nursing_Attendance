@@ -3,7 +3,6 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
-  Text,
   ScrollView,
   Alert,
   ActivityIndicator,
@@ -25,13 +24,11 @@ const HolidayScreen = ({navigation}: {navigation: any}) => {
   const [submitRequest, setsubmitRequest] = useState('submit');
   const [loader, setloader] = useState(false);
   const [calenderloader, setcalenderloader] = useState(true);
+  const [selected, setselected] = useState('');
 
   useEffect(() => {
     (async () => {
-      const response = await get_user_leave_request();
-      if (response.status == 'success') {
-        global.DateArray = response.data;
-      }
+      await get_user_leave_request();
       setcalenderloader(false);
     })();
   }, [isFocused]);

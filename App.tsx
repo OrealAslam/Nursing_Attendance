@@ -5,6 +5,7 @@ import Route from './src/routes/Route';
 import {get_async_data} from './src/Helper/AppHelper';
 import MainRoute from './src/routes/MainRoute';
 import {useNetInfo} from '@react-native-community/netinfo';
+// import Geolocation from '@react-native-community/geolocation';
 import {
   View,
   BackHandler,
@@ -14,6 +15,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {NetworkModelStyle} from './src/Helper/StyleHelper';
+// import LocationAccess from './src/components/LocationAccess';
 
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 200;
@@ -24,10 +26,13 @@ const App = (navigation: any) => {
   const [splashClosed, setsplashClosed] = useState(false);
   const [userid, setuserid] = useState(null);
   const [NetworkModel, setNetworkModel] = useState(false);
+  // const [locationaccess, setlocationaccess] = useState(false);
 
   useEffect(() => {
     (async () => {
       let user_id = await get_async_data('user_id');
+      // let loc_access = await get_async_data('loc_access');
+      // if (loc_access == 'accessed') setlocationaccess(true);
       setuserid(user_id);
       setsplashClosed(true);
       SplashScreen.hide();
@@ -53,7 +58,7 @@ const App = (navigation: any) => {
                 <Text style={NetworkModelStyle.description}>
                   Failed to connect to Internet. Try again Later!
                 </Text>
-                <TouchableOpacity onPress={()=>BackHandler.exitApp()}>
+                <TouchableOpacity onPress={() => BackHandler.exitApp()}>
                   <Image
                     style={{
                       alignSelf: 'center',
@@ -67,6 +72,7 @@ const App = (navigation: any) => {
               </View>
             </View>
           ) : (
+            // locationaccess == false ? (<LocationAccess />) :
             <>{userid != null ? <MainRoute></MainRoute> : <Route></Route>}</>
           )}
         </>

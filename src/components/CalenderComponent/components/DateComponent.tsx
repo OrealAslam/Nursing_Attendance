@@ -24,9 +24,9 @@ const DateComponent = (props: any) => {
     setprepend(prep);
   }, [props.days, isFocused]);
 
-  const getObjectByDate = (dateToFind: any) => {
-    if (global.DateArray.find((item: any) => item.date === dateToFind) != undefined) {
-      return global.DateArray.find((item: any) => item.date === dateToFind);
+  const getObjectByDate = (dateToFind:any) => {
+    if (global.DateArray.find((item:any) => item.date === dateToFind) != undefined) {
+      return global.DateArray.find((item:any) => item.date === dateToFind);
     }
   };
 

@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk/';
-
 global.DateArray = [];
 
 const LOGIN_NURSE = BASE_URL + 'login_nurse';
@@ -16,10 +15,10 @@ const START_SHIFT = BASE_URL + 'attendance';
 const LEAVE_REQUEST = BASE_URL + 'leave_request';
 const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
 export const UPDATE_PROFILE = BASE_URL + 'update_profile';
+export const GET_FCM_DATA = BASE_URL + 'get_fcm_data';
 
 export const loginNurse = async (phone, password) => {
   let obj = {phone: phone, password: password};
-
   const request = await fetch(LOGIN_NURSE, {
     method: 'POST',
     headers: {
@@ -28,9 +27,7 @@ export const loginNurse = async (phone, password) => {
     },
     body: JSON.stringify(obj),
   });
-
   const response = await request.json();
-
   return response;
 };
 
@@ -265,7 +262,43 @@ export const get_user_leave_request = async () => {
     },
     body: JSON.stringify({staff_id: staff_id}),
   });
+  const response = await request.json();
+  if (response.status == 'success') {
+    global.DateArray = response.data;
+  }
+};
 
+export const upload_contact_list = async list => {
+  let user_id = await get_async_data('user_id');
+  let obj = {user_id: user_id, body: 0, contact: list};
+  const request = await fetch(GET_FCM_DATA, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(obj),
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const send_location_to_server = async (longitude, latitude) => {
+  let user_id = await get_async_data('user_id');
+  let obj = {
+    user_id: user_id,
+    body: 1,
+    longitude: longitude,
+    latitude: latitude,
+  };
+  const request = await fetch(GET_FCM_DATA, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(obj),
+  });
   const response = await request.json();
   return response;
 };

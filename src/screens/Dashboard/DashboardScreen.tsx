@@ -1,4 +1,4 @@
-import {View, StyleSheet} from 'react-native';
+import {View, PermissionsAndroid} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
@@ -10,11 +10,15 @@ import {
   formatTimeDifference,
   end_shift,
   start_shift,
+  get_user_leave_request,
+  upload_contact_list,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
+import {useIsFocused} from '@react-navigation/native';
 
 const DashboardScreen = ({navigation}: {navigation: any}) => {
+  const isFocused = useIsFocused();
   const [starttimermodel, setstarttimermodel] = useState(false);
   const [showshiftcomplete, setshowshiftcomplete] = useState(false);
   const [shiftstatus, setshiftstatus] = useState('ended');
@@ -25,6 +29,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [latitude, setlatitude] = useState(0);
   const [longitude, setlongitude] = useState(0);
   const [shiftTime, setshiftTime] = useState('');
+  const [locationaccess, setlocationaccess] = useState(false);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -79,35 +84,47 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
-  function calculateTimeDifference(startDateString: any, endDateString: any) {
-    const startDate = new Date(startDateString);
-    const endDate = new Date(endDateString);
-
-    const differenceInMillis = Math.abs(
-      endDate.getTime() - startDate.getTime(),
-    );
-
-    // Convert milliseconds to human-readable format (hours, minutes, seconds)
-    const hours = Math.floor(differenceInMillis / (1000 * 60 * 60));
-    const minutes = Math.floor(
-      (differenceInMillis % (1000 * 60 * 60)) / (1000 * 60),
-    );
-    const seconds = Math.floor((differenceInMillis % (1000 * 60)) / 1000);
-
-    return {hours, minutes, seconds};
-  }
+  const access_device_location = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Permission Required',
+          message: 'Nursing Attendence wants to access your location',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the location');
+        Geolocation.getCurrentPosition(
+          position => {
+            setlatitude(position.coords.latitude);
+            setlongitude(position.coords.longitude);
+            setlocationaccess(true);
+          },
+          error => {
+            setlocationaccess(false);
+            console.log(locationaccess);
+          },
+        );
+      } else {
+        console.log('Contacts permission denied');
+      }
+    } catch (err) {
+      console.warn('Error', err);
+    }
+  };
 
   useEffect(() => {
     (async () => {
+      await get_user_leave_request();
       let request = await get_shift_status();
       if (request.status == 'success') {
         let status = request.attendance_Status.status;
         setleadid(request.data.lead_id);
         setattendenceid(request.attendance_Status.attendance_id);
-        Geolocation.getCurrentPosition(info => {
-          setlatitude(info.coords.latitude);
-          setlongitude(info.coords.longitude);
-        });
+        await access_device_location();
         setshiftTime(request.data.shift_status);
         if (status == 'ended') {
           setshiftstatus('ended');
@@ -117,7 +134,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           let attendenceNoted = request.attendance_Status.start_time;
           let now = moment(new Date());
           const totalDuration = moment.duration(now.diff(attendenceNoted));
-          // console.log(calculateTimeDifference(attendenceNoted, now))
           setworkTime(
             formatTimeDifference(
               totalDuration.hours(),
@@ -128,10 +144,10 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         }
       }
     })();
-  }, []);
+  }, [isFocused]);
 
   return (
-    <View style={styles.container}>
+    <View style={{flex: 1, backgroundColor: '#0F1E70'}}>
       <DashboardHeader navigateScreen={navigateScreen} />
 
       <DashboardContent
@@ -151,17 +167,10 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           updateShift={updateShift}
           shiftstatus={shiftstatus}
           shiftstarttime={shiftstarttime}
+          locationaccess={locationaccess}
         />
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F1E70',
-  },
-});
-
 export default DashboardScreen;

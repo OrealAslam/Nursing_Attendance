@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "666621160562",
+    "project_id": "nursing-attendence",
+    "storage_bucket": "nursing-attendence.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666621160562:android:2e546306b0d5e26df8e6eb",
+        "android_client_info": {
+          "package_name": "com.nursingattendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo9N_jy0P1K_kxNy0GJKA7g2823a07zi0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import React from 'react';
 import moment from 'moment';
@@ -14,25 +15,51 @@ const StartTimerModel = (props: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.modelContainer}>
-        <Text style={styles.heading}>
-          Are you sure you want to {props.shiftstatus == 'started' ? 'end' : 'start'} the care?
-        </Text>
-        <Text style={[styles.heading, {fontWeight: '500'}]}>
-          {props.shiftstatus} Time:{' '}
-          {moment(props.shiftstarttime).format('hh:mm A')}
-        </Text>
+        {props.locationaccess == false ? (
+          <>
+            <Text style={styles.heading}>
+              Please check Location and Contacts permission from Settings
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text style={styles.heading}>
+              Are you sure you want to{' '}
+              {props.shiftstatus == 'started' ? 'end' : 'start'} the care?
+            </Text>
+            <Text style={[styles.heading, {fontWeight: '500'}]}>
+              {/* {props.shiftstatus == 'started' ? 'end' : 'start'} Time:{' '} */}
+              {/* {props.shiftstarttime} */}
+            </Text>
+          </>
+        )}
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => props.updateShift('yes')}>
-            <Text style={{color: '#fff'}}>Yes</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, {backgroundColor: '#A7B7DF'}]}
-            onPress={() => props.updateShift('no')}>
-            <Text style={{color: '#fff'}}>No</Text>
-          </TouchableOpacity>
+          {props.locationaccess == false ? (
+            <>
+              <TouchableOpacity style={styles.button} onPress={() => Linking.openSettings()}>
+                <Text style={{color: '#fff'}}>Settings</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, {backgroundColor: '#A7B7DF'}]}
+                onPress={() => props.updateShift('no')}>
+                <Text style={{color: '#fff'}}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => props.updateShift('yes')}>
+                <Text style={{color: '#fff'}}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, {backgroundColor: '#A7B7DF'}]}
+                onPress={() => props.updateShift('no')}>
+                <Text style={{color: '#fff'}}>No</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
     </View>
