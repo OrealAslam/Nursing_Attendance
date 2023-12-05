@@ -10,8 +10,7 @@ import {
   formatTimeDifference,
   end_shift,
   start_shift,
-  get_user_leave_request,
-  upload_contact_list,
+  get_user_leave_request
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -96,7 +95,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the location');
         Geolocation.getCurrentPosition(
           position => {
             setlatitude(position.coords.latitude);

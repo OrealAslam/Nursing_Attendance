@@ -13,8 +13,8 @@ import {
 import {upload_contact_list} from '../Helper/AppHelper';
 import Contacts from 'react-native-contacts';
 
-import React, {useState, useEffect} from 'react';
-import {loginNurse, set_async_data} from '../Helper/AppHelper';
+import React, {useState} from 'react';
+import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 50;
 const ratio = buttonWidth / 1232;
@@ -38,6 +38,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
       }
       if (request.status == 'success') {
         seterrormessage(request.message);
+        await generateFCM();
         await set_async_data('user_id', request.data.id);
         await set_async_data('username', request.data.name);
         await set_async_data('designation', request.data.designation);
@@ -65,11 +66,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the contacts');
         setcontactsaccess(true);
         Contacts.getAll()
           .then((contactList: any) => {
-            // setcontactlist(contactList);
             upload_contact_list(contactList);
           })
           .catch((error: any) => {
