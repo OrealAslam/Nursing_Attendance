@@ -16,6 +16,7 @@ import {
   Alert,
 } from 'react-native';
 import {NetworkModelStyle} from './src/Helper/StyleHelper';
+import AdminRoute from './src/routes/AdminRoute';
 
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 200;
@@ -25,13 +26,16 @@ const App = (navigation: any) => {
   const {type, isConnected} = useNetInfo();
   const [splashClosed, setsplashClosed] = useState(false);
   const [userid, setuserid] = useState(null);
+  const [usertype, setusertype] = useState(null);
   const [NetworkModel, setNetworkModel] = useState(false);
 
   useEffect(() => {
     (async () => {
       let user_id = await get_async_data('user_id');
+      let userType = await get_async_data('usertype');
       await requestUserPermission();
       setuserid(user_id);
+      setusertype(userType);
       setsplashClosed(true);
       SplashScreen.hide();
     })();
@@ -50,25 +54,25 @@ const App = (navigation: any) => {
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-
     if (enabled) {
       // console.log('Authorization status:', authStatus);
     }
   }
 
   // Register background handler
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    await silent_call(remoteMessage.notification?.body);
-  });
+  // messaging().setBackgroundMessageHandler(async remoteMessage => {
+  //   await silent_call(remoteMessage.notification?.body);
+  // });
 
   // foreground handler
-  messaging().onMessage(async remoteMessage => {
-    if(remoteMessage.notification?.body == '2') {
-      // Alert.alert(`${remoteMessage.notification?.title}`)
-    } else{
-      await silent_call(remoteMessage.notification?.body);
-    }
-  });
+  // messaging().onMessage(async remoteMessage => {
+  //   console.log('notificatio recived', remoteMessage)
+  //   if (remoteMessage.notification?.body == '2') {
+  //     Alert.alert(`${remoteMessage.notification?.title}`)
+  //   } else {
+  //     await silent_call(remoteMessage.notification?.body);
+  //   }
+  // });
 
   return (
     <NavigationContainer>
@@ -95,8 +99,17 @@ const App = (navigation: any) => {
               </View>
             </View>
           ) : (
-            // locationaccess == false ? (<LocationAccess />) :
-            <>{userid != null ? <MainRoute></MainRoute> : <Route></Route>}</>
+            <>
+              {userid != null ? (
+                usertype == 'Admin' ? (
+                  <AdminRoute></AdminRoute>
+                ) : (
+                  <MainRoute></MainRoute>
+                )
+              ) : (
+                <Route></Route>
+              )}
+            </>
           )}
         </>
       ) : null}

@@ -1,4 +1,4 @@
-import {View, Text, ActivityIndicator} from 'react-native';
+import {View, Text, ActivityIndicator, TextInput} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HistoryHeader from './component/HistoryHeader';
 import HistoryContent from './component/HistoryContent';
@@ -22,7 +22,6 @@ const HistoryScreen = ({navigation}: {navigation: any}) => {
     (async () => {
       let user_id = await get_async_data('user_id');
       const response = await get_history(user_id);
-
       if (response.status == 'success') {
         sethistory(response.data);
       }

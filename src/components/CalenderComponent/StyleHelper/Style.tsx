@@ -1,4 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground } from 'react-native';
 const {width, height} = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
@@ -22,5 +22,20 @@ export const styles = StyleSheet.create({
     padding: 10,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+  }
+});
+
+export const searchBox = StyleSheet.create({
+  container: {
+    width: '95%',
+    maxHeight: 200,
+    ImageBackground: '#fff',
+    overflow: 'scroll'
+  },
+  item: {
+    width: '100%',
+    borderBottomWidth: 1,
+    padding: 10,
+    borderBottomColor: '#CCDDE4'
   }
 });

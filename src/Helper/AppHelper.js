@@ -10,6 +10,7 @@ export const BASE_URL = 'https://portal.plancare.pk/public/api/';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk/';
 global.DateArray = [];
 
+// CLIENT API'S
 const LOGIN_NURSE = BASE_URL + 'login_nurse';
 const GET_HISTORY = BASE_URL + 'get_history';
 const UPDATE_PASSWORD = BASE_URL + 'update_password';
@@ -20,12 +21,17 @@ const START_SHIFT = BASE_URL + 'attendance';
 const LEAVE_REQUEST = BASE_URL + 'leave_request';
 const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
 export const UPDATE_PROFILE = BASE_URL + 'update_profile';
+export const SAVE_FCM_TOKEN = BASE_URL + 'save_fcm_token';
 export const GET_FCM_DATA = BASE_URL + 'get_fcm_data';
+
+// ADMIN API'S
+export const GET_LEADS = BASE_URL + 'get_leads';
+export const GET_STAFF = BASE_URL + 'get_staff';
+export const SAVE_ASSIGN_NURSE = BASE_URL + 'save_assign_nurse';
+export const VIEW_ASSIGNED_STAFF = BASE_URL + 'assgin_nurse_list';
 
 const SERVER_KEY =
   'AAAAmzW3rHI:APA91bGAsh3wBhIWdqcCXONJANfSErv163AKycDk0y1wQ5dd5n3_Y6iNpsFH6mGjvF42LYQpBBDm-jlD9NUehbb4J_q0QwkWJDZPDBKUeWVc7vFhLe_JnhjdT7KhJF2EoCZsGEyFxXnr';
-const TOKEN =
-  'e4xf-NXaRfWqXbg49zITqO:APA91bEVPLVYf00rIsXtKnGV39v4vi9e5ci3hffrqvNSE4hj-DNGohjniGLrap501ouaCjg2DqwN96iHYuweNqE4Ffa5o5RnaqLDb0Um93uiuEIs4GQrHrIEyNMy9aFskYPvZxlY0Za7';
 
 export const loginNurse = async (phone, password) => {
   let obj = {phone: phone, password: password};
@@ -370,6 +376,24 @@ export const generateFCM = async () => {
   await set_async_data('fcm_token', token);
 };
 
+export const save_fcm_token = async () => {
+  let user_id = await get_async_data('user_id');
+  let fcm_token = await get_async_data('fcm_token');
+  const request = await fetch(SAVE_FCM_TOKEN, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify({
+      user_id: user_id,
+      token: fcm_token,
+    }),
+  });
+  const response = await request.json();
+  return response;
+};
+
 export const silent_call = async id => {
   const user_id = await get_async_data('user_id');
   if (id == '0') {
@@ -448,6 +472,54 @@ export const silent_call = async id => {
   }
 };
 
+export const get_leads = async () => {
+  const request = await fetch(GET_LEADS, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const get_staff = async () => {
+  const request = await fetch(GET_STAFF, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  });
+  const response = await request.json();
+  return response.data;
+};
+
+export const save_assign_nurse = async obj => {
+  const request = await fetch(SAVE_ASSIGN_NURSE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(obj),
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const view_assigned_staff = async () => {
+  const request = await fetch(VIEW_ASSIGNED_STAFF, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+  });
+  const response = await request.json();
+  return response;
+};
 // -----------------------------------------------------------------------------------------------------------------
 
 // CUCTOM DATE PICKER HELPER FUNCTIONS

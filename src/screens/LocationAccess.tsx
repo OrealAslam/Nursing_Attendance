@@ -6,14 +6,16 @@ import {
   BackHandler,
   TouchableOpacity,
   ImageBackground,
+  PermissionsAndroid,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import Geolocation from '@react-native-community/geolocation';
 
 const {width} = Dimensions.get('window');
 const containerRatio = (width - 50) / 1272;
 
-const LocationAccess = () => {
+const LocationAccess = ({navigation}: {navigation: any}) => {
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -30,16 +32,7 @@ const LocationAccess = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => {
-              Geolocation.getCurrentPosition(position => {
-                console.log(position.coords.latitude)
-                console.log(position.coords.longitude)
-              },
-              error => {
-                console.log('Erorr: ', error);
-              },
-              );
-            }}>
+            onPress={() => navigation.navigate('LoginScreen')}>
             <Text style={[styles.button, {color: '#FF6582'}]}>ACCEPT</Text>
           </TouchableOpacity>
         </View>
@@ -47,6 +40,7 @@ const LocationAccess = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -81,5 +75,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
 export default LocationAccess;

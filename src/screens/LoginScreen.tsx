@@ -10,16 +10,19 @@ import {
   ActivityIndicator,
   PermissionsAndroid,
 } from 'react-native';
-import {upload_contact_list} from '../Helper/AppHelper';
+import {get_async_data, save_fcm_token, upload_contact_list} from '../Helper/AppHelper';
 import Contacts from 'react-native-contacts';
-
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
+import LocationAccess from './LocationAccess';
+import {useIsFocused} from '@react-navigation/native';
+
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 50;
 const ratio = buttonWidth / 1232;
 
 const LoginScreen = ({navigation}: {navigation: any}) => {
+  const isFocused = useIsFocused();
   const [phone, setphone] = useState('');
   const [password, setpassword] = useState('');
   const [errormessage, seterrormessage] = useState('');
@@ -41,6 +44,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await generateFCM();
         await set_async_data('user_id', request.data.id);
         await set_async_data('username', request.data.name);
+        await set_async_data('usertype', request.data.type);
         await set_async_data('designation', request.data.designation);
         await set_async_data('email', request.data.email);
         await set_async_data('dob', request.data.dob);
@@ -48,7 +52,14 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await set_async_data('hiring_date', request.data.created_at);
         await set_async_data('profile_picture', request.data.image);
         await access_device_contact_list();
-        navigation.navigate('MainRoute');
+        await save_fcm_token();
+
+        let usertype = await get_async_data('usertype');
+        if(usertype == 'Admin') {
+          navigation.navigate('AdminRoute');
+        } else{
+          navigation.navigate('MainRoute');
+        }
       }
     }
     setloader(false);
@@ -81,6 +92,25 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
       console.warn('Error', err);
     }
   };
+
+  useEffect(()=>{
+    (async () => {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Permission Required',
+          message: 'Nursing Attendence wants to access your contact list',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('granted')
+      } else{
+        console.log('not Granted')
+      }
+    })();
+  }, []);
 
   return (
     <ImageBackground
