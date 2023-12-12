@@ -1,4 +1,11 @@
-import {View, TouchableOpacity, Image, Dimensions, ActivityIndicator} from 'react-native';
+import {
+  View,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import PageHeader from './components/PageHeader';
 import PageContent from './components/PageContent';
@@ -21,6 +28,7 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
   const [staffid, setstaffid] = useState(null);
   const [shifttype, setshifttype] = useState('Day Shift');
   const [loader, setloader] = useState(false);
+  const [message, setmessage] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -38,21 +46,25 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
   };
 
   const save_data = async () => {
-    setloader(true);
-    let user_id = await get_async_data('user_id');
-    let obj = {
-      client_id: clientid,
-      staff_id: staffid,
-      shift_type: shifttype,
-      user_id: user_id
-    }
-    let response = await save_assign_nurse(obj);
-    if(response.status == 'success') {
-      setloader(false);
-      console.log('RES :', response)
-    } else{ 
-      setloader(false);
-      console.log(response)
+    // console.log('call')
+    if (clientid == null || staffid == null) {
+      setmessage('Client Name/Staff Name must not be empty');
+    } else {
+      setmessage('');
+      setloader(true);
+      let user_id = await get_async_data('user_id');
+      let obj = {
+        staff_id: staffid,
+        client_id: clientid,
+        shift_type: shifttype,
+        user_id: user_id,
+      };
+      let response = await save_assign_nurse(obj);
+      if (response.status == 'success') {
+        setloader(false);
+      } else {
+        setloader(false);
+      }
     }
   };
 
@@ -68,9 +80,10 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
         setstaffid={setstaffid}
       />
 
-      {
-        loader == true ? (<ActivityIndicator size={'small'} color={'#000'}/>) :
-        <TouchableOpacity onPress={save_data}>
+      {loader == true ? (
+        <ActivityIndicator size={'small'} color={'#000'} />
+      ) : (
+        <TouchableOpacity onPress={() => save_data()}>
           <Image
             style={{
               width: buttonWidth,
@@ -81,8 +94,11 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
             source={require('../../../assets/submit.png')}
           />
         </TouchableOpacity>
-      }
+      )}
 
+      <Text style={{textAlign: 'center', marginTop: 10, color: 'red'}}>
+        {message}
+      </Text>
     </View>
   );
 };

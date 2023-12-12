@@ -12,7 +12,7 @@ const {width, height} = Dimensions.get('window');
 const PageHeader = (props: any) => {
   return (
     <View style={styles.headerContainer}>
-      <TouchableOpacity onPress={() => props.navigateScreen('AdminDshboard')}>
+      <TouchableOpacity style={{paddingVertical: 10}} onPress={() => props.navigateScreen('AdminDshboard')}>
         <Image
           style={styles.backIcon}
           source={require('../../../../assets/backicon.png')}

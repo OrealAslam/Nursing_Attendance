@@ -1,13 +1,15 @@
 import {View, Text, TouchableOpacity, Image, Linking} from 'react-native';
 import React, {useState} from 'react';
 import {HeaderStyle, ImagePicker} from '../profilestyles';
-import {IMAGE_BASE_URL} from '../../../Helper/AppHelper';
+import {IMAGE_BASE_URL} from '../../../../Helper/AppHelper';
 import * as Picker from 'react-native-image-picker';
 
 const ProfileHeader = (props: any) => {
 
   let uploadImage = async (imageData: any) => {
     const formdata = new FormData();
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", "multipart/form-data");
     // formdata.append('image', {
     //   originalName: imageData.fileName,
     //   mimeType: imageData.type,
@@ -24,7 +26,7 @@ const ProfileHeader = (props: any) => {
       type: imageData.type,
       name: imageData.fileName,
     });
-    props.setimageData(formdata?._parts[0][1]);
+    props.setimageData(formdata._parts[0][1]);
   };
 
   return (
@@ -32,10 +34,10 @@ const ProfileHeader = (props: any) => {
       <View style={HeaderStyle.headerContainer}>
         <TouchableOpacity
           style={{padding: 5}}
-          onPress={() => props.navigateScreen('DashboardScreen')}>
+          onPress={() => props.navigateScreen('AdminDshboard')}>
           <Image
             style={HeaderStyle.backIcon}
-            source={require('../../../assets/backicon.png')}
+            source={require('../../../../assets/backicon.png')}
           />
         </TouchableOpacity>
         <Text style={HeaderStyle.heading}>Profile</Text>
@@ -49,7 +51,7 @@ const ProfileHeader = (props: any) => {
         ) : (
           <Image
             style={ImagePicker.imageStyle}
-            source={require('../../../assets/defaultprofileimage.png')}
+            source={require('../../../../assets/defaultprofileimage.png')}
           />
         )}
 
@@ -77,7 +79,7 @@ const ProfileHeader = (props: any) => {
           style={ImagePicker.editButton}>
           <Image
             style={ImagePicker.editButtonImg}
-            source={require('../../../assets/editprofilepicbtn.png')}
+            source={require('../../../../assets/editprofilepicbtn.png')}
           />
         </TouchableOpacity>
       </View>

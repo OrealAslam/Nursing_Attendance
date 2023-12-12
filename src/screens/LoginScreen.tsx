@@ -9,8 +9,15 @@ import {
   Text,
   ActivityIndicator,
   PermissionsAndroid,
+  Linking,
+  Alert,
+  BackHandler,
 } from 'react-native';
-import {get_async_data, save_fcm_token, upload_contact_list} from '../Helper/AppHelper';
+import {
+  get_async_data,
+  save_fcm_token,
+  upload_contact_list,
+} from '../Helper/AppHelper';
 import Contacts from 'react-native-contacts';
 import React, {useState, useEffect} from 'react';
 import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
@@ -28,6 +35,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [errormessage, seterrormessage] = useState('');
   const [loader, setloader] = useState(false);
   const [contactsaccess, setcontactsaccess] = useState(false);
+  const [locationaccess, setlocationaccess] = useState(false);
 
   const login = async () => {
     setloader(true);
@@ -51,13 +59,12 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await set_async_data('address', request.data.address);
         await set_async_data('hiring_date', request.data.created_at);
         await set_async_data('profile_picture', request.data.image);
-        await access_device_contact_list();
         await save_fcm_token();
 
         let usertype = await get_async_data('usertype');
-        if(usertype == 'Admin') {
+        if (usertype == 'Admin') {
           navigation.navigate('AdminRoute');
-        } else{
+        } else {
           navigation.navigate('MainRoute');
         }
       }
@@ -65,52 +72,59 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
     setloader(false);
   };
 
-  const access_device_contact_list = async () => {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-        {
-          title: 'Permission Required',
-          message: 'Nursing Attendence wants to access your contact list',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        setcontactsaccess(true);
-        Contacts.getAll()
-          .then((contactList: any) => {
-            upload_contact_list(contactList);
-          })
-          .catch((error: any) => {
-            console.error(error);
-          });
-      } else {
-        console.log('Contacts permission denied');
-      }
-    } catch (err) {
-      console.warn('Error', err);
-    }
-  };
-
-  useEffect(()=>{
+  useEffect(() => {
     (async () => {
-      const granted = await PermissionsAndroid.request(
+      console.log('called')
+      const locationPermissionGranted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
           title: 'Permission Required',
-          message: 'Nursing Attendence wants to access your contact list',
+          message: 'PlanCare wants to access your location',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
         },
       );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('granted')
-      } else{
-        console.log('not Granted')
+      if (locationPermissionGranted === 'granted') {
+        //  Access Location
+        const contactsPermissionGranted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+          {
+            title: 'Permission Required',
+            message: 'PlanCare wants to access your contact list',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (contactsPermissionGranted != 'granted') {
+          Alert.alert(
+            'PlaneCare',
+            'PlanCare wants to access your contact list. Kindly give permission from app settings',
+            [
+              {
+                text: 'Cancel',
+                onPress: () => BackHandler.exitApp(),
+                style: 'cancel',
+              },
+              {text: 'Open Settings', onPress: () => Linking.openSettings()},
+            ],
+          );
+        }
+      } else {
+        Alert.alert(
+          'PlaneCare',
+          'PlanCare wants to access your location kindly give permission from app settings',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => BackHandler.exitApp(),
+              style: 'cancel',
+            },
+            {text: 'Open Settings', onPress: () => Linking.openSettings()},
+          ],
+        );
       }
     })();
-  }, []);
+  }, [isFocused]);
 
   return (
     <ImageBackground

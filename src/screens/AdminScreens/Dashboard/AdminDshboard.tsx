@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {View, BackHandler} from 'react-native';
 import React, {useState} from 'react';
 import AdminDashboardHeader from './components/AdminDashboardHeader';
 import StartTimerModel from '../../../components/StartTimerModel';

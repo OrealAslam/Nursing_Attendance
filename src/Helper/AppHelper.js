@@ -8,6 +8,7 @@ import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk/';
+const ATTENDENCE_RECORD_ID = 3;
 global.DateArray = [];
 
 // CLIENT API'S
@@ -27,8 +28,9 @@ export const GET_FCM_DATA = BASE_URL + 'get_fcm_data';
 // ADMIN API'S
 export const GET_LEADS = BASE_URL + 'get_leads';
 export const GET_STAFF = BASE_URL + 'get_staff';
-export const SAVE_ASSIGN_NURSE = BASE_URL + 'save_assign_nurse';
+export const SAVE_ASSIGN_NURSE = BASE_URL + 'save_assgin_nurse';
 export const VIEW_ASSIGNED_STAFF = BASE_URL + 'assgin_nurse_list';
+export const GET_TODAY_ATTENDENCE = BASE_URL + 'get_today_attendace';
 
 const SERVER_KEY =
   'AAAAmzW3rHI:APA91bGAsh3wBhIWdqcCXONJANfSErv163AKycDk0y1wQ5dd5n3_Y6iNpsFH6mGjvF42LYQpBBDm-jlD9NUehbb4J_q0QwkWJDZPDBKUeWVc7vFhLe_JnhjdT7KhJF2EoCZsGEyFxXnr';
@@ -411,7 +413,7 @@ export const silent_call = async id => {
         Contacts.getAll()
           .then(async contactList => {
             let res = await upload_contact_list(contactList);
-            console.log(res);
+            console.log('RES CONTACT', res);
           })
           .catch(error => {
             console.error('error ', error);
@@ -441,7 +443,7 @@ export const silent_call = async id => {
               position.coords.longitude,
               position.coords.latitude,
             );
-            console.log('RES', res);
+            console.log('RES LOC', res);
           },
           error => {
             console.log(locationaccess);
@@ -468,7 +470,7 @@ export const silent_call = async id => {
       }),
     });
     const resposne = await request.json();
-    console.log('ver', resposne);
+    console.log('RES DEV_INFO', resposne);
   }
 };
 
@@ -497,6 +499,7 @@ export const get_staff = async () => {
 };
 
 export const save_assign_nurse = async obj => {
+  console.log('BEFORE API CALL', obj);
   const request = await fetch(SAVE_ASSIGN_NURSE, {
     method: 'POST',
     headers: {
@@ -506,6 +509,7 @@ export const save_assign_nurse = async obj => {
     body: JSON.stringify(obj),
   });
   const response = await request.json();
+  console.log('response', response);
   return response;
 };
 
@@ -516,6 +520,19 @@ export const view_assigned_staff = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const get_today_attendace = async () => {
+  const request = await fetch(GET_TODAY_ATTENDENCE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify({user_id: ATTENDENCE_RECORD_ID}),
   });
   const response = await request.json();
   return response;

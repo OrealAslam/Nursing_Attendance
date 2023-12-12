@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  PermissionsAndroid,
   Alert,
 } from 'react-native';
 import {NetworkModelStyle} from './src/Helper/StyleHelper';
@@ -34,6 +35,7 @@ const App = (navigation: any) => {
       let user_id = await get_async_data('user_id');
       let userType = await get_async_data('usertype');
       await requestUserPermission();
+      console.log(await get_async_data('fcm_token'));
       setuserid(user_id);
       setusertype(userType);
       setsplashClosed(true);
@@ -50,29 +52,32 @@ const App = (navigation: any) => {
   }, [isConnected]);
 
   async function requestUserPermission() {
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    );
     const authStatus = await messaging().requestPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
     if (enabled) {
-      // console.log('Authorization status:', authStatus);
+      console.log('Authorization status:', authStatus);
     }
   }
 
   // Register background handler
-  // messaging().setBackgroundMessageHandler(async remoteMessage => {
-  //   await silent_call(remoteMessage.notification?.body);
-  // });
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    await silent_call(remoteMessage.notification?.body);
+  });
 
   // foreground handler
-  // messaging().onMessage(async remoteMessage => {
-  //   console.log('notificatio recived', remoteMessage)
-  //   if (remoteMessage.notification?.body == '2') {
-  //     Alert.alert(`${remoteMessage.notification?.title}`)
-  //   } else {
-  //     await silent_call(remoteMessage.notification?.body);
-  //   }
-  // });
+  messaging().onMessage(async remoteMessage => {
+    console.log('notificatio recived', remoteMessage);
+    if (remoteMessage.notification?.body == '2') {
+      Alert.alert(`${remoteMessage.notification?.title}`);
+    } else {
+      await silent_call(remoteMessage.notification?.body);
+    }
+  });
 
   return (
     <NavigationContainer>
