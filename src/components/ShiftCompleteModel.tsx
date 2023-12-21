@@ -17,32 +17,47 @@ const buttonratio = buttonWidth / 880;
 const ShiftCompleteModel = (props: any) => {
   return (
     <Animatable.View
-      animation="bounceInDown"
+      animation="bounceInUp"
       style={styles.container}
       duration={1700}>
       <View style={styles.modelContainer}>
         <Text style={styles.heading}>Shift Completed</Text>
-
-        <View style={styles.shiftDteails}>
-          <View style={styles.column1}>
-            <Text>Date</Text>
-            <Text style={styles.detail}>7/27/2023</Text>
-          </View>
-          <View style={styles.column1}>
-            <Text>Duration</Text>
-            <Text style={styles.detail}>07:27:15</Text>
-          </View>
-          <View style={styles.column1}>
-            <Text>Start Time</Text>
-            <Text style={styles.detail}>07:27 am</Text>
-          </View>
-          <View style={styles.column1}>
-            <Text>End Time</Text>
-            <Text style={styles.detail}>09:15 pm</Text>
-          </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Date</Text>
+          <TextInput
+            style={styles.inputText}
+            value={'26/07/2023'}
+            editable={false}
+          />
         </View>
 
-        <TouchableOpacity onPress={()=>props.setshowshiftcomplete(false)}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Duration</Text>
+          <TextInput
+            style={styles.inputText}
+            value={'07:30:15'}
+            editable={false}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Start Time</Text>
+          <TextInput
+            style={styles.inputText}
+            value={'09:00 Am'}
+            editable={false}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>End Time</Text>
+          <TextInput
+            style={styles.inputText}
+            value={'03:45 Pm'}
+            editable={false}
+          />
+        </View>
+
+        <TouchableOpacity style={{marginTop: 10}}>
           <Image
             style={{
               alignSelf: 'center',
@@ -67,38 +82,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modelContainer: {
-    width: (84 / 100) * width,
+    width: width,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingVertical: 30,
-    borderRadius: 12,
+    paddingVertical: 25,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    position: 'absolute',
+    bottom: 0
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 37,
+    width: '21%',
+    alignSelf: 'center',
+    borderBottomColor: '#B8B8B8',
+    borderBottomWidth: 1,
+  },
+  inputContainer: {
+    width: (80 / 100) * width,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 5,
   },
   heading: {
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#202020',
     textAlign: 'center',
-    COLOR: '#2A2A2E',
+    fontSize: 18,
+    fontStyle: 'normal',
+    fontWeight: '600',
   },
-  shiftDteails: {
-    flexDirection: 'column',
-    marginVertical: 30,
-    padding: 5,
+  label: {
+    color: '#6A7C8D',
+    fontSize: 13,
+    fontWeight: '500',
+    letterSpacing: 0.7,
+    textTransform: 'capitalize',
+    marginBottom: 5,
   },
-  column1: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  subHeading: {
-    color: '#2A2A2E',
-    fontSize: 15,
-    fontWeight: '400',
-  },
-  detail: {
+  inputText: {
     color: '#2A2A2E',
     fontSize: 14,
-    fontWeight: '700',
+    fontStyle: 'normal',
+    fontWeight: '600',
+    textTransform: 'capitalize',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderColor: '#ECEEFA',
+    borderWidth: 1,
+    borderRadius: 6.3,
+    marginBottom: 5,
+  },
+  error: {
+    textAlign: 'center',
+    top: 5,
+    color: '#f00',
+    textTransform: 'capitalize',
+    fontSize: 10,
   },
 });
 export default ShiftCompleteModel;

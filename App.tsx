@@ -15,13 +15,14 @@ import {
   Dimensions,
   PermissionsAndroid,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import {NetworkModelStyle} from './src/Helper/StyleHelper';
 import AdminRoute from './src/routes/AdminRoute';
 
 const {width, height} = Dimensions.get('window');
-const buttonWidth = width - 200;
-const buttonratio = buttonWidth / 480;
+const buttonWidth = width - 180;
+const buttonratio = buttonWidth / 560;
 
 const App = (navigation: any) => {
   const {type, isConnected} = useNetInfo();
@@ -35,7 +36,7 @@ const App = (navigation: any) => {
       let user_id = await get_async_data('user_id');
       let userType = await get_async_data('usertype');
       await requestUserPermission();
-      console.log(await get_async_data('fcm_token'));
+      // console.log(await get_async_data('fcm_token'));
       setuserid(user_id);
       setusertype(userType);
       setsplashClosed(true);
@@ -84,12 +85,19 @@ const App = (navigation: any) => {
       {splashClosed ? (
         <>
           {NetworkModel == true ? (
-            <View style={NetworkModelStyle.container}>
+            <ImageBackground
+              source={require('./src/assets/appbackground.png')}
+              style={NetworkModelStyle.container}>
               <View style={NetworkModelStyle.modelContainer}>
-                <Text style={NetworkModelStyle.heading}>Network Error</Text>
+                <Image
+                  style={NetworkModelStyle.imgIcon}
+                  source={require('./src/assets/networkerror.png')}
+                />
+                <Text style={[NetworkModelStyle.heading, {marginTop: 10}]}>Network Error</Text>
                 <Text style={NetworkModelStyle.description}>
-                  Failed to connect to Internet. Try again Later!
+                  Failed to connect to Internet
                 </Text>
+                <Text style={[NetworkModelStyle.description, {marginBottom: 10}]}>Please Try again later!</Text>
                 <TouchableOpacity onPress={() => BackHandler.exitApp()}>
                   <Image
                     style={{
@@ -102,7 +110,7 @@ const App = (navigation: any) => {
                   />
                 </TouchableOpacity>
               </View>
-            </View>
+            </ImageBackground>
           ) : (
             <>
               {userid != null ? (

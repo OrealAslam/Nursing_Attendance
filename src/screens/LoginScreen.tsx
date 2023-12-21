@@ -183,15 +183,22 @@ const styles = StyleSheet.create({
     height: 31.06,
     alignSelf: 'center',
   },
+  headerHeading: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '300'
+  },
   containerOne: {
-    flex: 2,
+    width: width,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 30
   },
   containerTwo: {
-    flex: 2,
+    width: width,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 50
   },
   textInput: {
     alignSelf: 'center',
@@ -200,11 +207,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 20,
+    color: '#9C9B9B'
   },
   containerThree: {
-    flex: 2,
+    width: width,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    bottom: 50
   },
   saveButton: {
     width: buttonWidth,

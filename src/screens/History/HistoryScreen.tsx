@@ -1,4 +1,9 @@
-import {View, Text, ActivityIndicator, TextInput} from 'react-native';
+import {
+  ActivityIndicator,
+  ImageBackground,
+  Dimensions,
+  View,
+} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HistoryHeader from './component/HistoryHeader';
 import HistoryContent from './component/HistoryContent';
@@ -8,6 +13,9 @@ import {useIsFocused} from '@react-navigation/native';
 import StopWatch from '../../components/Stopwatch';
 import moment from 'moment';
 import TimerHook from '../../components/TimerHook';
+import Label from './component/Label';
+
+const {width, height} = Dimensions.get('window');
 
 const HistoryScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();
@@ -29,15 +37,27 @@ const HistoryScreen = ({navigation}: {navigation: any}) => {
     })();
   }, [isFocused]);
 
-
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    <ImageBackground
+      style={{width: width, height: height}}
+      source={require('../../assets/appbackground.png')}>
       <HistoryHeader navigateScreen={navigateScreen} />
-      {
-        loader == true ? (<ActivityIndicator size={'large'} color={'#e0e0e0'} />) : 
-        <HistoryContent history={history}/>
-      }
-    </View>
+      <View
+        style={{
+          width: width,
+          height: '100%',
+          borderTopLeftRadius: 35,
+          borderTopRightRadius: 35,
+          backgroundColor: '#fff',
+          paddingVertical: 15,
+        }}>
+        {loader == true ? (
+          <ActivityIndicator size={'large'} color={'#e0e0e0'} />
+        ) : (
+          <HistoryContent history={history} />
+        )}
+      </View>
+    </ImageBackground>
   );
 };
 

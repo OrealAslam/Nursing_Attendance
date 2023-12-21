@@ -7,8 +7,20 @@ const ratio = buttonWidth / 1232;
 export const HeaderStyle = StyleSheet.create({
   headerContainer: {
     width: width,
-    padding: 15,
+    height: (15 / 100) * height,
+    paddingHorizontal: 15,
+    paddingTop: 20,
     flexDirection: 'row',
+    alignItems: 'flex-start'
+  },
+  col1: {
+    width: (8 / 100) * width,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  col2: {
+    width: (80 / 100) * width,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   backIcon: {
@@ -16,29 +28,29 @@ export const HeaderStyle = StyleSheet.create({
     height: 13.87,
   },
   heading: {
-    color: '#2A2A2E',
+    color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-    marginLeft: '37%',
   },
 });
 
 export const ImagePicker = StyleSheet.create({
   container: {
     width: width,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    top: '-7%'
   },
   imageStyle: {
-    width: 116,
-    height: 116,
-    borderRadius: 100
+    width: 101,
+    height: 101,
+    borderRadius: 100,
+    borderWidth: 3,
+    borderColor: '#fff'
   },
   editButton: {
     position: 'absolute',
-    bottom: 10,
-    left: '62%',
+    bottom: 0,
+    left: '57%',
   },
   editButtonImg: {
     width: 27.8,
@@ -51,30 +63,41 @@ export const ImagePicker = StyleSheet.create({
   },
 });
 
+export const MainContainer = StyleSheet.create({
+  container: {
+    width: width,
+    height: '100%',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+  },
+});
+
 export const TextArea = StyleSheet.create({
   inputContainer: {
-    width: (85 / 100) * width,
+    width: (88 / 100) * width,
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom: 20
+    marginBottom: 10,
   },
   label: {
-    color: '#A1A1A1',
-    fontSize: 12,
-    fontWeight: '400',
-    marginBottom: 5
+    color: '#6A7C8D',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 5,
   },
-  inputText:{
-    color: '#2A2A2E',
+  inputText: {
+    color: '#515151',
     fontSize: 16,
     fontWeight: '600',
     textTransform: 'capitalize',
-    paddingVertical: 0,
-    borderBottomColor: '#CADFF8',
-    borderBottomWidth: 1
+    paddingHorizontal: 10,
+    borderColor: '#ECEEFA',
+    borderWidth: 1,
+    borderRadius: 7,
   },
   changePasswordText: {
     color: '#A1A1A1',
-    fontSize: 13
-  }
+    fontSize: 13,
+  },
 });

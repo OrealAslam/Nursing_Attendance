@@ -5,16 +5,30 @@ import {
   Dimensions,
   StyleSheet,
   Linking,
+  Image,
 } from 'react-native';
 import React from 'react';
 import moment from 'moment';
 
 const {width, height} = Dimensions.get('window');
 
+const timerImgWidth = width - 190;
+const timerImgRatio = timerImgWidth / 353;
+
 const StartTimerModel = (props: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.modelContainer}>
+        <Image
+          style={{
+            width: 88.17,
+            height: 98.78,
+            alignSelf: 'center',
+            marginBottom: 20,
+          }}
+          source={require('../assets/timer.png')}
+        />
+        {/* <Image style={{width:timerImgWidth,height:396*timerImgRatio}} source={require('../assets/timer.png')} /> */}
         {props.locationaccess == false ? (
           <>
             <Text style={styles.heading}>
@@ -25,11 +39,7 @@ const StartTimerModel = (props: any) => {
           <>
             <Text style={styles.heading}>
               Are you sure you want to{' '}
-              {props.shiftstatus == 'started' ? 'end' : 'start'} the care?
-            </Text>
-            <Text style={[styles.heading, {fontWeight: '500'}]}>
-              {/* {props.shiftstatus == 'started' ? 'end' : 'start'} Time:{' '} */}
-              {/* {props.shiftstarttime} */}
+              {props.shiftstatus == 'started' ? 'end' : 'start'} this care?
             </Text>
           </>
         )}
@@ -37,7 +47,9 @@ const StartTimerModel = (props: any) => {
         <View style={styles.buttonContainer}>
           {props.locationaccess == false ? (
             <>
-              <TouchableOpacity style={styles.button} onPress={() => Linking.openSettings()}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => Linking.openSettings()}>
                 <Text style={{color: '#fff'}}>Settings</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -48,15 +60,17 @@ const StartTimerModel = (props: any) => {
             </>
           ) : (
             <>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => props.updateShift('yes')}>
-                <Text style={{color: '#fff'}}>Yes</Text>
+              <TouchableOpacity onPress={() => props.updateShift('yes')}>
+                <Image
+                  style={{width: 93.43, height: 36.71}}
+                  source={require('../assets/yes.png')}
+                />
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, {backgroundColor: '#A7B7DF'}]}
-                onPress={() => props.updateShift('no')}>
-                <Text style={{color: '#fff'}}>No</Text>
+              <TouchableOpacity onPress={() => props.updateShift('no')}>
+                <Image
+                  style={{width: 93.43, height: 36.71}}
+                  source={require('../assets/no.png')}
+                />
               </TouchableOpacity>
             </>
           )}
@@ -75,18 +89,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modelContainer: {
-    width: (84 / 100) * width,
+    width: (85 / 100) * width,
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 30,
-    borderRadius: 12,
+    borderRadius: 18,
   },
   heading: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '500',
-    color: '#000',
+    color: '#6A7C8D',
     textAlign: 'center',
-    marginBottom: 15,
+    marginBottom: 20,
+    textTransform: 'capitalize',
   },
   buttonContainer: {
     flexDirection: 'row',

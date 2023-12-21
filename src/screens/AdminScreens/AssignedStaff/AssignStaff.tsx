@@ -62,6 +62,7 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
       let response = await save_assign_nurse(obj);
       if (response.status == 'success') {
         setloader(false);
+        setmessage('Staff assigned succesfully');
       } else {
         setloader(false);
       }

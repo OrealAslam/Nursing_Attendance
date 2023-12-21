@@ -3,6 +3,7 @@ const {width, height} = Dimensions.get('window');
 const win = Dimensions.get('window');
 const ratioBoardingBG = win.width / 360;
 
+const iconRatio = (width - 190) / 428;
 export const headerStyle = StyleSheet.create({
   header: {
     width: '100%',
@@ -52,26 +53,34 @@ export const headerStyle = StyleSheet.create({
 
 export const NetworkModelStyle = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#0F1E70',
+    width: width,
+    height: height,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modelContainer: {
-    width: (78 / 100) * width,
+    width: (85 / 100) * width,
     backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 8,
+    paddingVertical: 25,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  imgIcon: {
+    width: width - 190,
+    height: 331 * iconRatio,
+    alignSelf: 'center',
+    marginVertical: 10
   },
   heading: {
-    textAlign: 'left',
-    fontSize: 22,
+    fontSize: 19,
     fontWeight: '600',
-    color: '#000',
+    color: '#202020',
   },
   description: {
-    fontSize: 14,
-    marginTop: 20,
-    color: '#000',
+    fontSize: 13,
+    fontWeight: '500',
+    lineHeight: 20,
+    color: '#6A7C8D',
   }
 });

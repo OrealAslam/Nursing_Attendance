@@ -11,61 +11,39 @@ export const HeaderStyle = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  col1: {
+    width: (8 / 100) * width,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  col2: {
+    width: (80 / 100) * width,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   backIcon: {
     width: 7.03,
     height: 13.87,
   },
   heading: {
-    color: '#2A2A2E',
+    color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-    marginLeft: '24%',
   },
 });
 
 export const MainContent = StyleSheet.create({
   container: {
     width: width,
+    height: '100%',
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
   },
   statusMessage: {
     textAlign: 'center',
     textTransform: 'capitalize',
     color: '#818080',
-    marginVertical: 20
+    marginVertical: 20,
   },
-  footerContainer: {
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    width: 80/100 * width,
-    alignSelf: 'center',
-    paddingVertical: 20
-  },
-  column: {
-    flexDirection: 'row', 
-    alignItems: 'center',
-    marginBottom: 10
-  },
-  mark1: {
-    width: 11.33,
-    height: 11.33,
-    backgroundColor: '#F84365',
-    borderRadius: 20
-  },
-  mark2: {
-    width: 11.33,
-    height: 11.33,
-    backgroundColor: '#17D62A',
-    borderRadius: 20
-  },
-  mark3: {
-    width: 11.33,
-    height: 11.33,
-    backgroundColor: '#BDBDBD',
-    borderRadius: 20
-  },
-  statement: {
-    color: '#636363',
-    fontSize: 11,
-    marginLeft: 10
-  }
 });

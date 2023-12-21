@@ -1,39 +1,62 @@
 import {
   View,
-  Image,
-  TouchableOpacity,
   Dimensions,
-  ScrollView,
   Alert,
-  ActivityIndicator,
+  ImageBackground,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HolidayHeader from './components/HolidayHeader';
 import {MainContent} from './holidaystyles';
 import HolidayFooter from './components/HolidayFooter';
-import Calender from '../../components/CalenderComponent/Calender';
 import {leave_request, get_user_leave_request} from '../../Helper/AppHelper';
 import {useIsFocused} from '@react-navigation/native';
+import HolidayCalender from './components/HolidayCalender';
 
 const {width, height} = Dimensions.get('window');
-const buttonWidth = width - 40;
-const buttonRatio = buttonWidth / 1232;
+const buttonWidth = width - 60;
+const buttonRatio = buttonWidth / 1236;
 
-const HolidayScreen = ({navigation}: {navigation: any}) => {
+const HolidayScreen = ({navigation}) => {
   const isFocused = useIsFocused();
   const [submitRequest, setsubmitRequest] = useState('submit');
   const [loader, setloader] = useState(false);
   const [calenderloader, setcalenderloader] = useState(true);
   const [selected, setselected] = useState('');
+  const [markedDates, setmarkedDates] = useState({});
 
   useEffect(() => {
     (async () => {
-      await get_user_leave_request();
+      let data = await get_user_leave_request();
+      objectify(data.data);
       setcalenderloader(false);
     })();
   }, [isFocused]);
 
-  const navigateScreen = (screenName: any) => {
+  const objectify = (arr) => {
+    if(arr.length > 0) {
+      let object = arr.map((item, index)=>{
+        var obj = {};
+        let date = item.date;
+        let cond = item.status;
+
+        var innerObject = {};
+        if(cond == 0 ){innerObject['color'] = '#6AD239'}
+        if(cond == 1 ){innerObject['color'] = '#74CAE3'}
+        if(cond == 2 ){innerObject['color'] = '#FF3366'}
+        innerObject['startingDay'] = true;
+        innerObject['textColor'] = '#fff';
+
+        if(index == arr.length - 1) {
+          innerObject['endingDay'] = true;
+        }
+        obj[date] = innerObject;
+        return obj;
+      });
+      setmarkedDates(object);
+    } else{return ;}
+  }
+
+  const navigateScreen = (screenName) => {
     navigation.navigate(screenName);
   };
 
@@ -61,34 +84,16 @@ const HolidayScreen = ({navigation}: {navigation: any}) => {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    <ImageBackground
+      style={{width: width, height: height}}
+      source={require('../../assets/appbackground.png')}>
       <HolidayHeader navigateScreen={navigateScreen} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {calenderloader == true ? (
-          <ActivityIndicator />
-        ) : (
-          <>
-            <View style={MainContent.container}>
-              <Calender />
-            </View>
 
-            <TouchableOpacity onPress={() => submit_leave_request()}>
-              <Image
-                style={{
-                  width: buttonWidth,
-                  height: 200 * buttonRatio,
-                  alignSelf: 'center',
-                  marginVertical: 15,
-                }}
-                source={require('../../assets/submit.png')}
-              />
-            </TouchableOpacity>
-            <HolidayFooter />
-          </>
-        )}
-      </ScrollView>
-    </View>
+      <View style={[MainContent.container, {paddingVertical: 10}]}>
+        <HolidayCalender markedDates={markedDates} />
+        <HolidayFooter />
+      </View>
+    </ImageBackground>
   );
 };
-
 export default HolidayScreen;

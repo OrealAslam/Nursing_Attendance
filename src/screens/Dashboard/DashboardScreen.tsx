@@ -1,4 +1,4 @@
-import {View, PermissionsAndroid} from 'react-native';
+import {View, PermissionsAndroid, ImageBackground} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
@@ -10,7 +10,7 @@ import {
   formatTimeDifference,
   end_shift,
   start_shift,
-  get_user_leave_request
+  get_user_leave_request,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -29,6 +29,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [longitude, setlongitude] = useState(0);
   const [shiftTime, setshiftTime] = useState('');
   const [locationaccess, setlocationaccess] = useState(false);
+  const [shiftstartat, setshiftstartat] = useState('--:--');
+  const [shiftendat, setshiftendat] = useState('--:--');
+  const [totalwotking, settotalwotking] = useState('--:--');
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -44,6 +47,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
       // API call to start shift
+      setshiftstartat(moment().format('HH:mm'));
       let start_date = moment().format('Y-M-D HH:mm:ss');
       let response = await start_shift(
         leadid,
@@ -65,6 +69,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     if (shiftstatus == 'started' && click == 'yes') {
       // API call to end shift
       let end_date = moment().format('Y-M-D HH:mm:ss');
+      setshiftendat(moment().format('HH:mm'));
       let response = await end_shift(
         leadid,
         attendenceid,
@@ -73,7 +78,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         end_date,
         shiftTime,
       );
-      console.log('API RES :', response);
       if (response.status == 'success') {
         setshiftstatus('ended');
       }
@@ -114,11 +118,19 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log('setshiftstartat', shiftstartat);
+  //   console.log('shiftendat', shiftendat);
+  // }, [shiftstatus]);
+
   useEffect(() => {
     (async () => {
       await get_user_leave_request();
       let request = await get_shift_status();
       if (request.status == 'success') {
+        setshiftstartat(
+          moment(request.attendance_Status.start_time).format('HH:mm'),
+        );
         let status = request.attendance_Status.status;
         setleadid(request.data.lead_id);
         setattendenceid(request.attendance_Status.attendance_id);
@@ -132,6 +144,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           let attendenceNoted = request.attendance_Status.start_time;
           let now = moment(new Date());
           const totalDuration = moment.duration(now.diff(attendenceNoted));
+          settotalwotking(formatTime(totalDuration.hours(), totalDuration.minutes()));
           setworkTime(
             formatTimeDifference(
               totalDuration.hours(),
@@ -144,15 +157,34 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     })();
   }, [isFocused]);
 
+  const formatTime = (hours: any, minutes: any) => {
+    let h = hours.toString();
+    let m = minutes.toString();
+
+    if (h.length < 2) {
+      h = '0' + hours.toString();
+    }
+    if (m.length < 2) {
+      m = '0' + minutes;
+    }
+    return `${h}:${m}`;
+  };
+
   return (
-    <View style={{flex: 1, backgroundColor: '#0F1E70'}}>
+    <ImageBackground
+      style={{width: '100%', height: '100%'}}
+      source={require('../../assets/appbackground.png')}>
       <DashboardHeader navigateScreen={navigateScreen} />
 
       <DashboardContent
+        shiftstatus={shiftstatus}
         setstarttimermodel={setstarttimermodel}
         starttimermodel={starttimermodel}
         shiftstatus={shiftstatus}
         workTime={workTime}
+        shiftendat={shiftendat}
+        shiftstartat={shiftstartat}
+        totalwotking={totalwotking}
       />
 
       <DashboardFooter navigateScreen={navigateScreen} />
@@ -168,7 +200,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           locationaccess={locationaccess}
         />
       )}
-    </View>
+    </ImageBackground>
   );
 };
 export default DashboardScreen;

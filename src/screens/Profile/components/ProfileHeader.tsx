@@ -1,35 +1,57 @@
-import {View, Text, TouchableOpacity, Image, Linking} from 'react-native';
-import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, Image, TextInput} from 'react-native';
+import React from 'react';
+import DocumentPicker from 'react-native-document-picker';
 import {HeaderStyle, ImagePicker} from '../profilestyles';
-import {IMAGE_BASE_URL} from '../../../Helper/AppHelper';
-import * as Picker from 'react-native-image-picker';
+import {IMAGE_BASE_URL, get_async_data, upload_user_image} from '../../../Helper/AppHelper';
 
 const ProfileHeader = (props: any) => {
 
-  let uploadImage = async (imageData: any) => {
-    const formdata = new FormData();
-    // formdata.append('image', {
-    //   originalName: imageData.fileName,
-    //   mimeType: imageData.type,
-    //   error: 0,
-    //   hashName: '',
-    //   pathName: imageData.originalPath,
-    //   fileName: imageData.fileName,
-    //   uri: imageData.uri,
-    //   type: imageData.type,
-    //   name: imageData.fileName,
-    // });
-    formdata.append('image', {
-      uri: imageData.uri,
-      type: imageData.type,
-      name: imageData.fileName,
-    });
-    props.setimageData(formdata?._parts[0][1]);
+  const pickImage = async () => {
+    let username = await get_async_data('username');
+    let dob = await get_async_data('dob');
+    let address = await get_async_data('address');
+    let id = await get_async_data('user_id');
+
+    let finalObj = {
+      id: id,
+      name: username,
+      dob: dob,
+      address: address,
+      image: {},
+    };
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.images],
+      });
+
+      // Upload FiLe Here
+      const formData = new FormData();
+      formData.append('image', {
+        uri: res[0].uri,
+        type: res[0].type,
+        name: res[0].name,
+      });
+      finalObj.image = formData?._parts[0][1];
+
+
+      let response = await upload_user_image(finalObj);
+
+      console.log('RESPONSE', response);
+
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the picker
+        console.log('cancel', err);
+      } else {
+        // Handle other errors
+        console.log('other', err);
+      }
+    }
   };
 
   return (
-    <>
-      <View style={HeaderStyle.headerContainer}>
+    <View style={HeaderStyle.headerContainer}>
+      <View style={HeaderStyle.col1}>
         <TouchableOpacity
           style={{padding: 5}}
           onPress={() => props.navigateScreen('DashboardScreen')}>
@@ -38,50 +60,11 @@ const ProfileHeader = (props: any) => {
             source={require('../../../assets/backicon.png')}
           />
         </TouchableOpacity>
+      </View>
+      <View style={HeaderStyle.col2}>
         <Text style={HeaderStyle.heading}>Profile</Text>
       </View>
-      <View style={ImagePicker.container}>
-        {props.profilepicture != '' ? (
-          <Image
-            style={ImagePicker.imageStyle}
-            source={{uri: IMAGE_BASE_URL + props.profilepicture}}
-          />
-        ) : (
-          <Image
-            style={ImagePicker.imageStyle}
-            source={require('../../../assets/defaultprofileimage.png')}
-          />
-        )}
-
-        <TouchableOpacity
-          onPress={() =>
-            Picker.launchCamera(
-              {
-                assetRepresentationMode: 'auto',
-                mediaType: 'photo',
-                quality: 1,
-                includeBase64: false,
-                presentationStyle: 'overFullScreen',                
-              },
-              async (response: any) => {
-                if (response.didCancel) {
-                  console.log('User cancelled image picker');
-                } else if (response.error) {
-                  console.log('ImagePicker Error: ', response.error);
-                } else {
-                  await uploadImage(response.assets[0]);
-                }
-              },
-            )
-          }
-          style={ImagePicker.editButton}>
-          <Image
-            style={ImagePicker.editButtonImg}
-            source={require('../../../assets/editprofilepicbtn.png')}
-          />
-        </TouchableOpacity>
-      </View>
-    </>
+    </View>
   );
 };
 

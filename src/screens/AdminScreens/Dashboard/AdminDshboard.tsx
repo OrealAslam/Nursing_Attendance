@@ -1,22 +1,33 @@
-import {View, BackHandler} from 'react-native';
+import {ImageBackground, View, Dimensions} from 'react-native';
 import React, {useState} from 'react';
 import AdminDashboardHeader from './components/AdminDashboardHeader';
-import StartTimerModel from '../../../components/StartTimerModel';
 import {useIsFocused} from '@react-navigation/native';
 import AdminDashboardContent from './components/AdminDashboardContent';
 
+const {width, height} = Dimensions.get('window');
 const AdminDshboard = ({navigation}: {navigation: any}) => {
-
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: '#0F1E70'}}>
+    <ImageBackground
+      style={{width: '100%', height: '100%'}}
+      source={require('../../../assets/appbackground.png')}>
       <AdminDashboardHeader navigateScreen={navigateScreen} />
 
-      <AdminDashboardContent navigateScreen={navigateScreen}/>
-    </View>
+      <View
+        style={{
+          width: width,
+          height: '100%',
+          backgroundColor: '#eceefa',
+          borderTopLeftRadius: 60,
+          alignItems: 'center',
+          paddingVertical: 20
+        }}>
+        <AdminDashboardContent navigateScreen={navigateScreen} />
+      </View>
+    </ImageBackground>
   );
 };
 export default AdminDshboard;

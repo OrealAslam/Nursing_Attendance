@@ -4,6 +4,8 @@ import DashboardScreen from '../screens/Dashboard/DashboardScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import HolidayScreen from '../screens/Holiday/HolidayScreen';
 import HistoryScreen from '../screens/History/HistoryScreen';
+import VitalSignScreen from '../screens/VitalSign/VitalSignScreen';
+import NurseNotesScreen from '../screens/NurseNotes/NurseNotesScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +30,16 @@ export default function MainRoute() {
       <Stack.Screen
         name="HistoryScreen"
         component={HistoryScreen}
+        options={{headerShown: false, animationenabled: false}}
+      />
+      <Stack.Screen
+        name="VitalSignScreen"
+        component={VitalSignScreen}
+        options={{headerShown: false, animationenabled: false}}
+      />
+      <Stack.Screen
+        name="NurseNotesScreen"
+        component={NurseNotesScreen}
         options={{headerShown: false, animationenabled: false}}
       />
     </Stack.Navigator>

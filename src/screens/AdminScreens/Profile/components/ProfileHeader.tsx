@@ -8,8 +8,6 @@ const ProfileHeader = (props: any) => {
 
   let uploadImage = async (imageData: any) => {
     const formdata = new FormData();
-    let myHeaders = new Headers();
-    myHeaders.append("Content-Type", "multipart/form-data");
     // formdata.append('image', {
     //   originalName: imageData.fileName,
     //   mimeType: imageData.type,
@@ -27,6 +25,7 @@ const ProfileHeader = (props: any) => {
       name: imageData.fileName,
     });
     props.setimageData(formdata._parts[0][1]);
+    // props.setimageData(formdata._parts[0][1]);
   };
 
   return (

@@ -3,8 +3,8 @@ import React from 'react';
 import { TextArea } from '../profilestyles';
 const {width} = Dimensions.get('window');
 
-const buttonWidth = width - 50;
-const ratio = buttonWidth / 1235;
+const buttonWidth = width - 60;
+const ratio = buttonWidth / 1236;
 
 const FooterComponent = (props:any) => {
   return (
@@ -13,7 +13,7 @@ const FooterComponent = (props:any) => {
         <Image
           style={{
             width: buttonWidth,
-            height: 184 * ratio,
+            height: 200 * ratio,
             alignSelf: 'center',
             marginTop: 45,
           }}

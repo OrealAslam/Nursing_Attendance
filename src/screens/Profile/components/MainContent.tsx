@@ -1,12 +1,12 @@
-import {View, Text, TextInput} from 'react-native';
+import {View, Text, TextInput, ScrollView} from 'react-native';
 import React from 'react';
 import {HeaderStyle, TextArea} from '../profilestyles';
 
 const MainContent = (props: any) => {
   return (
-    <>
+    <ScrollView style={{maxHeight: 370}}>
       <View style={TextArea.inputContainer}>
-        <Text style={TextArea.label}>Your Name</Text>
+        <Text style={TextArea.label}>Name</Text>
         <TextInput
           style={TextArea.inputText}
           value={props.name}
@@ -59,7 +59,7 @@ const MainContent = (props: any) => {
           value={props.email}
         />
       </View>
-    </>
+    </ScrollView>
   );
 };
 

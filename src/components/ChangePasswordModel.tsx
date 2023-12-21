@@ -56,6 +56,8 @@ const ChangePasswordModel = (props: any) => {
       style={styles.container}
       duration={1700}>
       <View style={styles.modelContainer}>
+
+        <Text style={styles.heading}>New Password</Text>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Current Password</Text>
           <TextInput
@@ -89,7 +91,7 @@ const ChangePasswordModel = (props: any) => {
           <ActivityIndicator size={'small'} color={'#000'} />
         ) : (
           <>
-            <TouchableOpacity onPress={() => updatePassword()}>
+            <TouchableOpacity style={{marginTop: 10}} onPress={() => updatePassword()}>
               <Image
                 style={{
                   alignSelf: 'center',
@@ -110,7 +112,6 @@ const ChangePasswordModel = (props: any) => {
     </Animatable.View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     width: width,
@@ -139,14 +140,23 @@ const styles = StyleSheet.create({
     width: (70 / 100) * width,
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom: 30,
+    marginVertical: 10,
+  },
+  heading: {
+    color: '#202020',
+    textAlign: 'center',
+    fontSize: 18,
+    fontStyle: 'normal',
+    fontWeight: '600',
+    // marginBottom: 10,
   },
   label: {
-    color: '#A1A1A1',
-    fontSize: 13,
-    fontWeight: '400',
+    color: '#6A7C8D',
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: .7,
     textTransform: 'capitalize',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   inputText: {
     color: '#2A2A2E',
@@ -154,9 +164,11 @@ const styles = StyleSheet.create({
     fontStyle: 'normal',
     fontWeight: '600',
     textTransform: 'capitalize',
-    paddingVertical: 0,
-    borderBottomColor: '#CADFF8',
-    borderBottomWidth: 1,
+    paddingVertical: 8,
+    borderColor: '#ECEEFA',
+    borderWidth: 1,
+    borderRadius: 6.3,
+    marginBottom: 5
   },
   error: {
     textAlign: 'center',
@@ -166,4 +178,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 });
+
 export default ChangePasswordModel;

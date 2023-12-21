@@ -24,6 +24,10 @@ const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
 export const UPDATE_PROFILE = BASE_URL + 'update_profile';
 export const SAVE_FCM_TOKEN = BASE_URL + 'save_fcm_token';
 export const GET_FCM_DATA = BASE_URL + 'get_fcm_data';
+export const ADD_VITAL_RECORD = BASE_URL + 'add_vital_record';
+export const GET_VITAL_RECORD = BASE_URL + 'get_vital_record';
+export const GET_NURSE_NOTES = BASE_URL + 'get_nurse_note';
+export const ADD_NURSE_NOTES = BASE_URL + 'add_nurse_note';
 
 // ADMIN API'S
 export const GET_LEADS = BASE_URL + 'get_leads';
@@ -167,6 +171,19 @@ export const update_user_profile = async data => {
   // }
 };
 
+export const upload_user_image = async data => {
+  const request = await fetch(UPDATE_PROFILE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(data),
+  });
+  const response = await request.json();
+  return response;
+};
+
 export const get_shift_status = async () => {
   const user_id = await get_async_data('user_id');
   const request = await fetch(SHIFT_STATUS, {
@@ -283,6 +300,7 @@ export const get_user_leave_request = async () => {
   const response = await request.json();
   if (response.status == 'success') {
     global.DateArray = response.data;
+    return response;
   }
 };
 
@@ -509,7 +527,6 @@ export const save_assign_nurse = async obj => {
     body: JSON.stringify(obj),
   });
   const response = await request.json();
-  console.log('response', response);
   return response;
 };
 
@@ -533,6 +550,68 @@ export const get_today_attendace = async () => {
       'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify({user_id: ATTENDENCE_RECORD_ID}),
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const add_vital_record = async obj => {
+  const request = await fetch(ADD_VITAL_RECORD, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(obj),
+  });
+  const response = await request.json();
+  console.log('Add Res', response);
+  return response;
+};
+
+export const get_vital_record = async () => {
+  // let lead_id = await get_async_data('lead_id');
+
+  const request = await fetch(GET_VITAL_RECORD, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify({lead_id: 465}),
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const get_nurse_note = async () => {
+  // let lead_id = await get_async_data('lead_id');
+
+  const request = await fetch(GET_NURSE_NOTES, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify({lead_id: 465}),
+  });
+  const response = await request.json();
+  return response;
+};
+
+export const add_nurse_note = async (note, shift_status) => {
+  const request = await fetch(ADD_NURSE_NOTES, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify({
+      lead_id: 465,
+      staff_id: 1,
+      notes: note,
+      shift_status: shift_status,
+    }),
   });
   const response = await request.json();
   return response;

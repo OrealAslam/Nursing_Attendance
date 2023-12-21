@@ -8,6 +8,7 @@ import {
   editableProfileData,
   get_async_data,
   update_user_profile,
+  UPDATE_PROFILE,
 } from '../../../Helper/AppHelper';
 
 const {width, height} = Dimensions.get('window');
@@ -21,11 +22,42 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [hiringdate, sethiringdate] = useState('');
   const [address, setaddress] = useState('');
   const [profilepicture, setprofilepicture] = useState('');
-  const [imageData, setimageData] = useState(null);
+  const [imageData, setimageData] = useState('');
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
+
+  useEffect(() => {
+    (async () => {
+      // UPDATE PROFILE IMAGE HERE
+      if (imageData != '') {
+        // try {
+        //   let uploadData = new FormData();
+        //   let myHeaders = new Headers();
+        //   let id = await get_async_data('user_id');
+        //   myHeaders.append('Content-Type', 'multipart/form-data');
+        //   let obj = {
+        //     id: id,
+        //     name: name,
+        //     dob: dob,
+        //     address: address,
+        //     image: imageData,
+        //   };
+        //   uploadData.append('data', obj);
+
+        //   const request = await fetch(UPDATE_PROFILE, {
+        //     method: 'POST',
+        //     headers: myHeaders,
+        //     body: uploadData,
+        //   });
+        //   const response = await request.json();
+        // } catch (err) {
+        //   console.log(err);
+        // }
+      }
+    })();
+  }, [imageData]);
 
   useEffect(() => {
     (async () => {
@@ -49,9 +81,9 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       address: address,
       image: '',
     };
-
     let response = await update_user_profile(obj);
-    if(response.status == 'success') {
+
+    if (response.status == 'success') {
       Alert.alert('Updated', 'Profile Updated Successfully');
     }
   };
