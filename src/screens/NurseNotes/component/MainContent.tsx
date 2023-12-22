@@ -5,57 +5,21 @@ import {
   ScrollView,
   Text,
   Modal,
-  Alert,
   StyleSheet,
   TextInput,
   ActivityIndicator,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {ContentStyle, CardStyle} from '../notestyles';
-import {add_nurse_note, get_nurse_note} from '../../../Helper/AppHelper';
+import {add_nurse_note} from '../../../Helper/AppHelper';
 import moment from 'moment';
-import {useIsFocused} from '@react-navigation/native';
 
 const MainContent = (props: any) => {
-  const isFocused = useIsFocused();
-  const [select, setselect] = useState('morning');
-  const [apidata, setapidata] = useState([]);
-  const [filterdata, setfilterdata] = useState([]);
+  const [result, setresult] = useState(props.data);
   const [modal, setmodal] = useState(false);
   const [loader, setloader] = useState(false);
   const [description, setdescription] = useState('');
-  const [shift, setshift] = useState('morning');
-
-  useEffect(() => {
-    (async () => {
-      let requestData = await get_nurse_note();
-      setfilterdata(requestData);
-      setapidata(requestData);
-    })();
-  }, [isFocused]);
-
-  // useEffect(() => {
-  //   if(apidata.length > 0) {
-  //     setfilterdata(searchByShift(apidata, select));
-  //     console.log(filterdata.length);
-  //   }
-  // }, [select]);
-
-  const displayRecord = () => {
-    let list = filterdata.map((item: any, index: any) => {
-      return (
-        <View style={CardStyle.card} key={index}>
-          <Text style={CardStyle.time}>
-            {moment(item.created_at).format('HH:mm A')}
-          </Text>
-          <View style={CardStyle.mainDescription}>
-            <Text>{item.notes}</Text>
-          </View>
-        </View>
-      );
-    });
-    return list;
-  };
+  const [shift, setshift] = useState('');
 
   const saveRecord = async () => {
     setloader(true);
@@ -66,32 +30,83 @@ const MainContent = (props: any) => {
     }
   };
 
-  const searchByShift = (array: any, date: string) => {
-    return array.find((item: any) => item.shift_status === date);
+  const displayRecord = () => {
+
+    if(result != undefined) {
+      let list = result.map((item: any, index: any) => {
+        return (
+          <View style={CardStyle.card} key={index}>
+            <Text style={CardStyle.time}>
+              {moment(item.created_at).format('HH:mm A')}
+            </Text>
+            <View style={CardStyle.mainDescription}>
+              <Text>{item.notes}</Text>
+            </View>
+          </View>
+        );
+      });
+      return list;
+    }
   };
+
+  const searchByShiftTime = (array: any, time: string, date:string) => {
+    let filter = [];
+    if(shift != '') {
+      filter = array.filter((item:any) => item.shift_status === time);
+      if(date != ''){
+        filter = filter.filter((record:any) => record.created_at.startsWith(moment(date).format('YYYY-MM-DD')));
+      }
+      return filter;
+    } else{
+      if(date != ''){
+        filter = props.data.filter((record:any) => record.created_at.startsWith(moment(date).format('YYYY-MM-DD')));
+        return filter;
+      } else{ 
+        return props.data;
+      }
+    }
+  };
+
+  useEffect(() => {
+    setresult(props.data);
+    let data = searchByShiftTime(props.data, shift, props.datestring);
+    setresult(data);
+  }, [shift, props.data, props.datestring]);
+
+
+  // const testFunc = () => {
+  //   const data = [
+  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 15:36:04", "id": 1, "lead_id": 465, "notes": "Morning desc", "shift_status": "morning", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
+  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-21 15:29:07", "id": 2, "lead_id": 465, "notes": "My test description", "shift_status": "night", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
+  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 12:20:06", "id": 3, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
+  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-02 12:19:14", "id": 4, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
+  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-11 12:18:53", "id": 5, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0}
+  //   ];    
+  //   const filteredRecords = data.filter(record => record.created_at.startsWith("2023-12-20"));    
+  // }
 
   return (
     <View style={ContentStyle.container}>
       <View style={ContentStyle.navigation}>
         <TouchableOpacity
-          onPress={() => setselect('morning')}
+          onPress={() => setshift('morning')}
           style={{marginHorizontal: 10}}>
           <Image
             style={ContentStyle.navImage}
             source={
-              select == 'morning'
+              shift == 'morning'
                 ? require('../../../assets/morning.png')
                 : require('../../../assets/morningunselect.png')
             }
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => setselect('night')}
+          onPress={() => setshift('night')}
           style={{marginHorizontal: 10}}>
           <Image
             style={ContentStyle.navImage}
             source={
-              select == 'night'
+              shift == 'night'
                 ? require('../../../assets/night.png')
                 : require('../../../assets/nightunselect.png')
             }
@@ -102,22 +117,23 @@ const MainContent = (props: any) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={ContentStyle.cardContainer}>{displayRecord()}</View>
       </ScrollView>
-
-      <TouchableOpacity
-        onPress={() => {
-          setmodal(true);
-        }}>
-        <Image
-          style={{
-            width: 53,
-            height: 53,
-            alignSelf: 'center',
-            position: 'absolute',
-            bottom: 210,
-          }}
-          source={require('../../../assets/addIcon.png')}
-        />
-      </TouchableOpacity>
+      {props.showaddicon && (
+        <TouchableOpacity
+          onPress={() => {
+            setmodal(true);
+          }}>
+          <Image
+            style={{
+              width: 53,
+              height: 53,
+              alignSelf: 'center',
+              position: 'absolute',
+              bottom: 210,
+            }}
+            source={require('../../../assets/addIcon.png')}
+          />
+        </TouchableOpacity>
+      )}
 
       {/* Modal */}
       {modal && (
@@ -137,32 +153,6 @@ const MainContent = (props: any) => {
                 onChangeText={setdescription}
               />
 
-              <View style={ContentStyle.navigation}>
-                <TouchableOpacity
-                  onPress={() => setshift('morning')}
-                  style={{marginHorizontal: 10}}>
-                  <Image
-                    style={ContentStyle.navImage}
-                    source={
-                      shift == 'morning'
-                        ? require('../../../assets/morning.png')
-                        : require('../../../assets/morningunselect.png')
-                    }
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setshift('night')}
-                  style={{marginHorizontal: 10}}>
-                  <Image
-                    style={ContentStyle.navImage}
-                    source={
-                      shift == 'night'
-                        ? require('../../../assets/night.png')
-                        : require('../../../assets/nightunselect.png')
-                    }
-                  />
-                </TouchableOpacity>
-              </View>
               {loader == true ? (
                 <ActivityIndicator
                   size={'small'}

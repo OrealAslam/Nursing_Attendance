@@ -2,11 +2,22 @@ import {View, Text, Image} from 'react-native';
 import React from 'react';
 import {CardStyle} from '../vitalstyles';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
+import moment from 'moment';
 
 const Card = (props: any) => {
+
   const displayCard = () => {
+    let list = [];
     if (props.record.length > 0) {
-      let list = props.record.map((item:any, index:any) => {
+      // check IF specific DATE is SELECTED or not
+      if(props.datestring != '') {
+        list = filterRecordByDate(props.record, props.datestring);
+        console.log('FILTER', list);
+      } else{
+        list = props.record;
+      }
+
+      list = list.map((item:any, index:any) => {
         return (
           <View style={CardStyle.cardcontainer} key={index}>
             <View style={CardStyle.row1}>
@@ -112,8 +123,12 @@ const Card = (props: any) => {
           </View>
         );
       });
-      return list;
     }
+    return list;
+  };
+
+  const filterRecordByDate = (array: any, date:string) => {
+    return array.filter((record:any) => record.created_at.startsWith(moment(date).format('YYYY-MM-DD')));
   };
 
   return (
@@ -122,5 +137,4 @@ const Card = (props: any) => {
     </>
   );
 };
-
 export default Card;

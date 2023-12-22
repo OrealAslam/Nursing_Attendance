@@ -1,12 +1,13 @@
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import CalenderHeader from './components/CalenderHeader';
 import CalenderBody from './components/CalenderBody';
 import moment from 'moment';
 
-const NativeCalender = () => {
-  const [currentyear, setcurrentyear] = useState(0);
-  const [currentmonth, setcurrentmonth] = useState(0);
+const NativeCalender = (props: any) => {
+  const [dt, setdt] = useState(new Date());
+  const [currentyear, setcurrentyear] = useState(dt.getFullYear());
+  const [currentmonth, setcurrentmonth] = useState(dt.getMonth());
   const [totaldaysinmonth, settotaldaysinmonth] = useState(0);
   const [startdayofmonth, setstartdayofmonth] = useState(0);
   const [lastdayofmonth, setlastdayofmonth] = useState(0);
@@ -29,11 +30,8 @@ const NativeCalender = () => {
     return new Date(date.getFullYear(), date.getMonth(), 1);
   };
 
+  
   useEffect(() => {
-    const dt = new Date();
-    setcurrentyear(dt.getFullYear());
-    setcurrentmonth(dt.getMonth());
-
     // starting day of month
     let totaldays = new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();
     settotaldaysinmonth(totaldays);
@@ -42,27 +40,48 @@ const NativeCalender = () => {
     // end day of month
     let lastday = moment().endOf('month').format('d');
     setlastdayofmonth(parseInt(lastday));
-  }, [currentyear, currentmonth]);
 
-  const datePressed = (date: any) => {
-    console.log('first', date);
-  };
+  }, []);
+
+  useEffect(()=>{
+    let totaldays = new Date(currentyear, currentmonth + 1, 0).getDate();
+    if(currentmonth == 0) {
+      setcurrentmonth(11);
+      setcurrentyear(currentyear - 1);
+    }
+
+    // starting day of month
+    settotaldaysinmonth(totaldays);
+    let firstDay = new Date(currentyear, currentmonth, 1);
+    let lastDay = new Date(currentyear, currentmonth + 1, 0);
+    console.log('START DAY', firstDay.getDay());
+    console.log('LAST DAY', lastDay.getDay());
+    setstartdayofmonth(firstDay.getDay());
+
+    // end day of month
+    setlastdayofmonth(lastDay.getDay());
+    
+  },[currentmonth, currentyear]);
+
 
   const prevMonth = () => {
-    return ;
-    // if(currentmonth > 0) {
-    //     console.log('called')
-        // setcurrentmonth(currentmonth - 1);
-    // }
-    // else{ return; }
+    if(currentmonth == 0) {
+      setcurrentmonth(11);
+      setcurrentyear(currentyear - 1);
+    }
+    else{
+      setcurrentmonth(currentmonth - 1);
+    }
   };
 
   const nextMonth = () => {
-    // if(currentmonth < 11) {
-    //     setcurrentmonth(currentmonth + 1);
-    // }
-    // else{ return; }
-    return;
+    if(currentmonth == 11) {
+      setcurrentmonth(0);
+      setcurrentyear(currentyear + 1);
+    }
+    else{
+      setcurrentmonth(currentmonth + 1);
+    }
   };
 
   return (
@@ -77,7 +96,12 @@ const NativeCalender = () => {
         totaldaysinmonth={totaldaysinmonth}
         startdayofmonth={startdayofmonth}
         lastdayofmonth={lastdayofmonth}
-        datePressed={datePressed}
+        currentmonth={currentmonth}
+        currentyear={currentyear}
+        highlightDate={props.highlightDate}
+        datePressed={(date: any) => { 
+          props.setdatepressed(date)
+        }}
       />
     </View>
   );

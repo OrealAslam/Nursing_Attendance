@@ -6,12 +6,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
+import {parseDate} from '../../../../../Helper/AppHelper';
 
 const {width} = Dimensions.get('screen');
 
 const CalenderBody = (props: any) => {
   const [daysdata, setdaysdata] = useState([]);
   const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const [selectdate, setselectdate] = useState(props.highlightDate);
 
   const displayWeekDays = () => {
     let dayList = weekDays.map((item: any, index: any) => {
@@ -27,36 +29,64 @@ const CalenderBody = (props: any) => {
   const Days = () => {
     let days = [];
     for (let i = 1; i <= props.totaldaysinmonth; i++) {
-      let d = <Text style={styles.dateText}>{i}</Text>;
+      let d = i;
+      // let d = <Text style={styles.dateText}>{i}</Text>;
       days.push(d);
     }
 
     // prepend days according to startdayofmonth of month
     for (let j = props.startdayofmonth; j > 0; j--) {
-      let emptystart = <Text style={styles.dateText}>X</Text>;
+      // let emptystart = <Text style={styles.dateText}>X</Text>;
+      let emptystart = <Text style={styles.dateText}>--</Text>;
       days.unshift(emptystart);
     }
 
     // append days according to lastdayofmonth of month
     for (let k = props.lastdayofmonth; k < 6; k++) {
-      let emptyend = <Text style={styles.dateText}>X</Text>;
+      let emptyend = <Text style={styles.dateText}>--</Text>;
       days.push(emptyend);
     }
-
     setdaysdata(days);
   };
 
   const displayDays = () => {
     let jsx = daysdata.map((item: any, index: any) => {
+      let type = typeof item;
+      let highlight = false;
+      let parsed = parseDate(props.currentyear, props.currentmonth + 1, item);
+      // check for active date
+      if (type == 'number') {
+        if (parsed == selectdate) {
+          highlight = true;
+        } else {
+          highlight = false;
+        }
+      }
       return (
         <TouchableOpacity
-          // onPress={()=>{props.datePressed(index)}}
-        style={[
+          onPress={() => {
+            if (type != 'object') {
+              props.datePressed(parsed);
+              setselectdate(parsed);
+            } else {
+              console.log('not date');
+            }
+          }}
+          style={[
             styles.date,
-            index == 0 ? {backgroundColor: 'transparent'} : {},
+            highlight == true
+              ? {backgroundColor: '#0D20A1'}
+              : {backgroundColor: 'transparent'},
           ]}
           key={index}>
-          <Text style={styles.dateText}>{item}</Text>
+          <View style={styles.mark}></View>
+          <Text
+            style={[
+              styles.dateText,
+              highlight == true ? {color: '#fff'} : {color: '#515151'},
+            ]}>
+            {item}
+          </Text>
         </TouchableOpacity>
       );
     });
@@ -68,7 +98,7 @@ const CalenderBody = (props: any) => {
   }, [props.totaldaysinmonth]);
 
   return (
-    <View style={{borderBottomWidth: .5, borderBottomColor: '#959595'}}>
+    <View style={{borderBottomWidth: 0.5, borderBottomColor: '#959595'}}>
       <View style={styles.dayContainer}>{displayWeekDays()}</View>
 
       <View style={styles.datesContainer}>{displayDays()}</View>
@@ -98,18 +128,20 @@ const styles = StyleSheet.create({
   },
   date: {
     width: '14.28%',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: 3,
     borderColor: '#959595',
     borderTopWidth: 0.4,
     borderRightWidth: 0.4,
   },
   dateText: {
-    fontSize: 14,
-    paddingVertical: 8,
+    fontSize: 12,
+    paddingVertical: 10,
     color: '#515151',
     fontWeight: '600',
   },
+  mark: {width: 8, height: 8, backgroundColor: '#34C2FE',borderRadius: 20,alignSelf: 'flex-start', left: 5},
 });
 export default CalenderBody;

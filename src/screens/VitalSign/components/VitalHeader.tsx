@@ -1,44 +1,9 @@
-import {View, Text, TouchableOpacity, Image} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import {View, Text, TouchableOpacity, Image, PermissionsAndroid} from 'react-native';
+import React from 'react';
 import {HeaderStyle, CalenderStyle} from '../vitalstyles';
+import CalendarStrip from 'react-native-calendar-strip';
 
 const VitalHeader = (props: any) => {
-  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-  const monthDateCount = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  const [month, setmonth] = useState(null);
-
-  const ReturnDays = () => {
-    let list = days.map((item: any, index: any) => {
-      return (
-        <View style={CalenderStyle.daycol} key={index}>
-          <Text style={CalenderStyle.dayText}>{item}</Text>
-        </View>
-      );
-    });
-    return list;
-  };
-
-  const ReturnDates = () => {
-    let list = [1, 2, 3, 4, 5, 6, 7].map((item: any, index: any) => {
-      return (
-        <View style={CalenderStyle.daycol} key={index}>
-          <Text style={CalenderStyle.dateText}>{item}</Text>
-        </View>
-      );
-    });
-    return list;
-  };
-
-  useEffect(() => {
-    const today = new Date();
-    let mon = today.getMonth();
-    setmonth(mon);
-  }, []);
-
-  useEffect(() => {
-    console.log(month);
-  }, [month]);
-
   return (
     <>
       <View style={HeaderStyle.headerContainer}>
@@ -58,28 +23,27 @@ const VitalHeader = (props: any) => {
       </View>
 
       <View style={HeaderStyle.calenderContainer}>
-        {/* Displaying Days */}
-        <View style={{flexDirection: 'row'}}>{ReturnDays()}</View>
-
-        {/* Displaying Dates */}
-        <View style={{flexDirection: 'row'}}>{ReturnDates()}</View>
-
-        {/* Displaying Navigation Buttons */}
-        <View style={CalenderStyle.navigationRow}>
-          <TouchableOpacity style={CalenderStyle.navBtn}>
-            <Image
-              style={{width: 7.03, height: 13.87, marginRight: 10}}
-              source={require('../../../assets/backicon.png')}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={CalenderStyle.navBtn}>
-            <Image
-              source={require('../../../assets/nexticon.png')}
-              style={{width: 7.03, height: 13.87}}
-            />
-          </TouchableOpacity>
-        </View>
+        <CalendarStrip
+          calendarAnimation={{type: 'sequence', duration: 30}}
+          useNativeDriver={true}
+          daySelectionAnimation={{
+            type: 'border',
+            duration: 200,
+            borderWidth: 1,
+            borderHighlightColor: '#fff',
+          }}
+          style={{height: 100, paddingTop: 10, paddingBottom: 10}}
+          calendarHeaderStyle={{color: 'white'}}
+          dateNumberStyle={{color: 'white',fontSize:18,fontWeight:'700'}}
+          dateNameStyle={{color: '#C3CBE7',fontSize:12,fontWeight:'500'}}
+          highlightDateNumberStyle={{color: '#C3CBE7'}}
+          highlightDateNameStyle={{color: '#C3CBE7'}}
+          iconLeft={require('../../../assets/backicon.png')}
+          iconRight={require('../../../assets/nexticon.png')}
+          iconContainer={{flex: .1}}
+          onDateSelected={(e)=>{props.setshowaddicon(true); props.setdatestring(e)}}
+          // selectedDate={moment()}
+        />
       </View>
     </>
   );

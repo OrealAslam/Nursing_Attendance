@@ -1,14 +1,11 @@
 import {View, Text} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {CardContainer} from '../historystyles';
-import moment, {max} from 'moment';
-import {Calendar} from 'react-native-calendars';
+import moment from 'moment';
 import Label from './Label';
-import {CalenderDateStyle} from '../../../components/CalenderComponent/StyleHelper/CalenderDateStyle';
 import NativeCalender from './CustomCalender/NativeCalender';
 
 const HistoryContent = (props: any) => {
-  const [historyData, sethistoryData] = useState(props.history);
   const [datepressed, setdatepressed] = useState(moment().format('YYYY-MM-DD'));
   const [result, setresult] = useState(null);
 
@@ -32,49 +29,14 @@ const HistoryContent = (props: any) => {
 
   return (
     <View style={{width: '100%', alignSelf: 'center'}}>
-      <Calendar
-        current={moment().format('YYYY-MM-DD')}
-        onDayPress={day => {
-          setdatepressed(day.dateString);
-        }}
-        markingType="dot"
-        enableSwipeMonths={true}
-        shouldRasterizeIOS={true}
-        // markedDates={{
-        //   ['2023-12-13']: {
-        //     selected: true,
-        //     marked: true,
-        //     disableTouchEvent: true,
-        //   },
-        //   ['2023-12-14']: {selected: true, marked: true, dotColor: '#6AD239'},
-        //   ['2023-12-15']: {
-        //     marked: true,
-        //     dotColor: '#6AD239',
-        //     disableTouchEvent: true,
-        //   },
-        //   ['2023-12-16']: {marked: true},
-        //   ['2023-12-18']: {
-        //     disabled: true,
-        //     activeOpacity: 0,
-        //     disableTouchEvent: false,
-        //   },
-        // }}
-        theme={{
-          textSectionTitleColor: '#000',
-          todayBackgroundColor: '#0D20A1',
-          todayButtonTextColor: '#fff',
-          todayButtonFontWeight: '600',
-        }}
-      />
-
-      {/* <NativeCalender /> */}
+      <NativeCalender setdatepressed={setdatepressed} highlightDate={datepressed} />
       <Label />
 
       {result != null ? (
         <View style={{width: '100%', padding: 10}}>
           <View style={CardContainer.card}>
             <View style={CardContainer.column1}>
-              <Text style={CardContainer.status}>Absent</Text>
+              <Text style={CardContainer.status}>{moment(result['created_at']).format('DD, MMMM YYYY') != '00:00:00' ? 'Present' : 'Absent'}</Text>
               <Text style={{color: '#646464', fontSize: 9, fontWeight: '600'}}>
                 {moment(result['created_at']).format('DD, MMMM YYYY')}
               </Text>

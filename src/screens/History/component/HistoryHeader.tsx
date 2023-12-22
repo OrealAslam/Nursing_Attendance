@@ -2,7 +2,7 @@ import {View, Text, TouchableOpacity, Image, Dimensions} from 'react-native';
 import React from 'react';
 import {HeaderStyle} from '../historystyles';
 import moment from 'moment';
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const HistoryHeader = (props: any) => {
   return (

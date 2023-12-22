@@ -31,6 +31,8 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
   const [spo2, setspo2] = useState('');
   const [remarks, setremarks] = useState('');
   const [record, setrecord] = useState([]);
+  const [showaddicon, setshowaddicon] = useState(false);
+  const [datestring, setdatestring] = useState('');
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -69,7 +71,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
     <ImageBackground
       style={{width: width, height: height}}
       source={require('../../assets/appbackground.png')}>
-      <VitalHeader navigateScreen={navigateScreen} />
+      <VitalHeader navigateScreen={navigateScreen} setshowaddicon={setshowaddicon} setdatestring={setdatestring} />
 
       <View style={ContentStyle.container}>
         {newrecord == true ? (
@@ -87,23 +89,26 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
         ) : (
           <>
             <ScrollView>
-              <Card record={record} />
+              <Card record={record} datestring={datestring} />
             </ScrollView>
-            <TouchableOpacity
-              onPress={() => {
-                setnewrecord(true);
-              }}>
-              <Image
-                style={{
-                  width: 53,
-                  height: 53,
-                  alignSelf: 'center',
-                  position: 'absolute',
-                  bottom: 310,
-                }}
-                source={require('../../assets/addIcon.png')}
-              />
-            </TouchableOpacity>
+
+            {showaddicon &&(
+              <TouchableOpacity
+                onPress={() => {
+                  setnewrecord(true);
+                }}>
+                <Image
+                  style={{
+                    width: 53,
+                    height: 53,
+                    alignSelf: 'center',
+                    position: 'absolute',
+                    bottom: 310,
+                  }}
+                  source={require('../../assets/addIcon.png')}
+                />
+              </TouchableOpacity>
+            )}
           </>
         )}
       </View>

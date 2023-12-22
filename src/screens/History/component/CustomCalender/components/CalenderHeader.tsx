@@ -1,5 +1,5 @@
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
-import React, {useEffect} from 'react';
+import React from 'react';
 
 const CalenderHeader = (props: any) => {
   return (

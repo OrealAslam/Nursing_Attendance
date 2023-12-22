@@ -31,12 +31,7 @@ export const HeaderStyle = StyleSheet.create({
     fontWeight: '600',
   },
   calenderContainer: {
-    width: (90 / 100) * width,
-    paddingVertical: 20,
     flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
   },
 });
 
