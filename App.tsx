@@ -114,7 +114,7 @@ const App = (navigation: any) => {
           ) : (
             <>
               {userid != null ? (
-                usertype == 'Nurse' ? ( // Admin
+                usertype == 'Admin' ? ( // Nurse
                   <AdminRoute></AdminRoute>
                 ) : (
                   <MainRoute></MainRoute>
