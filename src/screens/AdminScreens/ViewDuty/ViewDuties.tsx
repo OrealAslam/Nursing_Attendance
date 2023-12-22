@@ -5,15 +5,16 @@ import {
   ScrollView,
   Dimensions,
   TextInput,
+  ImageBackground,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import PageHeader from './components/PageHeader';
 import {view_assigned_staff} from '../../../Helper/AppHelper';
 import {CardContainer, InputStyle} from './styles';
 
-const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
-const ViewAssignedStaff = ({navigation}: {navigation: any}) => {
+const ViewDuties = ({navigation}: {navigation: any}) => {
   const [assignedstaff, setassignedstaff] = useState([]);
   const [apidata, setapidata] = useState([]);
   const [loader, setloader] = useState(true);
@@ -36,7 +37,7 @@ const ViewAssignedStaff = ({navigation}: {navigation: any}) => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     if (searchText.length > 0) {
       // Filter the data based on the search text
       const filteredData = assignedstaff.filter((item: any) =>
@@ -46,7 +47,7 @@ const ViewAssignedStaff = ({navigation}: {navigation: any}) => {
     } else {
       setassignedstaff(apidata);
     }
-  },[searchText]);
+  }, [searchText]);
 
   useEffect(() => {
     (async () => {
@@ -72,7 +73,7 @@ const ViewAssignedStaff = ({navigation}: {navigation: any}) => {
           </View>
           <View style={CardContainer.row}>
             <Text style={CardContainer.key}>Shift Type</Text>
-            <Text style={CardContainer.value}>{item.Shift_Time}</Text>
+            <Text style={CardContainer.value}>{item.Shift_Time == null ? 'N/A' : item.Shift_Time}</Text>
           </View>
         </View>
       );
@@ -81,33 +82,39 @@ const ViewAssignedStaff = ({navigation}: {navigation: any}) => {
   };
 
   return (
-    <View>
+    <ImageBackground
+      style={{width: width, height: height}}
+      source={require('../../../assets/appbackground.png')}>
       <PageHeader navigateScreen={navigateScreen} />
       {loader == true ? (
         <View>
-          <ActivityIndicator size={'large'} color={'#000'} />
+          <ActivityIndicator size={'large'} color={'#fff'} />
         </View>
       ) : (
         <>
           <TextInput
             onChangeText={setsearchText}
             placeholder="Search Staff"
-            style={[
-              InputStyle.inputBox,
-              {
-                width: (90 / 100) * width,
-                alignSelf: 'center',
-                marginBottom: 20,
-              },
-            ]}
+            style={InputStyle.searchBox}
             keyboardType="default"
             value={searchText}
           />
-          <ScrollView>{dislay_assigned_staff()}</ScrollView>
+
+          <View
+            style={{
+              paddingVertical: 10,
+              marginTop: 29,
+              backgroundColor: '#fff',
+              borderTopLeftRadius: 35,
+              borderTopEndRadius: 35,
+              height: '100%',
+            }}>
+            <ScrollView>{dislay_assigned_staff()}</ScrollView>
+          </View>
         </>
       )}
-    </View>
+    </ImageBackground>
   );
 };
 
-export default ViewAssignedStaff;
+export default ViewDuties;

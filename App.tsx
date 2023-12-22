@@ -72,7 +72,7 @@ const App = (navigation: any) => {
 
   // foreground handler
   messaging().onMessage(async remoteMessage => {
-    console.log('notificatio recived', remoteMessage);
+    // console.log('notificatio recived', remoteMessage);
     if (remoteMessage.notification?.body == '2') {
       Alert.alert(`${remoteMessage.notification?.title}`);
     } else {
@@ -114,7 +114,7 @@ const App = (navigation: any) => {
           ) : (
             <>
               {userid != null ? (
-                usertype == 'Admin' ? (
+                usertype == 'Nurse' ? ( // Admin
                   <AdminRoute></AdminRoute>
                 ) : (
                   <MainRoute></MainRoute>

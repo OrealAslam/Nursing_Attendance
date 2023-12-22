@@ -13,8 +13,6 @@ import {get_today_attendace} from '../../../../Helper/AppHelper';
 const {width, height} = Dimensions.get('window');
 
 const PageContent = (props: any) => {
-  const [btntext, setbtntext] = useState('Select Shift');
-  const [dropdown, setdropdown] = useState(false);
   const [apidata, setapidata] = useState([
     {
       id: 1,
@@ -40,31 +38,6 @@ const PageContent = (props: any) => {
       City: null,
     },
   ]);
-
-  const display_staff_list = () => {
-    let list = props.items.map((item: any, index: any) => {
-      return (
-        <View
-          style={[
-            styles.optionContainer,
-            index % 2 == 0
-              ? {borderBottomColor: '#eef', borderBottomWidth: 0.5}
-              : {},
-          ]}
-          key={index}>
-          <TouchableOpacity onPress={() => select_option(item)}>
-            <Text>{item}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    });
-    return list;
-  };
-
-  const select_option = (item: any) => {
-    setbtntext(item);
-    setdropdown(false);
-  };
 
   useEffect(() => {
     (async () => {
@@ -114,18 +87,19 @@ const PageContent = (props: any) => {
 
   // Hook Call to filter data
   useEffect(() => {
-    if (btntext == 'Day Shift') {
-      let filter = filterData(btntext);
+    if (props.select == 'day') {
+      let filter = filterData('Day Shift');
       setfilteredData(filter);
     }
-    if (btntext == 'Night Shift') {
-      let filter = filterData(btntext);
+    if (props.select == 'night') {
+      let filter = filterData('Night Shift');
       setfilteredData(filter);
     }
-    if (btntext == 'Both') {
+    if (props.select == 'all') {
       setfilteredData(apidata);
     }
-  }, [btntext]);
+
+  }, [props.select]);
 
   const filterData = (shift_status: any) => {
     const nightShiftData = apidata.filter(
@@ -140,7 +114,7 @@ const PageContent = (props: any) => {
         <ActivityIndicator color={'#000'} size={'large'} />
       ) : (
         <>
-          <View style={styles.inputContainer}>
+          {/* <View style={styles.inputContainer}>
             <TouchableOpacity
               style={styles.inputBox}
               onPress={() => setdropdown(!dropdown)}>
@@ -149,7 +123,7 @@ const PageContent = (props: any) => {
             {dropdown && (
               <View style={styles.listContainer}>{display_staff_list()}</View>
             )}
-          </View>
+          </View> */}
           {/* Main Content Area */}
 
             <View style={styles.attendenceTable}>
@@ -212,9 +186,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 20,
-    borderTopColor: '#D1DBE1',
-    borderTopWidth: 2,
   },
   column: {
     width: (30 / 100) * width,

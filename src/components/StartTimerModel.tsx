@@ -28,7 +28,6 @@ const StartTimerModel = (props: any) => {
           }}
           source={require('../assets/timer.png')}
         />
-        {/* <Image style={{width:timerImgWidth,height:396*timerImgRatio}} source={require('../assets/timer.png')} /> */}
         {props.locationaccess == false ? (
           <>
             <Text style={styles.heading}>
@@ -37,6 +36,7 @@ const StartTimerModel = (props: any) => {
           </>
         ) : (
           <>
+          <Text style={{color:'#202020',fontWeight:'600',fontSize:17,textAlign:'center',marginVertical:10}}>Verification</Text>
             <Text style={styles.heading}>
               Are you sure you want to{' '}
               {props.shiftstatus == 'started' ? 'end' : 'start'} this care?

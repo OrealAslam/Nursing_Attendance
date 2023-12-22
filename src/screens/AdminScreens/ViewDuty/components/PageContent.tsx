@@ -123,7 +123,7 @@ const PageContent = (props: any) => {
             return item;
           }}
           defaultValueByIndex={0}
-          buttonStyle={[InputStyle.inputBox, {width: '100%',backgroundColor: '#fff'}]}
+          buttonStyle={[InputStyle.inputBox, {width: '100%'}]}
           buttonTextStyle={{
             position: 'absolute',
             right: 0,

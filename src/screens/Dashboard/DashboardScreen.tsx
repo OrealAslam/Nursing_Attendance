@@ -14,6 +14,7 @@ import {
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from 'react-native-geolocation-service';
 import {useIsFocused} from '@react-navigation/native';
 
 const DashboardScreen = ({navigation}: {navigation: any}) => {
@@ -98,7 +99,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           buttonPositive: 'OK',
         },
       );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      if (granted === 'granted') {
         Geolocation.getCurrentPosition(
           position => {
             setlatitude(position.coords.latitude);
@@ -111,6 +112,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           },
         );
       } else {
+        setlocationaccess(false);
         console.log('Contacts permission denied');
       }
     } catch (err) {
@@ -118,14 +120,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log('setshiftstartat', shiftstartat);
-  //   console.log('shiftendat', shiftendat);
-  // }, [shiftstatus]);
-
   useEffect(() => {
     (async () => {
-      await get_user_leave_request();
+      // await get_user_leave_request();
       let request = await get_shift_status();
       if (request.status == 'success') {
         setshiftstartat(
@@ -138,6 +135,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         setshiftTime(request.data.shift_status);
         if (status == 'ended') {
           setshiftstatus('ended');
+          setshiftstartat('--:--');
         } else {
           setshiftstarttime(request.attendance_Status.start_time);
           setshiftstatus(status);
@@ -180,7 +178,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         shiftstatus={shiftstatus}
         setstarttimermodel={setstarttimermodel}
         starttimermodel={starttimermodel}
-        shiftstatus={shiftstatus}
         workTime={workTime}
         shiftendat={shiftendat}
         shiftstartat={shiftstartat}

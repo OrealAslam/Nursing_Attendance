@@ -1,9 +1,4 @@
-import {
-  View,
-  Dimensions,
-  Alert,
-  ImageBackground,
-} from 'react-native';
+import {View, Dimensions, Alert, ImageBackground} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HolidayHeader from './components/HolidayHeader';
 import {MainContent} from './holidaystyles';
@@ -27,17 +22,18 @@ const HolidayScreen = ({navigation}) => {
   useEffect(() => {
     (async () => {
       let data = await get_user_leave_request();
-      objectify(data.data);
+      let md = objectify(data.data);
+      setmarkedDates(md);
       setcalenderloader(false);
     })();
   }, [isFocused]);
 
-  const objectify = (arr) => {
-    if(arr.length > 0) {
-      let object = arr.map((item, index)=>{
-        var obj = {};
-        let date = item.date;
+  const objectify = arr => {
+    let markedData = {};
+    if (arr.length > 0) {
+      arr.forEach((item, index) => {
         let cond = item.status;
+        let date = item.date;
 
         var innerObject = {};
         if(cond == 0 ){innerObject['color'] = '#6AD239'}
@@ -45,18 +41,16 @@ const HolidayScreen = ({navigation}) => {
         if(cond == 2 ){innerObject['color'] = '#FF3366'}
         innerObject['startingDay'] = true;
         innerObject['textColor'] = '#fff';
-
-        if(index == arr.length - 1) {
-          innerObject['endingDay'] = true;
-        }
-        obj[date] = innerObject;
-        return obj;
+        innerObject['endingDay'] = index == arr.length - 1 ? true : false;
+        markedData[date] = innerObject; // You can assign any value you want here
       });
-      setmarkedDates(object);
-    } else{return ;}
-  }
 
-  const navigateScreen = (screenName) => {
+      return markedData;
+    }
+    return;
+  };
+
+  const navigateScreen = screenName => {
     navigation.navigate(screenName);
   };
 

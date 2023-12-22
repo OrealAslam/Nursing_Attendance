@@ -11,6 +11,9 @@ const cardRatio = cardWidth / 1236;
 const footerContainer = width;
 const footerContainerRatio = footerContainer / 1440;
 
+const adminCardsWidth = width / 2 - 40;
+const adminCardsRatio = adminCardsWidth / 575;
+
 
 export const HeaderStyle = StyleSheet.create({
   headerContainer: {
@@ -25,18 +28,41 @@ export const HeaderStyle = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // backfaceVisibility
-    // backgroundColor: '#f00'
   },
   headerLogo: {
     width: 106.15,
     height: 19,
-    // top:
+  },
+  title: {
+    color: '#CDD4FE',
+    fontSize: 16,
+    fontWeight: '500'
+  },
+  adminName: {
+    fontSize: 20,
+    color:'#fff',
+    fontWeight:'700'
+  },
+  adminPhoto: {
+    width: 69.73,
+    height: 69.73,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#fff'
+  },
+  editButtonImg: {
+    width: 16.70,
+    height: 16.70,
+    left: '70%',
+    bottom: 15
+  },
+  waveIcon:{
+    width: 21.61,
+    height: 21.76,
   },
   profileLogo: {
     width: 32,
     height: 32.02,
-    // top: 10
   },
   headerBadge: {
     width: (86 / 100) * width,
@@ -130,4 +156,13 @@ export const FooterStyle = StyleSheet.create({
     width: cardWidth,
     height: 250 * cardRatio,
   },
+  attendenceImg: {
+    width: cardWidth,
+    height: 496 * cardRatio,
+    alignSelf: 'center'
+  },
+  adminCards: {
+    width: adminCardsWidth,
+    height: 540 * adminCardsRatio,
+  }
 });

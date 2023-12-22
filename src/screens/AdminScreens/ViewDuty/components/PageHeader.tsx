@@ -23,7 +23,7 @@ const PageHeader = (props: any) => {
         </TouchableOpacity>
       </View>
       <View style={styles.col2}>
-        <Text style={styles.heading}>Assign Staff</Text>
+        <Text style={styles.heading}>View Duties</Text>
       </View>
     </View>
   );

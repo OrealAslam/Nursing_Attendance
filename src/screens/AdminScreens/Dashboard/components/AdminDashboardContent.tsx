@@ -19,16 +19,16 @@ const AdminDashboardContent = (props: any) => {
           style={{marginBottom: 10}}
           onPress={() => props.navigateScreen('AssignStaff')}>
           <Image
-            style={FooterStyle.cardstyle}
+            style={FooterStyle.adminCards}
             source={require('../../../../assets/staffassigned.png')}
           />
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => props.navigateScreen('ViewAssignedStaff')}
+          onPress={() => props.navigateScreen('ViewDuties')}
           style={{marginBottom: 10}}>
           <Image
-            style={FooterStyle.cardstyle}
+            style={FooterStyle.adminCards}
             source={require('../../../../assets/viewassignedstaff.png')}
           />
         </TouchableOpacity>

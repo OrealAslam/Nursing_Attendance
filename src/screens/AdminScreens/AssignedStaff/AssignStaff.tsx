@@ -1,10 +1,11 @@
 import {
-  View,
+  ImageBackground,
   TouchableOpacity,
   Image,
   Dimensions,
   Text,
   ActivityIndicator,
+  View
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import PageHeader from './components/PageHeader';
@@ -70,37 +71,43 @@ const AssignStaff = ({navigation}: {navigation: any}) => {
   };
 
   return (
-    <View>
+    <ImageBackground
+    style={{width: width, height: height}}
+    source={require('../../../assets/appbackground.png')}>
       <PageHeader navigateScreen={navigateScreen} />
-      <PageContent
-        leads={leads}
-        staff={staff}
-        shift={shift}
-        setshifttype={setshifttype}
-        setclientid={setclientid}
-        setstaffid={setstaffid}
-      />
 
-      {loader == true ? (
-        <ActivityIndicator size={'small'} color={'#000'} />
-      ) : (
-        <TouchableOpacity onPress={() => save_data()}>
-          <Image
-            style={{
-              width: buttonWidth,
-              height: 200 * buttonRatio,
-              alignSelf: 'center',
-              marginTop: 40,
-            }}
-            source={require('../../../assets/submit.png')}
-          />
-        </TouchableOpacity>
-      )}
+      <View style={{paddingVertical: 10, width: width, height: '100%',borderTopLeftRadius: 35,backgroundColor:'#fff'}}>
+        <PageContent
+          leads={leads}
+          staff={staff}
+          shift={shift}
+          setshifttype={setshifttype}
+          setclientid={setclientid}
+          setstaffid={setstaffid}
+        />
 
-      <Text style={{textAlign: 'center', marginTop: 10, color: 'red'}}>
-        {message}
-      </Text>
-    </View>
+        {loader == true ? (
+          <ActivityIndicator size={'small'} color={'#000'} />
+        ) : (
+          <TouchableOpacity onPress={() => save_data()}>
+            <Image
+              style={{
+                width: buttonWidth,
+                height: 200 * buttonRatio,
+                alignSelf: 'center',
+                marginTop: 40,
+              }}
+              source={require('../../../assets/submit.png')}
+            />
+          </TouchableOpacity>
+        )}
+
+        <Text style={{textAlign: 'center', marginTop: 10, color: 'red'}}>
+          {message}
+        </Text>
+
+      </View>
+    </ImageBackground>
   );
 };
 

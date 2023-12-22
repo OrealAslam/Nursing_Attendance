@@ -3,7 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import AdminDshboard from '../screens/AdminScreens/Dashboard/AdminDshboard';
 import ProfileScreen from '../screens/AdminScreens/Profile/ProfileScreen';
 import AssignStaff from '../screens/AdminScreens/AssignedStaff/AssignStaff';
-import ViewAssignedStaff from '../screens/AdminScreens/AssignedStaff/ViewAssignedStaff';
+import ViewDuties from '../screens/AdminScreens/ViewDuty/ViewDuties';
 import AttendenceRecord from '../screens/AdminScreens/AttendenceRecord/AttendenceRecord';
 const Stack = createNativeStackNavigator();
 
@@ -26,8 +26,8 @@ export default function AdminRoute() {
         options={{headerShown: false, animationenabled: false}}
       />
       <Stack.Screen
-        name="ViewAssignedStaff"
-        component={ViewAssignedStaff}
+        name="ViewDuties"
+        component={ViewDuties}
         options={{headerShown: false, animationenabled: false}}
       />
       <Stack.Screen
