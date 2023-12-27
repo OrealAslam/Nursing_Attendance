@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import ProfileHeader from './components/ProfileHeader';
@@ -13,12 +14,14 @@ import FooterComponent from './components/FooterComponent';
 import ChangePasswordModel from '../../components/ChangePasswordModel';
 import {
   IMAGE_BASE_URL,
+  UPDATE_PROFILE,
   editableProfileData,
   get_async_data,
   update_user_profile,
-  upload_user_image,
 } from '../../Helper/AppHelper';
-import DocumentPicker from 'react-native-document-picker';
+import {launchCamera} from 'react-native-image-picker';
+import RNFS from 'react-native-fs';
+import RNFetchBlob from 'rn-fetch-blob';
 import {ImagePicker, MainContainer} from './profilestyles';
 
 const {width, height} = Dimensions.get('window');
@@ -33,6 +36,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [address, setaddress] = useState('');
   const [profilepicture, setprofilepicture] = useState('');
   const [imageData, setimageData] = useState(null);
+  const [loader, setloader] = useState(false);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -52,67 +56,37 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   }, []);
 
   const updateRecord = async () => {
+    setloader(true);
     const id = await get_async_data('user_id');
     let obj = {
       id: id,
       name: name,
       dob: dob,
       address: address,
-      image: '',
+      image: imageData != null ? imageData : '',
     };
-
     let response = await update_user_profile(obj);
     if (response.status == 'success') {
-      Alert.alert('Updated', 'Profile Updated Successfully');
+      setloader(false);
+    } else {
+      setloader(false);
     }
   };
 
-  const pickImage = async () => {
-    let username = await get_async_data('username');
-    let dob = await get_async_data('dob');
-    let address = await get_async_data('address');
-    let id = await get_async_data('user_id');
-
-    let finalObj = {
-      id: id,
-      name: username,
-      dob: dob,
-      address: address,
-      image: {},
-    };
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.images],
-      });
-
-      // Upload FiLe Here
-      const formData = new FormData();
-      formData.append('image', {
-        uri: res[0].uri,
-        type: res[0].type,
-        name: res[0].name,
-      });
-      finalObj.image = formData?._parts[0][1];
-      let response = await upload_user_image(finalObj);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
-        console.log('cancel', err);
-      } else {
-        // Handle other errors
-        console.log('other', err);
-      }
-    }
-  };
-
-  let uploadImage = async (imageData: any) => {
-    const formdata = new FormData();
-    formdata.append('image', {
-      uri: imageData.uri,
-      type: imageData.type,
-      name: imageData.fileName,
-    });
-    setimageData(formdata?._parts[0][1]);
+  const captureImage = async (imageData: any) => {
+    console.log(imageData.assets[0]);
+    let formData = new FormData();
+    formData.append('image',{
+      fileName: imageData.assets[0].fileName,
+      fileSize: imageData.assets[0].fileSize,
+      height: imageData.assets[0].height,
+      originalPath: imageData.assets[0].originalPath,
+      type: imageData.assets[0].type,
+      uri: imageData.assets[0].uri,
+      width: imageData.assets[0].width,
+    })
+    setimageData(formData._parts[0][1]);
+    // console.log('FORM DATA', formData._parts[0][1])
   };
 
   return (
@@ -140,9 +114,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
             />
           )}
 
-          <TouchableOpacity
-            onPress={() => pickImage()}
-            style={ImagePicker.editButton}>
+          <TouchableOpacity style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}
               source={require('../../assets/editprofilepicbtn.png')}
@@ -150,10 +122,10 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              Picker.launchCamera(
+              launchCamera(
                 {
-                  assetRepresentationMode: 'auto',
                   mediaType: 'photo',
+                  assetRepresentationMode: 'current',
                   quality: 1,
                   includeBase64: false,
                   presentationStyle: 'overFullScreen',
@@ -164,7 +136,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
                   } else if (response.error) {
                     console.log('ImagePicker Error: ', response.error);
                   } else {
-                    await uploadImage(response.assets[0]);
+                    await captureImage(response);
                   }
                 },
               )
@@ -190,7 +162,11 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
           sethiringdate={sethiringdate}
           setaddress={setaddress}
         />
-        <FooterComponent setmodel={setmodel} updateRecord={updateRecord} />
+        {loader == true ? (
+          <ActivityIndicator size={'large'} color={'#b4b4b4'} />
+        ) : (
+          <FooterComponent setmodel={setmodel} updateRecord={updateRecord} />
+        )}
       </View>
       {model && <ChangePasswordModel setmodel={setmodel} />}
     </ImageBackground>

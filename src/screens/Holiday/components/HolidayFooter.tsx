@@ -6,7 +6,7 @@ const {width} = Dimensions.get('window');
 const buttonWidth = width - 60;
 const ratio = buttonWidth / 1236;
 
-const HolidayFooter = () => {
+const HolidayFooter = (props:any) => {
   return (
     <>
       <View style={styles.container}>
@@ -23,7 +23,9 @@ const HolidayFooter = () => {
           <Text style={styles.label}>Pending</Text>
         </View>
       </View>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={()=>props.submit_leave_request()}
+      >
         <Image style={{
             width: buttonWidth,
             height: 200 * ratio,

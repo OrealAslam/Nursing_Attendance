@@ -92,10 +92,10 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
               <Card record={record} datestring={datestring} />
             </ScrollView>
 
-            {showaddicon &&(
+            {showaddicon == true ? (
               <TouchableOpacity
                 onPress={() => {
-                  setnewrecord(true);
+                  setnewrecord(true)
                 }}>
                 <Image
                   style={{
@@ -108,7 +108,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
                   source={require('../../assets/addIcon.png')}
                 />
               </TouchableOpacity>
-            )}
+            ) : (<></>)}
           </>
         )}
       </View>

@@ -12,11 +12,14 @@ const HolidayCalender = (props: any) => {
       current={selected}
       // Callback that gets called when the user selects a day
       onDayPress={day => {
-        console.log('selected day', day);
+        props.check_for_already_selected(day.dateString);
       }}
       // Mark specific dates as marked
       markingType={'period'}
       markedDates={props.markedDates}
+      minDate={moment().format('YYYY-MM-DD')}
+      disableAllTouchEventsForDisabledDays={true}
+      isMultiSelection={true}
     />
   );
 };

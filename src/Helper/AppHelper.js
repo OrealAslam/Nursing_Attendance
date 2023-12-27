@@ -140,19 +140,6 @@ export const get_nurse_status = async () => {
 };
 
 export const update_user_profile = async data => {
-  // if (Object.keys(data.image).length > 0) {
-  //   const request = await fetch(UPDATE_PROFILE, {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //       'X-Requested-With': 'XMLHttpRequest',
-  //     },
-  //     body: JSON.stringify(data),
-  //   });
-
-  //   const response = await request.json();
-  //   return response;
-  // } else {
   const request = await fetch(UPDATE_PROFILE, {
     method: 'POST',
     headers: {
@@ -162,25 +149,12 @@ export const update_user_profile = async data => {
     body: JSON.stringify(data),
   });
   const response = await request.json();
+  console.log('RES', response)
   if (response.status == 'success') {
     await set_async_data('username', data.name);
     await set_async_data('dob', data.dob);
     await set_async_data('address', data.address);
   }
-  return response;
-  // }
-};
-
-export const upload_user_image = async data => {
-  const request = await fetch(UPDATE_PROFILE, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      'X-Requested-With': 'XMLHttpRequest',
-    },
-    body: JSON.stringify(data),
-  });
-  const response = await request.json();
   return response;
 };
 

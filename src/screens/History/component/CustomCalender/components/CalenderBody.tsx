@@ -54,6 +54,7 @@ const CalenderBody = (props: any) => {
       let type = typeof item;
       let highlight = false;
       let parsed = parseDate(props.currentyear, props.currentmonth + 1, item);
+      let markColor = dateMarkColor(parsed);
       // check for active date
       if (type == 'number') {
         if (parsed == selectdate) {
@@ -79,7 +80,7 @@ const CalenderBody = (props: any) => {
               : {backgroundColor: 'transparent'},
           ]}
           key={index}>
-          <View style={styles.mark}></View>
+          <View style={[styles.mark,{backgroundColor: markColor}]}></View>
           <Text
             style={[
               styles.dateText,
@@ -92,6 +93,15 @@ const CalenderBody = (props: any) => {
     });
     return jsx;
   };
+
+  const dateMarkColor = (date:any) => {
+    let find = props.history.find((item: any) => item.created_at === date);
+    if(find == undefined) {
+      return '#FF3366';
+    } else if(find.status == 'Duty Time') {
+      return '#74CAE3';
+    } else{ return '#6AD239'; }
+  }
 
   useEffect(() => {
     Days();
@@ -142,6 +152,6 @@ const styles = StyleSheet.create({
     color: '#515151',
     fontWeight: '600',
   },
-  mark: {width: 8, height: 8, backgroundColor: '#34C2FE',borderRadius: 20,alignSelf: 'flex-start', left: 5},
+  mark: {width: 8, height: 8,borderRadius: 20,alignSelf: 'flex-start', left: 5},
 });
 export default CalenderBody;

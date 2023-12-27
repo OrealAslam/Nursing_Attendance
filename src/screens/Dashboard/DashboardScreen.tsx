@@ -139,6 +139,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         } else {
           setshiftstarttime(request.attendance_Status.start_time);
           setshiftstatus(status);
+          setshiftendat('--:--');
           let attendenceNoted = request.attendance_Status.start_time;
           let now = moment(new Date());
           const totalDuration = moment.duration(now.diff(attendenceNoted));

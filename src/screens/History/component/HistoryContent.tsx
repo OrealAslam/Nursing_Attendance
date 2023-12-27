@@ -29,7 +29,7 @@ const HistoryContent = (props: any) => {
 
   return (
     <View style={{width: '100%', alignSelf: 'center'}}>
-      <NativeCalender setdatepressed={setdatepressed} highlightDate={datepressed} />
+      <NativeCalender setdatepressed={setdatepressed} highlightDate={datepressed} history={props.history} />
       <Label />
 
       {result != null ? (

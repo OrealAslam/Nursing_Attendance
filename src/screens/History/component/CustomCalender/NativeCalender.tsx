@@ -49,13 +49,12 @@ const NativeCalender = (props: any) => {
       setcurrentmonth(11);
       setcurrentyear(currentyear - 1);
     }
-
     // starting day of month
     settotaldaysinmonth(totaldays);
     let firstDay = new Date(currentyear, currentmonth, 1);
     let lastDay = new Date(currentyear, currentmonth + 1, 0);
-    console.log('START DAY', firstDay.getDay());
-    console.log('LAST DAY', lastDay.getDay());
+    // console.log('START DAY', firstDay.getDay());
+    // console.log('LAST DAY', lastDay.getDay());
     setstartdayofmonth(firstDay.getDay());
 
     // end day of month
@@ -102,6 +101,7 @@ const NativeCalender = (props: any) => {
         datePressed={(date: any) => { 
           props.setdatepressed(date)
         }}
+        history={props.history}
       />
     </View>
   );

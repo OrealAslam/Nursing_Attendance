@@ -1,4 +1,4 @@
-import {View, Dimensions, Alert, ImageBackground} from 'react-native';
+import {View, Dimensions, Alert, ImageBackground, ActivityIndicator} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import HolidayHeader from './components/HolidayHeader';
 import {MainContent} from './holidaystyles';
@@ -12,19 +12,21 @@ const buttonWidth = width - 60;
 const buttonRatio = buttonWidth / 1236;
 
 const HolidayScreen = ({navigation}) => {
+  let DATE_ARRAY = [];
   const isFocused = useIsFocused();
-  const [submitRequest, setsubmitRequest] = useState('submit');
-  const [loader, setloader] = useState(false);
+  const [loader, setloader] = useState(true);
   const [calenderloader, setcalenderloader] = useState(true);
-  const [selected, setselected] = useState('');
   const [markedDates, setmarkedDates] = useState({});
 
   useEffect(() => {
     (async () => {
       let data = await get_user_leave_request();
-      let md = objectify(data.data);
-      setmarkedDates(md);
-      setcalenderloader(false);
+      if(data.status == 'success') {
+        let md = objectify(data.data);
+        setmarkedDates(md);
+        setloader(false);
+        console.log(data)
+      }
     })();
   }, [isFocused]);
 
@@ -55,14 +57,14 @@ const HolidayScreen = ({navigation}) => {
   };
 
   const submit_leave_request = async () => {
-    if (global.DateArray.length < 1) {
+    if (DATE_ARRAY.length < 1) {
       Alert.alert(
         'Warning',
         'Select atleast single date to submit leave request',
       );
     } else {
       setloader(true);
-      let response = await leave_request(global.DateArray);
+      let response = await leave_request(DATE_ARRAY);
       if (response.status == 'successfully') {
         Alert.alert('Success', response.message);
       }
@@ -77,15 +79,31 @@ const HolidayScreen = ({navigation}) => {
     setloader(false);
   };
 
+  const check_for_already_selected = (dateString) => {
+    const index = DATE_ARRAY.indexOf(dateString);
+    if (index != -1) {
+      // If entry exists in the array, remove it
+      DATE_ARRAY.splice(index, 1);
+    } else {
+      // If entry does not exist in the array, add it
+      DATE_ARRAY.push(dateString);
+    }
+    console.log('selecteddays', DATE_ARRAY);
+  }
+
+
   return (
     <ImageBackground
       style={{width: width, height: height}}
       source={require('../../assets/appbackground.png')}>
       <HolidayHeader navigateScreen={navigateScreen} />
-
       <View style={[MainContent.container, {paddingVertical: 10}]}>
-        <HolidayCalender markedDates={markedDates} />
-        <HolidayFooter />
+        {
+          loader == true ? (<ActivityIndicator size={'large'} color={'#e4e4e4'}/>) : (<>
+            <HolidayCalender markedDates={markedDates} check_for_already_selected={check_for_already_selected} />
+            <HolidayFooter submit_leave_request={submit_leave_request} />
+            </>)
+        }
       </View>
     </ImageBackground>
   );
