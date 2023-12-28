@@ -86,7 +86,6 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       width: imageData.assets[0].width,
     })
     setimageData(formData._parts[0][1]);
-    // console.log('FORM DATA', formData._parts[0][1])
   };
 
   return (

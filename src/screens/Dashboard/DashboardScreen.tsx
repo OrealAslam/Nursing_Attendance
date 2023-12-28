@@ -1,4 +1,4 @@
-import {View, PermissionsAndroid, ImageBackground} from 'react-native';
+import {PermissionsAndroid, ImageBackground} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
@@ -10,7 +10,6 @@ import {
   formatTimeDifference,
   end_shift,
   start_shift,
-  get_user_leave_request,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -122,7 +121,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     (async () => {
-      // await get_user_leave_request();
       let request = await get_shift_status();
       if (request.status == 'success') {
         setshiftstartat(

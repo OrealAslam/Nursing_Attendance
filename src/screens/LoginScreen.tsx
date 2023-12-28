@@ -21,8 +21,8 @@ import {
 import Contacts from 'react-native-contacts';
 import React, {useState, useEffect} from 'react';
 import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
-import LocationAccess from './LocationAccess';
 import {useIsFocused} from '@react-navigation/native';
+import LocationAccess from '../components/LocationAccess';
 
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 50;
@@ -36,6 +36,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [loader, setloader] = useState(false);
   const [contactsaccess, setcontactsaccess] = useState(false);
   const [locationaccess, setlocationaccess] = useState(false);
+  const [showoverlay, setshowoverlay] = useState(true);
 
   const login = async () => {
     setloader(true);
@@ -59,13 +60,14 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await set_async_data('address', request.data.address);
         await set_async_data('hiring_date', request.data.created_at);
         await set_async_data('profile_picture', request.data.image);
+        await set_async_data('login_user', 'loggedin');
         await save_fcm_token();
 
         let usertype = await get_async_data('usertype');
         if (usertype == 'Admin') {
-          navigation.navigate('AdminRoute');
+          navigation.replace('AdminRoute');
         } else {
-          navigation.navigate('MainRoute');
+          navigation.replace('MainRoute');
         }
       }
     }
@@ -74,31 +76,45 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     (async () => {
-      console.log('called')
-      const locationPermissionGranted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Permission Required',
-          message: 'PlanCare wants to access your location',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (locationPermissionGranted === 'granted') {
-        //  Access Location
-        const contactsPermissionGranted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      if(showoverlay == false) {
+        const locationPermissionGranted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
             title: 'Permission Required',
-            message: 'PlanCare wants to access your contact list',
+            message: 'PlanCare wants to access your location',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
           },
         );
-        if (contactsPermissionGranted != 'granted') {
+        if (locationPermissionGranted === 'granted') {
+          //  Access Location
+          const contactsPermissionGranted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+            {
+              title: 'Permission Required',
+              message: 'PlanCare wants to access your contact list',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          if (contactsPermissionGranted != 'granted') {
+            Alert.alert(
+              'PlaneCare',
+              'PlanCare wants to access your contact list. Kindly give permission from app settings',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => BackHandler.exitApp(),
+                  style: 'cancel',
+                },
+                {text: 'Open Settings', onPress: () => Linking.openSettings()},
+              ],
+            );
+          }
+        } else {
           Alert.alert(
             'PlaneCare',
-            'PlanCare wants to access your contact list. Kindly give permission from app settings',
+            'PlanCare wants to access your location kindly give permission from app settings',
             [
               {
                 text: 'Cancel',
@@ -109,22 +125,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
             ],
           );
         }
-      } else {
-        Alert.alert(
-          'PlaneCare',
-          'PlanCare wants to access your location kindly give permission from app settings',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => BackHandler.exitApp(),
-              style: 'cancel',
-            },
-            {text: 'Open Settings', onPress: () => Linking.openSettings()},
-          ],
-        );
       }
     })();
-  }, [isFocused]);
+  }, [showoverlay]);
 
   return (
     <ImageBackground
@@ -169,6 +172,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
         )}
       </View>
+      {
+        showoverlay && (<LocationAccess setshowoverlay={setshowoverlay} />)
+      }
     </ImageBackground>
   );
 };
@@ -186,19 +192,19 @@ const styles = StyleSheet.create({
   headerHeading: {
     color: '#fff',
     fontSize: 20,
-    fontWeight: '300'
+    fontWeight: '300',
   },
   containerOne: {
     width: width,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 30
+    paddingVertical: 30,
   },
   containerTwo: {
     width: width,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 50
+    paddingVertical: 50,
   },
   textInput: {
     alignSelf: 'center',
@@ -207,14 +213,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 20,
-    color: '#9C9B9B'
+    color: '#9C9B9B',
   },
   containerThree: {
     width: width,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 50
+    bottom: 50,
   },
   saveButton: {
     width: buttonWidth,

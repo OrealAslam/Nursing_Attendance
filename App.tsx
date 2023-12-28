@@ -7,24 +7,13 @@ import MainRoute from './src/routes/MainRoute';
 import {useNetInfo} from '@react-native-community/netinfo';
 import messaging from '@react-native-firebase/messaging';
 import {
-  View,
-  BackHandler,
-  Text,
-  TouchableOpacity,
-  Image,
-  Dimensions,
   PermissionsAndroid,
   Alert,
-  ImageBackground,
 } from 'react-native';
-import {NetworkModelStyle} from './src/Helper/StyleHelper';
 import AdminRoute from './src/routes/AdminRoute';
+import NetworkModal from './src/components/NetworkModal';
 
-const {width, height} = Dimensions.get('window');
-const buttonWidth = width - 180;
-const buttonratio = buttonWidth / 560;
-
-const App = (navigation: any) => {
+const App = () => {
   const {type, isConnected} = useNetInfo();
   const [splashClosed, setsplashClosed] = useState(false);
   const [userid, setuserid] = useState(null);
@@ -36,7 +25,6 @@ const App = (navigation: any) => {
       let user_id = await get_async_data('user_id');
       let userType = await get_async_data('usertype');
       await requestUserPermission();
-      // console.log(await get_async_data('fcm_token'));
       setuserid(user_id);
       setusertype(userType);
       setsplashClosed(true);
@@ -85,32 +73,7 @@ const App = (navigation: any) => {
       {splashClosed ? (
         <>
           {NetworkModel == true ? (
-            <ImageBackground
-              source={require('./src/assets/appbackground.png')}
-              style={NetworkModelStyle.container}>
-              <View style={NetworkModelStyle.modelContainer}>
-                <Image
-                  style={NetworkModelStyle.imgIcon}
-                  source={require('./src/assets/networkerror.png')}
-                />
-                <Text style={[NetworkModelStyle.heading, {marginTop: 10}]}>Network Error</Text>
-                <Text style={NetworkModelStyle.description}>
-                  Failed to connect to Internet
-                </Text>
-                <Text style={[NetworkModelStyle.description, {marginBottom: 10}]}>Please Try again later!</Text>
-                <TouchableOpacity onPress={() => BackHandler.exitApp()}>
-                  <Image
-                    style={{
-                      alignSelf: 'center',
-                      width: buttonWidth,
-                      height: 148 * buttonratio,
-                      marginTop: 20,
-                    }}
-                    source={require('./src/assets/exitApp.png')}
-                  />
-                </TouchableOpacity>
-              </View>
-            </ImageBackground>
+           <NetworkModal />
           ) : (
             <>
               {userid != null ? (
@@ -129,5 +92,4 @@ const App = (navigation: any) => {
     </NavigationContainer>
   );
 };
-
 export default App;

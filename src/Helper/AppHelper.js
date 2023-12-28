@@ -539,7 +539,7 @@ export const add_vital_record = async obj => {
     body: JSON.stringify(obj),
   });
   const response = await request.json();
-  console.log('Add Res', response);
+  console.log('RES', response);
   return response;
 };
 

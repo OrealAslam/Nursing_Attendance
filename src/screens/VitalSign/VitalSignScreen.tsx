@@ -5,6 +5,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import VitalHeader from './components/VitalHeader';
@@ -54,18 +55,20 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
       temperature: temperature,
     };
     const response = await add_vital_record(obj);
-    if (response.status) {
+    if (response.status == 'success') {
       setloader(false);
       setnewrecord(false);
+      Alert.alert('Successful', 'Record added successfully')
     }
   };
 
   useEffect(() => {
     (async () => {
+      console.log('useeffect called');
       let response = await get_vital_record();
       setrecord(response);
     })();
-  }, [isFocused]);
+  }, [isFocused, loader]);
 
   return (
     <ImageBackground
@@ -92,7 +95,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
               <Card record={record} datestring={datestring} />
             </ScrollView>
 
-            {showaddicon == true ? (
+            {/* {showaddicon == true ? ( */}
               <TouchableOpacity
                 onPress={() => {
                   setnewrecord(true)
@@ -108,7 +111,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
                   source={require('../../assets/addIcon.png')}
                 />
               </TouchableOpacity>
-            ) : (<></>)}
+            {/* ) : (<></>)} */}
           </>
         )}
       </View>

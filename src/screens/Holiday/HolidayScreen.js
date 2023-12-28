@@ -28,7 +28,7 @@ const HolidayScreen = ({navigation}) => {
         console.log(data)
       }
     })();
-  }, [isFocused]);
+  }, [isFocused, loader]);
 
   const objectify = arr => {
     let markedData = {};

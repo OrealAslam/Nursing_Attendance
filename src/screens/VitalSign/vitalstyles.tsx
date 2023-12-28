@@ -27,14 +27,6 @@ export const HeaderStyle = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  calenderContainer: {
-    // width: (100 / 100) * width,
-    // paddingVertical: 20,
-    // flexDirection: 'column',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // alignSelf: 'center',
-  },
 });
 
 export const ContentStyle = StyleSheet.create({

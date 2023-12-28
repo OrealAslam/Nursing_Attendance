@@ -114,10 +114,10 @@ const MainContent = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false}>
         <View style={ContentStyle.cardContainer}>{displayRecord()}</View>
       </ScrollView>
-      {props.showaddicon && (
+      {/* {props.showaddicon && ( */}
         <TouchableOpacity
           onPress={() => {
             setmodal(true);
@@ -133,7 +133,7 @@ const MainContent = (props: any) => {
             source={require('../../../assets/addIcon.png')}
           />
         </TouchableOpacity>
-      )}
+      {/* )} */}
 
       {/* Modal */}
       {modal && (
