@@ -34,37 +34,60 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
   const [record, setrecord] = useState([]);
   const [showaddicon, setshowaddicon] = useState(false);
   const [datestring, setdatestring] = useState('');
+  const [message, setmessage] = useState('');
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
 
   const add_record = async () => {
-    setloader(true);
-    let lead_id = await get_async_data('lead_id');
-    let user_id = await get_async_data('user_id');
-    let obj = {
-      lead_id: lead_id,
-      staff_id: user_id,
-      blood_pressure: bloodpressure,
-      pulse_rate: pulserate,
-      remarks: remarks,
-      resp: resp,
-      spo2: spo2,
-      bsr: bsr,
-      temperature: temperature,
-    };
-    const response = await add_vital_record(obj);
-    if (response.status == 'success') {
-      setloader(false);
-      setnewrecord(false);
-      Alert.alert('Successful', 'Record added successfully')
+    let check = check_for_empty_fields();
+    if(check == false) {
+      setmessage('Could not submit empty form');
+    } else{
+      setloader(true);
+      let lead_id = await get_async_data('lead_id');
+      let user_id = await get_async_data('user_id');
+      let obj = {
+        lead_id: 465, // lead_id,
+        staff_id: 1, //user_id,
+        blood_pressure: bloodpressure,
+        pulse_rate: pulserate,
+        remarks: remarks,
+        resp: resp,
+        spo2: spo2,
+        bsr: bsr,
+        temperature: temperature,
+      };
+      const response = await add_vital_record(obj);
+      if (response.status == 'success') {
+        setloader(false);
+        setnewrecord(false);
+        Alert.alert('Successful', 'Record added successfully');
+      } else {
+        console.log(response);
+        setloader(false);
+      }
     }
+  };
+
+  const check_for_empty_fields = () => {
+    if (
+      bloodpressure == '' &&
+      pulserate == '' &&
+      temperature == '' &&
+      resp == '' &&
+      bsr == '' &&
+      spo2 == '' &&
+      remarks == ''
+    ) {
+      return false;
+    }
+    return true;
   };
 
   useEffect(() => {
     (async () => {
-      console.log('useeffect called');
       let response = await get_vital_record();
       setrecord(response);
     })();
@@ -74,7 +97,11 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
     <ImageBackground
       style={{width: width, height: height}}
       source={require('../../assets/appbackground.png')}>
-      <VitalHeader navigateScreen={navigateScreen} setshowaddicon={setshowaddicon} setdatestring={setdatestring} />
+      <VitalHeader
+        navigateScreen={navigateScreen}
+        setshowaddicon={setshowaddicon}
+        setdatestring={setdatestring}
+      />
 
       <View style={ContentStyle.container}>
         {newrecord == true ? (
@@ -88,29 +115,25 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
             setremarks={setremarks}
             loader={loader}
             add_record={add_record}
+            message={message}
           />
         ) : (
           <>
             <ScrollView>
               <Card record={record} datestring={datestring} />
             </ScrollView>
-
-            {/* {showaddicon == true ? ( */}
-              <TouchableOpacity
-                onPress={() => {
-                  setnewrecord(true)
-                }}>
+            <View style={{position: 'absolute', bottom: 60}}>
+              <TouchableOpacity onPress={() => setnewrecord(true)}>
                 <Image
                   style={{
                     width: 53,
                     height: 53,
                     alignSelf: 'center',
-                    position: 'absolute',
-                    bottom: 310,
                   }}
                   source={require('../../assets/addIcon.png')}
                 />
               </TouchableOpacity>
+            </View>
             {/* ) : (<></>)} */}
           </>
         )}

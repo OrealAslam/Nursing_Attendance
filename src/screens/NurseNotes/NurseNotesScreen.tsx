@@ -26,14 +26,14 @@ const NurseNotesScreen = ({navigation}: {navigation: any}) => {
         setdata(requestData);
       }
     })();
-  }, [isFocused]);
+  }, [isFocused, loader]);
 
   return (
     <ImageBackground
       style={{width: width, height: height}}
       source={require('../../assets/appbackground.png')}>
       <Header navigateScreen={navigateScreen} setshowaddicon={setshowaddicon} setdatestring={setdatestring} />
-      {loader == true ? (<ActivityIndicator size={'large'} color={'#ddd'} style={{alignSelf:'center'}} />) : (<MainContent datestring={datestring} showaddicon={showaddicon} data={data} />)}
+      {loader == true ? (<ActivityIndicator size={'large'} color={'#ddd'} style={{alignSelf:'center'}} />) : (<MainContent datestring={datestring} showaddicon={showaddicon} data={data} setloader={setloader} loader={loader}/>)}
     </ImageBackground>
   );
 };

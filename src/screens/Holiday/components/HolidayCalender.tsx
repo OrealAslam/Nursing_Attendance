@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {Calendar} from 'react-native-calendars';
 import moment from 'moment';
-
 const HolidayCalender = (props: any) => {
   const [selected, setSelected] = useState(moment().format('YYYY-MM-DD'));
 
@@ -10,6 +9,7 @@ const HolidayCalender = (props: any) => {
       style={{width: '94%', alignSelf: 'center'}}
       // Specify the current date
       current={selected}
+      allowRangeSelection={true}
       // Callback that gets called when the user selects a day
       onDayPress={day => {
         props.check_for_already_selected(day.dateString);

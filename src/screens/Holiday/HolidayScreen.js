@@ -6,6 +6,7 @@ import HolidayFooter from './components/HolidayFooter';
 import {leave_request, get_user_leave_request} from '../../Helper/AppHelper';
 import {useIsFocused} from '@react-navigation/native';
 import HolidayCalender from './components/HolidayCalender';
+import moment from 'moment';
 
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 60;
@@ -17,6 +18,7 @@ const HolidayScreen = ({navigation}) => {
   const [loader, setloader] = useState(true);
   const [calenderloader, setcalenderloader] = useState(true);
   const [markedDates, setmarkedDates] = useState({});
+  const [datepressed, setdatepressed] = useState('');
 
   useEffect(() => {
     (async () => {

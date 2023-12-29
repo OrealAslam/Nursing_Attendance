@@ -7,7 +7,7 @@ import Geolocation from '@react-native-community/geolocation';
 import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
-export const IMAGE_BASE_URL = 'https://portal.plancare.pk/';
+export const IMAGE_BASE_URL = 'https://portal.plancare.pk';
 const ATTENDENCE_RECORD_ID = 3;
 global.DateArray = [];
 
@@ -143,6 +143,7 @@ export const update_user_profile = async data => {
   const request = await fetch(UPDATE_PROFILE, {
     method: 'POST',
     headers: {
+      // 'Content-Type': 'multipart/form-data',
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },

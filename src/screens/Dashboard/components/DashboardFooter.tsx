@@ -8,7 +8,7 @@ const DashboardFooter = (props: any) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <TouchableOpacity
           style={{marginBottom: 8}}
-          onPress={() => props.navigateScreen('HolidayScreen')}>
+          onPress={() => props.navigateScreen('LeaveRequest')}>
           <Image
             style={FooterStyle.cardstyle}
             source={require('../../../assets/holidayrequest.png')}

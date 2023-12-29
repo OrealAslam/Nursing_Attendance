@@ -38,7 +38,7 @@ export const HeaderStyle = StyleSheet.create({
 export const ContentStyle = StyleSheet.create({
   container: {
     width: width,
-    height: '100%',
+    height: 84/100*height,
     backgroundColor: '#fff',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,

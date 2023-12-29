@@ -81,6 +81,8 @@ const Form = (props: any) => {
         <TextInput style={styles.textInput} onChangeText={props.setremarks} />
       </View>
 
+      <Text style={styles.message}>{props.message}</Text>
+
       {props.loader == true ? (
         <ActivityIndicator size={'large'} color={'#000'} />
       ) : (
@@ -136,6 +138,13 @@ const styles = StyleSheet.create({
     paddingRight: 13,
     fontWeight: '500',
     color: '#000',
+  },
+  message: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '500',
+    marginVertical: 10,
+    color: '#f00',
   },
 });
 export default Form;

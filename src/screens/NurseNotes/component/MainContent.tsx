@@ -17,22 +17,32 @@ import moment from 'moment';
 const MainContent = (props: any) => {
   const [result, setresult] = useState(props.data);
   const [modal, setmodal] = useState(false);
-  const [loader, setloader] = useState(false);
   const [description, setdescription] = useState('');
   const [shift, setshift] = useState('');
+  const [modalshift, setmodalshift] = useState('');
+  const [message, setmessage] = useState('');
 
   const saveRecord = async () => {
-    setloader(true);
-    let response = await add_nurse_note(description, shift);
-    if (response.status == 'success') {
-      setloader(false);
-      setmodal(false);
+    if (description.length < 1) {
+      setmessage('could not enter empty record');
+    } else {
+      props.setloader(true);
+      let response = await add_nurse_note(description, modalshift);
+      if (response.status == 'success') {
+        setmessage('Added Successfully');
+        props.setloader(false);
+        setmodal(false);
+      } else {
+        // setmodal(false);
+        console.log(response);
+        props.setloader(false);
+        setmessage('Unable to add a note');
+      }
     }
   };
 
   const displayRecord = () => {
-
-    if(result != undefined) {
+    if (result != undefined) {
       let list = result.map((item: any, index: any) => {
         return (
           <View style={CardStyle.card} key={index}>
@@ -49,19 +59,23 @@ const MainContent = (props: any) => {
     }
   };
 
-  const searchByShiftTime = (array: any, time: string, date:string) => {
+  const searchByShiftTime = (array: any, time: string, date: string) => {
     let filter = [];
-    if(shift != '') {
-      filter = array.filter((item:any) => item.shift_status === time);
-      if(date != ''){
-        filter = filter.filter((record:any) => record.created_at.startsWith(moment(date).format('YYYY-MM-DD')));
+    if (shift != '') {
+      filter = array.filter((item: any) => item.shift_status === time);
+      if (date != '') {
+        filter = filter.filter((record: any) =>
+          record.created_at.startsWith(moment(date).format('YYYY-MM-DD')),
+        );
       }
       return filter;
-    } else{
-      if(date != ''){
-        filter = props.data.filter((record:any) => record.created_at.startsWith(moment(date).format('YYYY-MM-DD')));
+    } else {
+      if (date != '') {
+        filter = props.data.filter((record: any) =>
+          record.created_at.startsWith(moment(date).format('YYYY-MM-DD')),
+        );
         return filter;
-      } else{ 
+      } else {
         return props.data;
       }
     }
@@ -73,7 +87,6 @@ const MainContent = (props: any) => {
     setresult(data);
   }, [shift, props.data, props.datestring]);
 
-
   // const testFunc = () => {
   //   const data = [
   //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 15:36:04", "id": 1, "lead_id": 465, "notes": "Morning desc", "shift_status": "morning", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
@@ -81,8 +94,8 @@ const MainContent = (props: any) => {
   //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 12:20:06", "id": 3, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
   //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-02 12:19:14", "id": 4, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
   //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-11 12:18:53", "id": 5, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0}
-  //   ];    
-  //   const filteredRecords = data.filter(record => record.created_at.startsWith("2023-12-20"));    
+  //   ];
+  //   const filteredRecords = data.filter(record => record.created_at.startsWith("2023-12-20"));
   // }
 
   return (
@@ -114,10 +127,14 @@ const MainContent = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView automaticallyAdjustKeyboardInsets={true} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        automaticallyAdjustKeyboardInsets={true}
+        showsVerticalScrollIndicator={false}>
         <View style={ContentStyle.cardContainer}>{displayRecord()}</View>
       </ScrollView>
       {/* {props.showaddicon && ( */}
+
+      <View style={{position: 'absolute', bottom: 60}}>
         <TouchableOpacity
           onPress={() => {
             setmodal(true);
@@ -127,12 +144,11 @@ const MainContent = (props: any) => {
               width: 53,
               height: 53,
               alignSelf: 'center',
-              position: 'absolute',
-              bottom: 210,
             }}
             source={require('../../../assets/addIcon.png')}
           />
         </TouchableOpacity>
+      </View>
       {/* )} */}
 
       {/* Modal */}
@@ -146,14 +162,42 @@ const MainContent = (props: any) => {
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
+              <View style={ContentStyle.navigation}>
+                <TouchableOpacity
+                  onPress={() => setmodalshift('morning')}
+                  style={{marginHorizontal: 10}}>
+                  <Image
+                    style={ContentStyle.navImage}
+                    source={
+                      modalshift == 'morning'
+                        ? require('../../../assets/morning.png')
+                        : require('../../../assets/morningunselect.png')
+                    }
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setmodalshift('night')}
+                  style={{marginHorizontal: 10}}>
+                  <Image
+                    style={ContentStyle.navImage}
+                    source={
+                      modalshift == 'night'
+                        ? require('../../../assets/night.png')
+                        : require('../../../assets/nightunselect.png')
+                    }
+                  />
+                </TouchableOpacity>
+              </View>
+
               <Text style={styles.label}>Description</Text>
               <TextInput
                 style={styles.textInput}
                 keyboardType="default"
                 onChangeText={setdescription}
               />
+              <Text style={styles.message}>{message}</Text>
 
-              {loader == true ? (
+              {props.loader == true ? (
                 <ActivityIndicator
                   size={'small'}
                   color="#000"
@@ -195,6 +239,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+  message: {
+    fontSize: 12,
+    textAlign: 'center',
+    fontWeight: '500',
+    marginVertical: 10,
+    color: '#000',
+  },
   button: {
     borderRadius: 20,
     padding: 10,
@@ -225,8 +276,8 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: '95%',
-    height: 70,
-    lineHeight: 70,
+    height: 80,
+    // lineHeight: 70,
     textAlign: 'left',
     backgroundColor: '#fff',
     borderRadius: 6,

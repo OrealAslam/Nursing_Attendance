@@ -19,9 +19,7 @@ import {
   get_async_data,
   update_user_profile,
 } from '../../Helper/AppHelper';
-import {launchCamera} from 'react-native-image-picker';
-import RNFS from 'react-native-fs';
-import RNFetchBlob from 'rn-fetch-blob';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {ImagePicker, MainContainer} from './profilestyles';
 
 const {width, height} = Dimensions.get('window');
@@ -65,6 +63,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       address: address,
       image: imageData != null ? imageData : '',
     };
+    console.log('OBJECT', obj);
     let response = await update_user_profile(obj);
     if (response.status == 'success') {
       setloader(false);
@@ -74,9 +73,10 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   };
 
   const captureImage = async (imageData: any) => {
-    console.log(imageData.assets[0]);
+    // console.log(imageData.assets[0]);
     let formData = new FormData();
     formData.append('image',{
+      // fileName: 'profilephoto.jpg',
       fileName: imageData.assets[0].fileName,
       fileSize: imageData.assets[0].fileSize,
       height: imageData.assets[0].height,
@@ -121,7 +121,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              launchCamera(
+              launchImageLibrary(
                 {
                   mediaType: 'photo',
                   assetRepresentationMode: 'current',

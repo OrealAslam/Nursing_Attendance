@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import DashboardScreen from '../screens/Dashboard/DashboardScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import HolidayScreen from '../screens/Holiday/HolidayScreen';
+import LeaveRequest from '../screens/LeaveRequest/LeaveRequest';
 import HistoryScreen from '../screens/History/HistoryScreen';
 import VitalSignScreen from '../screens/VitalSign/VitalSignScreen';
 import NurseNotesScreen from '../screens/NurseNotes/NurseNotesScreen';
@@ -25,6 +26,11 @@ export default function MainRoute() {
       <Stack.Screen
         name="HolidayScreen"
         component={HolidayScreen}
+        options={{headerShown: false, animationenabled: false}}
+      />
+      <Stack.Screen
+        name="LeaveRequest"
+        component={LeaveRequest}
         options={{headerShown: false, animationenabled: false}}
       />
       <Stack.Screen
