@@ -15,6 +15,7 @@ import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
 // import Geolocation from 'react-native-geolocation-service';
 import {useIsFocused} from '@react-navigation/native';
+import OverlayLoader from '../../components/OverlayLoader';
 
 const DashboardScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();
@@ -141,7 +142,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           let attendenceNoted = request.attendance_Status.start_time;
           let now = moment(new Date());
           const totalDuration = moment.duration(now.diff(attendenceNoted));
-          settotalwotking(formatTime(totalDuration.hours(), totalDuration.minutes()));
+          settotalwotking(
+            formatTime(totalDuration.hours(), totalDuration.minutes()),
+          );
           setworkTime(
             formatTimeDifference(
               totalDuration.hours(),

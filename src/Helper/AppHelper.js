@@ -7,7 +7,9 @@ import Geolocation from '@react-native-community/geolocation';
 import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
+export const LOCAL_BASE_URL = 'http://192.168.10.14/MRL-Apps/MRL-Apps/public/api/update-locally';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk';
+export const WHATSAPP_NUMBER = '+923041111949';
 const ATTENDENCE_RECORD_ID = 3;
 global.DateArray = [];
 
@@ -72,23 +74,14 @@ export const get_async_data = async name => {
 };
 
 export const editableProfileData = async () => {
-  let name = await get_async_data('username');
-  let designation = await get_async_data('designation');
-  let email = await get_async_data('email');
-  let dob = await get_async_data('dob');
-  let address = await get_async_data('address');
-  let hiring_date = await get_async_data('hiring_date');
-  let profile_picture = await get_async_data('profile_picture');
 
-  return {
-    name: name,
-    designation: designation,
-    email: email,
-    dob: dob,
-    address: address,
-    hiring_date: hiring_date,
-    profile_picture: profile_picture,
-  };
+  let phone = await get_async_data('phone');
+  let password = await get_async_data('password');
+  const data = await loginNurse(phone, password);
+  if (data.status == 'success') {
+    return data.data;
+  }
+  return data;
 };
 
 export const get_history = async id => {
@@ -143,19 +136,20 @@ export const update_user_profile = async data => {
   const request = await fetch(UPDATE_PROFILE, {
     method: 'POST',
     headers: {
-      // 'Content-Type': 'multipart/form-data',
+      'Content-Type': 'multipart/form-data',
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify(data),
   });
   const response = await request.json();
-  console.log('RES', response)
-  if (response.status == 'success') {
-    await set_async_data('username', data.name);
-    await set_async_data('dob', data.dob);
-    await set_async_data('address', data.address);
-  }
+
+  // if (response.status == 'success') {
+  //   await set_async_data('username', data.name);
+  //   await set_async_data('dob', data.dob);
+  //   await set_async_data('address', data.address);
+  //   await set_async_data('profile_picture', data.image);
+  // }
   return response;
 };
 
@@ -275,6 +269,9 @@ export const get_user_leave_request = async () => {
   const response = await request.json();
   if (response.status == 'success') {
     global.DateArray = response.data;
+    return response;
+  }
+  if (response.status == 'error') {
     return response;
   }
 };

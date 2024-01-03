@@ -1,10 +1,10 @@
 import {View, Text, TextInput, ScrollView} from 'react-native';
 import React from 'react';
-import {HeaderStyle, TextArea} from '../profilestyles';
+import {TextArea} from '../profilestyles';
 
 const MainContent = (props: any) => {
   return (
-    <ScrollView style={{maxHeight: '50%',top: -10,paddingBottom :10}}>
+    <ScrollView style={{maxHeight: 370}}>
       <View style={TextArea.inputContainer}>
         <Text style={TextArea.label}>Name</Text>
         <TextInput
@@ -42,21 +42,21 @@ const MainContent = (props: any) => {
         />
       </View>
 
-      <View style={TextArea.inputContainer}>
-        <Text style={TextArea.label}>Hiring Date</Text>
-        <TextInput
-          style={TextArea.inputText}
-          editable={false}
-          value={props.hiringdate}
-        />
-      </View>
-
       <View style={[TextArea.inputContainer, {marginBottom: 0}]}>
         <Text style={TextArea.label}>Email</Text>
         <TextInput
           style={TextArea.inputText}
           editable={false}
           value={props.email}
+        />
+      </View>
+
+      <View style={TextArea.inputContainer}>
+        <Text style={TextArea.label}>Phone Number</Text>
+        <TextInput
+          style={TextArea.inputText}
+          value={props.phone}
+          onChangeText={props.setphone}
         />
       </View>
     </ScrollView>

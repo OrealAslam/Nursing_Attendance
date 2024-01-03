@@ -3,13 +3,11 @@ import SplashScreen from 'react-native-splash-screen';
 import {NavigationContainer} from '@react-navigation/native';
 import Route from './src/routes/Route';
 import {get_async_data, silent_call} from './src/Helper/AppHelper';
-import MainRoute from './src/routes/MainRoute';
+import NurseRoute from './src/routes/NurseRoute';
+import ClientRoute from './src/routes/ClientRoutes';
 import {useNetInfo} from '@react-native-community/netinfo';
 import messaging from '@react-native-firebase/messaging';
-import {
-  PermissionsAndroid,
-  Alert,
-} from 'react-native';
+import {PermissionsAndroid, Alert} from 'react-native';
 import AdminRoute from './src/routes/AdminRoute';
 import NetworkModal from './src/components/NetworkModal';
 
@@ -73,14 +71,16 @@ const App = () => {
       {splashClosed ? (
         <>
           {NetworkModel == true ? (
-           <NetworkModal />
+            <NetworkModal />
           ) : (
             <>
               {userid != null ? (
-                usertype == 'Admin' ? ( // Nurse
+                usertype == 'Admin' ? (
                   <AdminRoute></AdminRoute>
+                  ) : usertype == 'Nurse' ? (
+                  <NurseRoute></NurseRoute>
                 ) : (
-                  <MainRoute></MainRoute>
+                  <ClientRoute></ClientRoute>
                 )
               ) : (
                 <Route></Route>

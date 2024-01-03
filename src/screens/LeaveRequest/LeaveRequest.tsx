@@ -10,6 +10,8 @@ const LeaveRequest = ({navigation}: {navigation: any}) => {
       let data = await get_user_leave_request();
       if (data.status == 'success') {
         setholidayHistory(data.data);
+      } else{
+        setholidayHistory([]);
       }
     })();
   }, []);

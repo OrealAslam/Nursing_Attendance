@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import DashboardScreen from '../screens/Dashboard/DashboardScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
@@ -10,7 +10,7 @@ import NurseNotesScreen from '../screens/NurseNotes/NurseNotesScreen';
 
 const Stack = createNativeStackNavigator();
 
-export default function MainRoute() {
+export default function NurseRoute() {
   return (
     <Stack.Navigator>
       <Stack.Screen

@@ -25,6 +25,8 @@ const HistoryContent = (props: any) => {
         time_duration: '00:00:00',
       });
     }
+
+    console.log(result)
   }, [datepressed]);
 
   return (
@@ -34,16 +36,16 @@ const HistoryContent = (props: any) => {
 
       {result != null ? (
         <View style={{width: '100%', padding: 10}}>
-          <View style={CardContainer.card}>
+          <View style={[CardContainer.card, result['time_duration'] != '00:00:00' ? {borderLeftColor: '#74CAE3'} : {borderLeftColor: '#FF3366'}]}>
             <View style={CardContainer.column1}>
-              <Text style={CardContainer.status}>{moment(result['created_at']).format('DD, MMMM YYYY') != '00:00:00' ? 'Present' : 'Absent'}</Text>
+              <Text style={CardContainer.status}>{result['time_duration'] != '00:00:00' ? 'Present' : 'Absent'}</Text>
               <Text style={{color: '#646464', fontSize: 9, fontWeight: '600'}}>
                 {moment(result['created_at']).format('DD, MMMM YYYY')}
               </Text>
             </View>
 
             <View style={CardContainer.column2}>
-              <Text style={CardContainer.dutyTime}>
+              <Text style={[CardContainer.dutyTime, result['time_duration'] != '00:00:00' ? {color: '#74CAE3'}: {color: '#FF3366'}]}>
                 {result['time_duration']}
               </Text>
             </View>

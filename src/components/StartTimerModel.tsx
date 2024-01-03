@@ -62,7 +62,7 @@ const StartTimerModel = (props: any) => {
             <>
               <TouchableOpacity onPress={() => props.updateShift('yes')}>
                 <Image
-                  style={{width: 93.43, height: 36.71}}
+                  style={{width: 93.13, height: 36.50}}
                   source={require('../assets/yes.png')}
                 />
               </TouchableOpacity>

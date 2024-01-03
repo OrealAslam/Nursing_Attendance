@@ -10,10 +10,10 @@ const Header = (props: any) => {
         <View style={HeaderStyle.col1}>
           <TouchableOpacity
             style={{padding: 5}}
-            onPress={() => props.navigateScreen('DashboardScreen')}>
+            onPress={() => props.navigateScreen('ClientDashboard')}>
             <Image
               style={HeaderStyle.backIcon}
-              source={require('../../../assets/backicon.png')}
+              source={require('../../../../assets/backicon.png')}
             />
           </TouchableOpacity>
         </View>
@@ -38,13 +38,14 @@ const Header = (props: any) => {
           dateNameStyle={{color: '#C3CBE7', fontSize: 12, fontWeight: '500'}}
           highlightDateNumberStyle={{color: '#C3CBE7'}}
           highlightDateNameStyle={{color: '#C3CBE7'}}
-          iconLeft={require('../../../assets/backicon.png')}
-          iconRight={require('../../../assets/nexticon.png')}
+          iconLeft={require('../../../../assets/backicon.png')}
+          iconRight={require('../../../../assets/nexticon.png')}
           iconContainer={{flex: 0.1}}
           onDateSelected={e => {
             props.setshowaddicon(true);
             props.setdatestring(e);
           }}
+          // selectedDate={moment()}
         />
       </View>
     </>

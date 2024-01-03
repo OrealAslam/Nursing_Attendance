@@ -6,40 +6,33 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  LogBox,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
 import MainContent from './components/MainContent';
 import FooterComponent from './components/FooterComponent';
-import ChangePasswordModel from '../../components/ChangePasswordModel';
+import ChangePasswordModel from '../../../components/ChangePasswordModel';
 import {
-  IMAGE_BASE_URL,
-  editableProfileData,
+  IMAGE_BASE_URL,  editableProfileData,
   get_async_data,
   update_user_profile,
-} from '../../Helper/AppHelper';
-import DocumentPicker, {types} from 'react-native-document-picker';
+} from '../../../Helper/AppHelper';
+import DocumentPicker, { types } from 'react-native-document-picker';
 import {ImagePicker, MainContainer} from './profilestyles';
-import {useIsFocused} from '@react-navigation/native';
-import messaging from '@react-native-firebase/messaging';
 
 const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = ({navigation}: {navigation: any}) => {
-  // LogBox.ignoreLogs(['Warning: ...']);
-  const isFocused = useIsFocused();
   const [model, setmodel] = useState(false);
-  const [uri, seturi] = useState(false);
   const [name, setname] = useState('');
   const [email, setemail] = useState('');
   const [dob, setdob] = useState('');
   const [designation, setdesignation] = useState('');
-  const [hiringdate, sethiringdate] = useState('');
+  const [phone, setphone] = useState('');
   const [address, setaddress] = useState('');
   const [profilepicture, setprofilepicture] = useState('');
-  const [imageData, setimageData] = useState(null);
-  const [loader, setloader] = useState(true);
+  const [imageData, setimageData] = useState({});
+  const [loader, setloader] = useState(false);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -52,35 +45,27 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       setemail(data.email);
       setdob(data.dob);
       setdesignation(data.designation);
-      sethiringdate(data.hiring_date);
+      setphone(data.phone_number);
       setaddress(data.address);
       setprofilepicture(data.image);
-      setloader(false);
     })();
-  }, [loader, isFocused]);
+  }, [loader]);
 
   const updateRecord = async () => {
     setloader(true);
     const id = await get_async_data('user_id');
-
     let obj = {
       id: id,
       name: name,
       dob: dob,
       address: address,
-      profile_image: imageData !=null?imageData[0] : '',
-      upload_image: imageData !=null?1 : 0,
+      image: imageData ? imageData : '',
     };
-
     let response = await update_user_profile(obj);
-
     if (response.status == 'success') {
-      console.log('AFTER UPDATE OBJ ', response);
       setloader(false);
-      Alert.alert('Success', 'Profile Updated Successfully');
     } else {
       setloader(false);
-      Alert.alert('Error', response.message);
     }
   };
 
@@ -89,42 +74,23 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       const response = await DocumentPicker.pick({
         presentationStyle: 'fullScreen',
         allowMultiSelection: false,
-        type: [DocumentPicker.types.images],
       });
-      setimageData(response);
+      setimageData(response[0]);
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        console.log('cancel picker');
-      } else {
-        throw err;
-      }
+      console.warn(err);
     }
   }, []);
-
-  // const handleDocumentSelection = useCallback(async () => {
-  //   try {
-  //     const response = await DocumentPicker.pick({
-  //       presentationStyle: 'fullScreen',
-  //       allowMultiSelection: false,
-  //     });
-  //     setimageData(response);
-  //     seturi(true);
-  //     setprofilepicture(response[0].uri)
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       seturi(false);
-  //       console.log('cancel picker')
-  //     } else {
-  //       throw err;
-  //     }
-  //   }
-  // }, []);
 
   return (
     <ImageBackground
       style={{width: width, height: height}}
-      source={require('../../assets/appbackground.png')}>
-      <ProfileHeader navigateScreen={navigateScreen} />
+      source={require('../../../assets/appbackground.png')}>
+      <ProfileHeader
+        profilepicture={profilepicture}
+        setprofilepicture={setprofilepicture}
+        navigateScreen={navigateScreen}
+        setimageData={setimageData}
+      />
 
       <View style={MainContainer.container}>
         <View style={ImagePicker.container}>
@@ -132,19 +98,18 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
             <Image
               style={ImagePicker.imageStyle}
               source={{uri: IMAGE_BASE_URL + profilepicture}}
-              // source={{uri: uri== true ? profilepicture : IMAGE_BASE_URL + profilepicture}}
             />
           ) : (
             <Image
               style={ImagePicker.imageStyle}
-              source={require('../../assets/defaultprofileimage.png')}
+              source={require('../../../assets/defaultprofileimage.png')}
             />
           )}
 
           <TouchableOpacity style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}
-              source={require('../../assets/editprofilepicbtn.png')}
+              source={require('../../../assets/editprofilepicbtn.png')}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -152,7 +117,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
             style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}
-              source={require('../../assets/editprofilepicbtn.png')}
+              source={require('../../../assets/editprofilepicbtn.png')}
             />
           </TouchableOpacity>
         </View>
@@ -162,12 +127,12 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
           address={address}
           dob={dob}
           designation={designation}
-          hiringdate={hiringdate}
+          phone={phone}
           setname={setname}
           setemail={setemail}
           setdob={setdob}
           setdesignation={setdesignation}
-          sethiringdate={sethiringdate}
+          setphone={setphone}
           setaddress={setaddress}
         />
         {loader == true ? (

@@ -48,7 +48,6 @@ export const CardContainer = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 10,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF3366',
     alignSelf: 'center'
   },
   column1: {

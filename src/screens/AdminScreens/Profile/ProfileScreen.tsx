@@ -30,37 +30,6 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     (async () => {
-      // UPDATE PROFILE IMAGE HERE
-      if (imageData != '') {
-        // try {
-        //   let uploadData = new FormData();
-        //   let myHeaders = new Headers();
-        //   let id = await get_async_data('user_id');
-        //   myHeaders.append('Content-Type', 'multipart/form-data');
-        //   let obj = {
-        //     id: id,
-        //     name: name,
-        //     dob: dob,
-        //     address: address,
-        //     image: imageData,
-        //   };
-        //   uploadData.append('data', obj);
-
-        //   const request = await fetch(UPDATE_PROFILE, {
-        //     method: 'POST',
-        //     headers: myHeaders,
-        //     body: uploadData,
-        //   });
-        //   const response = await request.json();
-        // } catch (err) {
-        //   console.log(err);
-        // }
-      }
-    })();
-  }, [imageData]);
-
-  useEffect(() => {
-    (async () => {
       let data = await editableProfileData();
       setname(data.name);
       setemail(data.email);

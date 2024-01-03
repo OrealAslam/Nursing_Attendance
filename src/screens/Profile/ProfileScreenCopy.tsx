@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  LogBox,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
@@ -27,7 +26,6 @@ import messaging from '@react-native-firebase/messaging';
 const {width, height} = Dimensions.get('window');
 
 const ProfileScreen = ({navigation}: {navigation: any}) => {
-  // LogBox.ignoreLogs(['Warning: ...']);
   const isFocused = useIsFocused();
   const [model, setmodel] = useState(false);
   const [uri, seturi] = useState(false);
@@ -38,7 +36,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [hiringdate, sethiringdate] = useState('');
   const [address, setaddress] = useState('');
   const [profilepicture, setprofilepicture] = useState('');
-  const [imageData, setimageData] = useState(null);
+  const [imageData, setimageData] = useState([]);
   const [loader, setloader] = useState(true);
 
   const navigateScreen = (screenName: any) => {
@@ -60,38 +58,48 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   }, [loader, isFocused]);
 
   const updateRecord = async () => {
-    setloader(true);
+    // setloader(true);
     const id = await get_async_data('user_id');
-
     let obj = {
       id: id,
       name: name,
       dob: dob,
       address: address,
-      profile_image: imageData !=null?imageData[0] : '',
-      upload_image: imageData !=null?1 : 0,
+      profile_image: imageData.length > 0 ? imageData[0] : '',
+      upload_image: imageData.length > 0 ? 1 : 0,
     };
 
-    let response = await update_user_profile(obj);
+    const formData = new FormData();
+    formData.append('data', {
+      id: id,
+      name: name,
+      dob: dob,
+      address: address,
+      profile_image: imageData.length > 0 ? imageData[0] : '',
+      upload_image: imageData.length > 0 ? 1 : 0,
+    });
 
+    console.log('formData', formData._parts[0][1]);
+    
+    let response = await update_user_profile(formData._parts[0][1]);
     if (response.status == 'success') {
-      console.log('AFTER UPDATE OBJ ', response);
+    console.log('SUCCESS RESPONSE: ', response);
       setloader(false);
       Alert.alert('Success', 'Profile Updated Successfully');
     } else {
       setloader(false);
-      Alert.alert('Error', response.message);
+      console.log(response);
+      Alert.alert('Error Response', response.message);
     }
   };
 
   const handleDocumentSelection = useCallback(async () => {
     try {
-      const response = await DocumentPicker.pick({
+      const file = await DocumentPicker.pick({
         presentationStyle: 'fullScreen',
         allowMultiSelection: false,
-        type: [DocumentPicker.types.images],
       });
-      setimageData(response);
+      setimageData(file);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('cancel picker');
@@ -100,25 +108,6 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       }
     }
   }, []);
-
-  // const handleDocumentSelection = useCallback(async () => {
-  //   try {
-  //     const response = await DocumentPicker.pick({
-  //       presentationStyle: 'fullScreen',
-  //       allowMultiSelection: false,
-  //     });
-  //     setimageData(response);
-  //     seturi(true);
-  //     setprofilepicture(response[0].uri)
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       seturi(false);
-  //       console.log('cancel picker')
-  //     } else {
-  //       throw err;
-  //     }
-  //   }
-  // }, []);
 
   return (
     <ImageBackground

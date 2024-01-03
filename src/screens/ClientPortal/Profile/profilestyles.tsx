@@ -11,7 +11,7 @@ export const HeaderStyle = StyleSheet.create({
     paddingHorizontal: 15,
     paddingTop: 20,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'flex-start'
   },
   col1: {
     width: (8 / 100) * width,
@@ -38,14 +38,14 @@ export const ImagePicker = StyleSheet.create({
   container: {
     width: width,
     alignItems: 'center',
-    top: '-5%'
+    top: '-7%'
   },
   imageStyle: {
     width: 101,
     height: 101,
     borderRadius: 100,
     borderWidth: 3,
-    borderColor: '#fff',
+    borderColor: '#fff'
   },
   editButton: {
     position: 'absolute',
@@ -82,13 +82,13 @@ export const TextArea = StyleSheet.create({
   },
   label: {
     color: '#6A7C8D',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
     marginBottom: 5,
   },
   inputText: {
     color: '#515151',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     textTransform: 'capitalize',
     paddingHorizontal: 10,

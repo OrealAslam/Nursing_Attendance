@@ -15,9 +15,9 @@ const FooterComponent = (props:any) => {
             width: buttonWidth,
             height: 200 * ratio,
             alignSelf: 'center',
-            marginTop: 20,
+            marginTop: 45,
           }}
-          source={require('../../../assets/profilesave.png')}
+          source={require('../../../../assets/profilesave.png')}
         />
       </TouchableOpacity>
 

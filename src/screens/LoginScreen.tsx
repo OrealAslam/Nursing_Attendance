@@ -52,6 +52,8 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         seterrormessage(request.message);
         await generateFCM();
         await set_async_data('user_id', request.data.id);
+        await set_async_data('phone', phone);
+        await set_async_data('password', password);
         await set_async_data('username', request.data.name);
         await set_async_data('usertype', request.data.type);
         await set_async_data('designation', request.data.designation);
@@ -66,8 +68,10 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         let usertype = await get_async_data('usertype');
         if (usertype == 'Admin') {
           navigation.replace('AdminRoute');
+        } if(usertype == 'Nurse') {
+          navigation.replace('NurseRoute');
         } else {
-          navigation.replace('MainRoute');
+          navigation.replace('ClientRoute');
         }
       }
     }
