@@ -102,7 +102,7 @@ const DashboardContent = (props: any) => {
             source={require('../../../assets/interval.png')}
           />
           <Text style={ContentStyle.time}>{props.totalwotking}</Text>
-          <Text style={ContentStyle.desc}>Working Hours</Text>
+          <Text style={ContentStyle.desc}>Today Hours</Text>
         </View>
       </View>
     </View>

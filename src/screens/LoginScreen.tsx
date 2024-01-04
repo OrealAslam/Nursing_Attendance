@@ -66,16 +66,20 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         await save_fcm_token();
 
         let usertype = await get_async_data('usertype');
-        if (usertype == 'Admin') {
-          navigation.replace('AdminRoute');
-        } if(usertype == 'Nurse') {
-          navigation.replace('NurseRoute');
-        } else {
-          navigation.replace('ClientRoute');
-        }
+        // setTimeout(() => {
+          console.log('usertype', usertype);
+          if (usertype == 'Admin') {
+            navigation.replace('AdminRoute');
+          } if(usertype == 'Nurse') {
+            navigation.replace('NurseRoute');
+          }
+          //  else {
+          //   navigation.replace('ClientRoute');
+          // }   
+          setloader(false);       
+        // }, 1000);
       }
     }
-    setloader(false);
   };
 
   useEffect(() => {

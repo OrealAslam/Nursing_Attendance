@@ -94,17 +94,17 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
       <View style={MainContainer.container}>
         <View style={ImagePicker.container}>
-          {profilepicture != '' ? (
+          {/* {profilepicture != '' ? (
             <Image
               style={ImagePicker.imageStyle}
               source={{uri: IMAGE_BASE_URL + profilepicture}}
             />
-          ) : (
+          ) : ( */}
             <Image
               style={ImagePicker.imageStyle}
               source={require('../../../assets/defaultprofileimage.png')}
             />
-          )}
+          {/* )} */}
 
           <TouchableOpacity style={ImagePicker.editButton}>
             <Image
@@ -113,7 +113,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handleDocumentSelection}
+            onPress={()=>{}}
             style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}

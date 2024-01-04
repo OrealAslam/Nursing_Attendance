@@ -1,6 +1,6 @@
 import {View, Text, TouchableOpacity, Image, PermissionsAndroid} from 'react-native';
 import React from 'react';
-import {HeaderStyle, CalenderStyle} from '../vitalstyles';
+import {HeaderStyle} from '../vitalstyles';
 import CalendarStrip from 'react-native-calendar-strip';
 
 const VitalHeader = (props: any) => {
@@ -22,10 +22,16 @@ const VitalHeader = (props: any) => {
         </View>
       </View>
 
-      <View style={HeaderStyle.calenderContainer}>
+      <View>
         <CalendarStrip
           calendarAnimation={{type: 'sequence', duration: 30}}
           useNativeDriver={true}
+          calendarHeaderFormat='MMM YYYY'
+          calendarHeaderContainerStyle={{start: '-38%'}}
+          highlightDateContainerStyle={{backgroundColor: '#617DE2',borderRadius: 10,borderWidth: 0}}
+          leftSelector={<></>}
+          rightSelector={<></>}
+          scrollable={true}
           daySelectionAnimation={{
             type: 'border',
             duration: 200,

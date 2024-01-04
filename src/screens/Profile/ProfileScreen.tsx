@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   LogBox,
+  NativeModules
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
@@ -26,6 +27,8 @@ import messaging from '@react-native-firebase/messaging';
 
 const {width, height} = Dimensions.get('window');
 
+const { ImagePickerModule } = NativeModules;
+
 const ProfileScreen = ({navigation}: {navigation: any}) => {
   // LogBox.ignoreLogs(['Warning: ...']);
   const isFocused = useIsFocused();
@@ -40,6 +43,16 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [profilepicture, setprofilepicture] = useState('');
   const [imageData, setimageData] = useState(null);
   const [loader, setloader] = useState(true);
+
+  const selectImage = async () => {
+    try {
+      const imagePath = await ImagePickerModule.selectImage();
+      console.log('Selected Image Path:', imagePath);
+      // You can handle the image path returned from the native module here
+    } catch (error) {
+      console.error('Image selection error:', error);
+    }
+  };
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -128,18 +141,18 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
       <View style={MainContainer.container}>
         <View style={ImagePicker.container}>
-          {profilepicture != '' ? (
+          {/* {profilepicture != '' ? (
             <Image
               style={ImagePicker.imageStyle}
               source={{uri: IMAGE_BASE_URL + profilepicture}}
               // source={{uri: uri== true ? profilepicture : IMAGE_BASE_URL + profilepicture}}
             />
-          ) : (
+          ) : ( */}
             <Image
               style={ImagePicker.imageStyle}
               source={require('../../assets/defaultprofileimage.png')}
             />
-          )}
+          {/* )} */}
 
           <TouchableOpacity style={ImagePicker.editButton}>
             <Image
@@ -148,7 +161,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handleDocumentSelection}
+            onPress={()=>{}}
             style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}

@@ -1,16 +1,27 @@
 import {View, Text, Image, TouchableOpacity} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import { HeaderStyle } from '../../../Dashboard/dashboardstyles';
-import {get_nurse_status} from '../../../../Helper/AppHelper';
+import {get_async_data, get_nurse_status} from '../../../../Helper/AppHelper';
+import { useIsFocused } from '@react-navigation/native';
 
 const AdminDashboardHeader = (props: any) => {
+  const [username, setusername] = useState('');
+  const isFocused = useIsFocused();
+
+  useEffect(()=>{
+    (async ()=>{
+      let username = await get_async_data('username');
+      setusername(username);
+    })()
+  }, [isFocused]);
+
   return (
     <View style={HeaderStyle.headerContainer}>
       <View style={HeaderStyle.topHeader}>
         <View>
           <Image
             style={HeaderStyle.adminPhoto}
-            source={require('../../../../assets/adminphoto.jpg')}
+            source={require('../../../../assets/defaultprofileimage.png')}
           />
           <Image
             style={HeaderStyle.editButtonImg}
@@ -31,7 +42,7 @@ const AdminDashboardHeader = (props: any) => {
 
       <View style={{width: '84%',alignSelf: 'center'}}>
         <Text style={HeaderStyle.title}>Welcome</Text>
-        <Text style={HeaderStyle.adminName}>Sahroon Sohail <Image style={HeaderStyle.waveIcon} source={require('../../../../assets/wave.png')}/></Text>
+        <Text style={HeaderStyle.adminName}>{username} <Image style={HeaderStyle.waveIcon} source={require('../../../../assets/wave.png')}/></Text>
       </View>
     </View>
   );

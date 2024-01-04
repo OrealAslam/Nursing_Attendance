@@ -30,9 +30,11 @@ const DashboardHeader = (props: any) => {
         </TouchableOpacity>
       </View>
 
-      <View style={HeaderStyle.headerBadge}>
+      {clientname.length > 1 ? <View style={HeaderStyle.headerBadge}>
         <Text style={HeaderStyle.badgeText}>{clientname}</Text>
-      </View>
+      </View> : <></>}
+
+      
     </View>
   );
 };

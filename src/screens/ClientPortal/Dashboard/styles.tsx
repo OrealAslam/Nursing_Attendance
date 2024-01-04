@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
     height: 312 * cardRatio,
   },
   whatsappContainer: {
-    width: 88/100 * width,
+    width: 83/100 * width,
     alignSelf: 'center'
   },
   whatsappImage: {

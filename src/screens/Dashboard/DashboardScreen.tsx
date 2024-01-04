@@ -1,4 +1,4 @@
-import {PermissionsAndroid, ImageBackground} from 'react-native';
+import {PermissionsAndroid, ImageBackground, Alert} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
@@ -10,6 +10,8 @@ import {
   formatTimeDifference,
   end_shift,
   start_shift,
+  get_async_data,
+  get_history,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -33,6 +35,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [shiftstartat, setshiftstartat] = useState('--:--');
   const [shiftendat, setshiftendat] = useState('--:--');
   const [totalwotking, settotalwotking] = useState('--:--');
+  const [loader, setloader] = useState(true);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -48,6 +51,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
       // API call to start shift
+      setloader(true);
       setshiftstartat(moment().format('HH:mm'));
       let start_date = moment().format('Y-M-D HH:mm:ss');
       let response = await start_shift(
@@ -60,6 +64,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       );
       if (response.status == 'success') {
         setshiftstatus('started');
+        setshiftstartat('--:--');
+        setloader(false);
+        await totalWorkingHours();
       }
     }
     if (shiftstatus == 'ended' && click == 'no') {
@@ -68,9 +75,11 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
     // trying to end shift
     if (shiftstatus == 'started' && click == 'yes') {
+      console.log('ending');
       // API call to end shift
+      setloader(true);
       let end_date = moment().format('Y-M-D HH:mm:ss');
-      setshiftendat(moment().format('HH:mm'));
+      setshiftendat(moment().format('hh:mm a'));
       let response = await end_shift(
         leadid,
         attendenceid,
@@ -81,6 +90,12 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       );
       if (response.status == 'success') {
         setshiftstatus('ended');
+        setloader(false);
+        await totalWorkingHours();
+      } else {
+        setshiftstatus('ended');
+        setloader(false);
+        await totalWorkingHours();
       }
     }
     if (shiftstatus == 'started' && click == 'no') {
@@ -122,10 +137,11 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     (async () => {
+      totalWorkingHours();
       let request = await get_shift_status();
       if (request.status == 'success') {
         setshiftstartat(
-          moment(request.attendance_Status.start_time).format('HH:mm'),
+          moment(request.attendance_Status.start_time).format('hh:mm a'),
         );
         let status = request.attendance_Status.status;
         setleadid(request.data.lead_id);
@@ -153,6 +169,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
             ),
           );
         }
+        setloader(false);
+      } else {
+        Alert.alert('Error', 'Server Error');
       }
     })();
   }, [isFocused]);
@@ -168,6 +187,20 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       m = '0' + minutes;
     }
     return `${h}:${m}`;
+  };
+
+  const totalWorkingHours = async () => {
+    const today = new Date().toISOString().slice(0, 10); // Get today's date in 'YYYY-MM-DD' format
+    let user_id = await get_async_data('user_id');
+    const response = await get_history(user_id);
+    if (response.status == 'success') {
+      if(response.data.length > 0) {
+        const objectsWithTodayDate = response.data.filter(
+          (obj:any) => obj.created_at.slice(0, 10) === today,
+        );
+        settotalwotking(objectsWithTodayDate[0].time_duration);
+      }
+    }
   };
 
   return (
@@ -199,6 +232,8 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           locationaccess={locationaccess}
         />
       )}
+
+      {loader && <OverlayLoader />}
     </ImageBackground>
   );
 };

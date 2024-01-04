@@ -144,12 +144,12 @@ export const update_user_profile = async data => {
   });
   const response = await request.json();
 
-  // if (response.status == 'success') {
-  //   await set_async_data('username', data.name);
-  //   await set_async_data('dob', data.dob);
-  //   await set_async_data('address', data.address);
-  //   await set_async_data('profile_picture', data.image);
-  // }
+  if (response.status == 'success') {
+    await set_async_data('username', data.name);
+    await set_async_data('dob', data.dob);
+    await set_async_data('address', data.address);
+    await set_async_data('profile_picture', data.image);
+  }
   return response;
 };
 
@@ -163,7 +163,6 @@ export const get_shift_status = async () => {
     },
     body: JSON.stringify({user_id: user_id}),
   });
-
   const resposne = await request.json();
   return resposne;
 };

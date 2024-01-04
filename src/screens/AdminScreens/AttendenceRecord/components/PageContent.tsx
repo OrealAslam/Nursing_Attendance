@@ -52,6 +52,11 @@ const PageContent = (props: any) => {
     let list = filteredData.map((item: any, index) => {
       return (
         <View style={styles.attendenceBody} key={index}>
+          <View style={[styles.dateColumn, {width: 12/100 * width}]}>
+            <Text style={{color: '#2A2A2E', fontWeight: '700', fontSize: 12}}>
+              {index + 1}
+            </Text>
+          </View>
           <View style={styles.dateColumn}>
             <Text style={{color: '#2A2A2E', fontWeight: '700', fontSize: 12}}>
               {item.staff_name}
@@ -126,17 +131,20 @@ const PageContent = (props: any) => {
           </View> */}
           {/* Main Content Area */}
 
-            <View style={styles.attendenceTable}>
-              <View style={styles.column}>
-                <Text style={styles.label}>Staff Name</Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.label}>Shift Type</Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.label}>Attendence</Text>
-              </View>
+          <View style={styles.attendenceTable}>
+            <View style={[styles.column, {width: 12/100 * width}]}>
+              <Text style={styles.label}>#</Text>
             </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>Staff Name</Text>
+            </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>Shift Type</Text>
+            </View>
+            <View style={styles.column}>
+              <Text style={styles.label}>Attendence</Text>
+            </View>
+          </View>
           <ScrollView showsVerticalScrollIndicator={false} style={{maxHeight: 75/100 * height}}>
             {display_attendence_record()}
           </ScrollView>
@@ -188,7 +196,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   column: {
-    width: (30 / 100) * width,
+    width: (26 / 100) * width,
     paddingHorizontal: 15,
     paddingVertical: 10,
     justifyContent: 'center',

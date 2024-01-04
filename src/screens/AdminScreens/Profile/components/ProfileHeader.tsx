@@ -19,17 +19,17 @@ const ProfileHeader = (props: any) => {
         <Text style={HeaderStyle.heading}>Profile</Text>
       </View>
       <View style={ImagePicker.container}>
-        {props.profilepicture != '' ? (
+        {/* {props.profilepicture != '' ? (
           <Image
             style={ImagePicker.imageStyle}
             source={{uri: IMAGE_BASE_URL + props.profilepicture}}
           />
-        ) : (
+        ) : ( */}
           <Image
             style={ImagePicker.imageStyle}
             source={require('../../../../assets/defaultprofileimage.png')}
           />
-        )}
+        {/* )} */}
 
         <TouchableOpacity
           onPress={() =>

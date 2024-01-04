@@ -1,4 +1,10 @@
-import {View, Text, TouchableOpacity, Image, PermissionsAndroid} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  PermissionsAndroid,
+} from 'react-native';
 import React from 'react';
 import {HeaderStyle, CalenderStyle} from '../vitalstyles';
 import CalendarStrip from 'react-native-calendar-strip';
@@ -26,6 +32,16 @@ const VitalHeader = (props: any) => {
         <CalendarStrip
           calendarAnimation={{type: 'sequence', duration: 30}}
           useNativeDriver={true}
+          calendarHeaderFormat="MMM YYYY"
+          calendarHeaderContainerStyle={{start: '-38%'}}
+          highlightDateContainerStyle={{
+            backgroundColor: '#617DE2',
+            borderRadius: 10,
+            borderWidth: 0,
+          }}
+          leftSelector={<></>}
+          rightSelector={<></>}
+          scrollable={true}
           daySelectionAnimation={{
             type: 'border',
             duration: 200,
@@ -34,14 +50,17 @@ const VitalHeader = (props: any) => {
           }}
           style={{height: 100, paddingTop: 10, paddingBottom: 10}}
           calendarHeaderStyle={{color: 'white'}}
-          dateNumberStyle={{color: 'white',fontSize:18,fontWeight:'700'}}
-          dateNameStyle={{color: '#C3CBE7',fontSize:12,fontWeight:'500'}}
+          dateNumberStyle={{color: 'white', fontSize: 18, fontWeight: '700'}}
+          dateNameStyle={{color: '#C3CBE7', fontSize: 12, fontWeight: '500'}}
           highlightDateNumberStyle={{color: '#C3CBE7'}}
           highlightDateNameStyle={{color: '#C3CBE7'}}
           iconLeft={require('../../../../assets/backicon.png')}
           iconRight={require('../../../../assets/nexticon.png')}
-          iconContainer={{flex: .1}}
-          onDateSelected={(e)=>{props.setshowaddicon(true); props.setdatestring(e)}}
+          iconContainer={{flex: 0.1}}
+          onDateSelected={e => {
+            props.setshowaddicon(true);
+            props.setdatestring(e);
+          }}
           // selectedDate={moment()}
         />
       </View>
