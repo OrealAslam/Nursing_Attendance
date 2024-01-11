@@ -7,16 +7,18 @@ import NurseRoute from './src/routes/NurseRoute';
 import ClientRoute from './src/routes/ClientRoutes';
 import {useNetInfo} from '@react-native-community/netinfo';
 import messaging from '@react-native-firebase/messaging';
-import {PermissionsAndroid, Alert} from 'react-native';
+import {PermissionsAndroid, Alert, LogBox} from 'react-native';
 import AdminRoute from './src/routes/AdminRoute';
-import NetworkModal from './src/components/NetworkModal';
+// import NetworkModal from './src/components/NetworkModal';
+
+LogBox.ignoreAllLogs();
 
 const App = () => {
   const {type, isConnected} = useNetInfo();
   const [splashClosed, setsplashClosed] = useState(false);
   const [userid, setuserid] = useState(null);
   const [usertype, setusertype] = useState(null);
-  const [NetworkModel, setNetworkModel] = useState(false);
+  // const [NetworkModel, setNetworkModel] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -30,13 +32,13 @@ const App = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    if (isConnected) {
-      setNetworkModel(false);
-    } else {
-      setNetworkModel(true);
-    }
-  }, [isConnected]);
+  // useEffect(() => {
+  //   if (isConnected) {
+  //     setNetworkModel(false);
+  //   } else {
+  //     setNetworkModel(true);
+  //   }
+  // }, [isConnected]);
 
   async function requestUserPermission() {
     PermissionsAndroid.request(
@@ -47,7 +49,7 @@ const App = () => {
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
     if (enabled) {
-      console.log('Authorization status:', authStatus);
+      console.log('Auth status:', authStatus);
     }
   }
 
@@ -70,23 +72,24 @@ const App = () => {
     <NavigationContainer>
       {splashClosed ? (
         <>
-          {NetworkModel == true ? (
+          {/* {NetworkModel == true ? (
             <NetworkModal />
           ) : (
-            <>
+            <> */}
               {userid != null ? (
                 usertype == 'Admin' ? (
                   <AdminRoute></AdminRoute>
-                  ) : usertype == 'Nurse' ? (
-                  <NurseRoute></NurseRoute>
+                  // ) : usertype == 'Nurse' ? (
+                  // <NurseRoute></NurseRoute>
                 ) : (
-                  <ClientRoute></ClientRoute>
+                  // <ClientRoute></ClientRoute>
+                  <NurseRoute></NurseRoute>
                 )
               ) : (
                 <Route></Route>
               )}
-            </>
-          )}
+            {/* </>
+          )} */}
         </>
       ) : null}
     </NavigationContainer>

@@ -65,16 +65,9 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       setemail(data.email);
       setdob(data.dob);
       setdesignation(data.designation);
-      sethiringdate(data.created_at);
+      sethiringdate(data.hiring_date);
       setaddress(data.address);
       setprofilepicture(data.image);
-
-      setpostData({
-        id: data.id,
-        name: data.name,
-        dob: data.dob,
-        address: data.address,
-      });
       setloader(false);
     })();
   }, [loader, isFocused]);
@@ -91,19 +84,19 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
     //   profile_image: imageData !=null?imageData[0] : '',
     //   upload_image: imageData !=null?1 : 0,
     // };
-    console.log("POST DATA",postData)
-    // let response = await update_user_profile(postData);
-    // console.log('RES', response);
-    // if (response.status == 'success') {
-    //   console.log('AFTER UPDATE OBJ ', response);
-    //   setloader(false);
-    //   console.log('Success', response);
-    //   Alert.alert('Success', 'Profile Updated Successfully');
-    // } else {
-    //   setloader(false);
-    //   console.log('Error', response);
-    //   Alert.alert('Error', response.message);
-    // }
+    console.log("POST DATA",postData);
+    let response = await update_user_profile(postData);
+    console.log('RES', response);
+    if (response.status == 'success') {
+      console.log('AFTER UPDATE OBJ ', response);
+      setloader(false);
+      console.log('Success', response);
+      Alert.alert('Success', 'Profile Updated Successfully');
+    } else {
+      setloader(false);
+      console.log('Error', response);
+      Alert.alert('Error', response.message);
+    }
   };
   const createFormData = (photo:any, body:any = {}) => {
     const data = new FormData();

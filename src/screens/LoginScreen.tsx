@@ -12,24 +12,27 @@ import {
   Linking,
   Alert,
   BackHandler,
+  ToastAndroid
 } from 'react-native';
 import {
   get_async_data,
   save_fcm_token,
   upload_contact_list,
 } from '../Helper/AppHelper';
+import {useNetInfo} from '@react-native-community/netinfo';
 import Contacts from 'react-native-contacts';
 import React, {useState, useEffect} from 'react';
 import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
 import {useIsFocused} from '@react-navigation/native';
 import LocationAccess from '../components/LocationAccess';
-
+import NetworkModal from '../components/NetworkModal';
 const {width, height} = Dimensions.get('window');
 const buttonWidth = width - 50;
 const ratio = buttonWidth / 1232;
 
 const LoginScreen = ({navigation}: {navigation: any}) => {
   const isFocused = useIsFocused();
+  const {isConnected} = useNetInfo();
   const [phone, setphone] = useState('');
   const [password, setpassword] = useState('');
   const [errormessage, seterrormessage] = useState('');
@@ -39,46 +42,57 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [showoverlay, setshowoverlay] = useState(true);
 
   const login = async () => {
-    setloader(true);
-    if (phone.length < 11 || password.length < 5) {
-      seterrormessage('Enter correct phone number or password');
-    } else {
-      seterrormessage('');
-      const request = await loginNurse(phone, password);
-      if (request.status == 'error') {
-        seterrormessage(request.message);
+    if(isConnected == true) {
+      setloader(true);
+      if (phone.length < 11 || password.length < 5) {
+        seterrormessage('Enter correct phone number or password');
+      } else {
+        seterrormessage('');
+        const request = await loginNurse(phone, password);
+        if (request.status == 'error') {
+          seterrormessage(request.message);
+        }
+        if (request.status == 'success') {
+          let object = {pair: []}
+          await set_async_data('attendence_history', JSON.stringify(object));
+          seterrormessage(request.message);
+          await generateFCM();
+          await set_async_data('user_id', request.data.id);
+          await set_async_data('phone', phone);
+          await set_async_data('password', password);
+          await set_async_data('username', request.data.name);
+          await set_async_data('usertype', request.data.type);
+          await set_async_data('designation', request.data.designation);
+          await set_async_data('email', request.data.email);
+          await set_async_data('dob', request.data.dob);
+          await set_async_data('address', request.data.address);
+          await set_async_data('hiring_date', request.data.created_at);
+          await set_async_data('profile_picture', request.data.image);
+          await set_async_data('login_user', 'loggedin');
+          await save_fcm_token();
+  
+          let usertype = await get_async_data('usertype');
+          // setTimeout(() => {
+            if (usertype == 'Admin') {
+              navigation.replace('AdminRoute');
+            } if(usertype == 'Nurse') {
+              navigation.replace('NurseRoute');
+            }
+            //  else {
+            //   navigation.replace('ClientRoute');
+            // }   
+            setloader(false);       
+          // }, 1000);
+        }
       }
-      if (request.status == 'success') {
-        seterrormessage(request.message);
-        await generateFCM();
-        await set_async_data('user_id', request.data.id);
-        await set_async_data('phone', phone);
-        await set_async_data('password', password);
-        await set_async_data('username', request.data.name);
-        await set_async_data('usertype', request.data.type);
-        await set_async_data('designation', request.data.designation);
-        await set_async_data('email', request.data.email);
-        await set_async_data('dob', request.data.dob);
-        await set_async_data('address', request.data.address);
-        await set_async_data('hiring_date', request.data.created_at);
-        await set_async_data('profile_picture', request.data.image);
-        await set_async_data('login_user', 'loggedin');
-        await save_fcm_token();
-
-        let usertype = await get_async_data('usertype');
-        // setTimeout(() => {
-          console.log('usertype', usertype);
-          if (usertype == 'Admin') {
-            navigation.replace('AdminRoute');
-          } if(usertype == 'Nurse') {
-            navigation.replace('NurseRoute');
-          }
-          //  else {
-          //   navigation.replace('ClientRoute');
-          // }   
-          setloader(false);       
-        // }, 1000);
-      }
+    } else{
+      ToastAndroid.showWithGravityAndOffset(
+        'Connect to internet!',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        5,
+        5,
+      );
     }
   };
 
@@ -135,7 +149,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         }
       }
     })();
-  }, [showoverlay]);
+  }, [showoverlay, isConnected]);
 
   return (
     <ImageBackground

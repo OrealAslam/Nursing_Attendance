@@ -7,7 +7,8 @@ import Geolocation from '@react-native-community/geolocation';
 import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
-export const LOCAL_BASE_URL = 'http://192.168.10.14/MRL-Apps/MRL-Apps/public/api/update-locally';
+export const LOCAL_BASE_URL =
+  'http://192.168.10.14/MRL-Apps/MRL-Apps/public/api/update-locally';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk';
 export const WHATSAPP_NUMBER = '+923041111949';
 const ATTENDENCE_RECORD_ID = 3;
@@ -19,7 +20,7 @@ const GET_HISTORY = BASE_URL + 'get_history';
 const UPDATE_PASSWORD = BASE_URL + 'update_password';
 const GET_NURSE_STATUS = BASE_URL + 'get_nures_status';
 const SHIFT_STATUS = BASE_URL + 'get_nures_status';
-const END_SHIFT = BASE_URL + 'attendance';
+export const END_SHIFT = BASE_URL + 'attendance';
 const START_SHIFT = BASE_URL + 'attendance';
 const LEAVE_REQUEST = BASE_URL + 'leave_request';
 const GET_USER_LEAVE_REQUEST = BASE_URL + 'get_user_leave_request';
@@ -30,6 +31,7 @@ export const ADD_VITAL_RECORD = BASE_URL + 'add_vital_record';
 export const GET_VITAL_RECORD = BASE_URL + 'get_vital_record';
 export const GET_NURSE_NOTES = BASE_URL + 'get_nurse_note';
 export const ADD_NURSE_NOTES = BASE_URL + 'add_nurse_note';
+export const OFFLINE_ATTENDENCE = BASE_URL + 'offlineAttendace';
 
 // ADMIN API'S
 export const GET_LEADS = BASE_URL + 'get_leads';
@@ -74,7 +76,6 @@ export const get_async_data = async name => {
 };
 
 export const editableProfileData = async () => {
-
   let phone = await get_async_data('phone');
   let password = await get_async_data('password');
   const data = await loginNurse(phone, password);
@@ -137,13 +138,11 @@ export const update_user_profile = async data => {
     method: 'POST',
     headers: {
       'Content-Type': 'multipart/form-data',
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify(data),
+    body: data,
   });
   const response = await request.json();
-
+  console.log('After Update ', response);
   if (response.status == 'success') {
     await set_async_data('username', data.name);
     await set_async_data('dob', data.dob);
@@ -187,8 +186,40 @@ export const end_shift = async (
     end_time: end_time,
     shift_status: shift_status,
   };
-
+  console.log('END SHIFT PARAMS', obj);
   const request = await fetch(END_SHIFT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+    },
+    body: JSON.stringify(obj),
+  });
+  const resposne = await request.json();
+  return resposne;
+};
+
+export const start_shift = async (
+  leadid,
+  longitude,
+  latitude,
+  start_time,
+  shift_status,
+) => {
+  const user_id = await get_async_data('user_id');
+  let obj = {
+    status: 'start',
+    staff_id: user_id,
+    lead_id: leadid,
+    longitude: longitude,
+    latitude: latitude,
+    start_time: start_time,
+    shift_status: shift_status,
+  };
+
+  console.log('START SHIFT PARAMS', obj);
+
+  const request = await fetch(START_SHIFT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -200,26 +231,18 @@ export const end_shift = async (
   const resposne = await request.json();
   return resposne;
 };
-
-export const start_shift = async (
-  leadid,
-  attendenceid,
-  longitude,
-  latitude,
-  start_time,
-  shift_status,
-) => {
+export const free_shift = async (longitude, latitude, start_time) => {
   const user_id = await get_async_data('user_id');
 
   let obj = {
-    status: 'start',
-    id: attendenceid,
+    status: 'free',
+    id: null,
     staff_id: user_id,
-    lead_id: leadid,
+    lead_id: null,
     longitude: longitude,
     latitude: latitude,
     start_time: start_time,
-    shift_status: shift_status,
+    shift_status: 'Day Shift',
   };
 
   const request = await fetch(START_SHIFT, {
@@ -232,6 +255,8 @@ export const start_shift = async (
   });
 
   const resposne = await request.json();
+  await set_async_data('free_attendence_offline', null);
+  console.log(resposne);
   return resposne;
 };
 
@@ -541,15 +566,14 @@ export const add_vital_record = async obj => {
 };
 
 export const get_vital_record = async () => {
-  // let lead_id = await get_async_data('lead_id');
-
+  let lead_id = await get_async_data('lead_id');
   const request = await fetch(GET_VITAL_RECORD, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({lead_id: 465}),
+    body: JSON.stringify({lead_id: 465}), // 465
   });
   const response = await request.json();
   return response;
@@ -557,7 +581,6 @@ export const get_vital_record = async () => {
 
 export const get_nurse_note = async () => {
   // let lead_id = await get_async_data('lead_id');
-
   const request = await fetch(GET_NURSE_NOTES, {
     method: 'POST',
     headers: {
@@ -587,65 +610,136 @@ export const add_nurse_note = async (note, shift_status) => {
   const response = await request.json();
   return response;
 };
+
+export const submit_offline_attendence_array = async () => {
+  let history_data = await get_async_data('attendence_history');
+  let data = JSON.parse(history_data);
+  if (data.pair.length > 0) {
+    for (let i = 0; i < data.pair.length; i++) {
+      let startobj = {
+        status: 'start',
+        staff_id: data.pair[i].staff_id,
+        lead_id: data.pair[i].lead_id,
+        longitude: data.pair[i].longitude,
+        latitude: data.pair[i].latitude,
+        start_time: data.pair[i].start,
+        shift_status:
+          data.pair[i].shift_status == ''
+            ? 'Day Shift'
+            : data.pair[i].shift_status,
+      };
+      const request = await fetch(START_SHIFT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(startobj),
+      });
+
+      const startresposne = await request.json();
+      if (startresposne.status == 'success') {
+        await set_async_data('attendance_id', response.attendance_id);
+        let attendance_id = response.attendance_id;
+        // now end the started attendence
+        let endobj = {
+          status: 'end',
+          id: attendance_id,
+          staff_id: data.pair[i].staff_id,
+          lead_id: data.pair[i].lead_id,
+          longitude: data.pair[i].longitude,
+          latitude: data.pair[i].latitude,
+          end_time: data.pair[i].end,
+          shift_status:
+            data.pair[i].shift_status == ''
+              ? 'Day Shift'
+              : data.pair[i].shift_status,
+        };
+
+        const request = await fetch(END_SHIFT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: JSON.stringify(endobj),
+        });
+        const endresposne = await request.json();
+        console.log('END Response', endresposne);
+      }
+    }
+    await set_async_data('attendence_history', JSON.stringify({pair: []}));
+  } else {
+    console.log('no offline attendence found');
+  }
+};
+
+export const check_for_already_start_free_offline_attendence = async () => {
+  let check = await get_async_data('free_attendence_marked');
+  if (check != null) {
+    // means attendence alredy started
+    return 'started';
+  }
+};
 // -----------------------------------------------------------------------------------------------------------------
 
 // CUCTOM DATE PICKER HELPER FUNCTIONS
 
-export const getMonthName = dateString => {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  const parts = dateString.split('-');
-  const monthNumber = parseInt(parts[1], 10);
-  const day = parseInt(parts[2], 10);
+// export const getMonthName = dateString => {
+//   const months = [
+//     'Jan',
+//     'Feb',
+//     'Mar',
+//     'Apr',
+//     'May',
+//     'Jun',
+//     'Jul',
+//     'Aug',
+//     'Sep',
+//     'Oct',
+//     'Nov',
+//     'Dec',
+//   ];
+//   const parts = dateString.split('-');
+//   const monthNumber = parseInt(parts[1], 10);
+//   const day = parseInt(parts[2], 10);
 
-  if (monthNumber >= 1 && monthNumber <= 12 && day >= 1 && day <= 31) {
-    const monthName = months[monthNumber - 1];
-    let name = monthName + ', ' + day;
-    return name.toString();
-  } else {
-    return 'Invalid Date';
-  }
-};
+//   if (monthNumber >= 1 && monthNumber <= 12 && day >= 1 && day <= 31) {
+//     const monthName = months[monthNumber - 1];
+//     let name = monthName + ', ' + day;
+//     return name.toString();
+//   } else {
+//     return 'Invalid Date';
+//   }
+// };
 
-export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+// export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const globalDate = new Date();
+// export const globalDate = new Date();
 
-export const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+// export const months = [
+//   'January',
+//   'February',
+//   'March',
+//   'April',
+//   'May',
+//   'June',
+//   'July',
+//   'August',
+//   'September',
+//   'October',
+//   'November',
+//   'December',
+// ];
 
-export const nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+// export const nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-export const addMonth = month => {
-  if (month == 11) {
-  }
-};
+// export const addMonth = month => {
+//   if (month == 11) {
+//   }
+// };
 
-export const subMonth = month => {
-  if (month == 1) {
-  }
-};
+// export const subMonth = month => {
+//   if (month == 1) {
+//   }
+// };

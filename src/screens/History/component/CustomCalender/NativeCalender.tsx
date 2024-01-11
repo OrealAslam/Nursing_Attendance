@@ -28,9 +28,7 @@ const NativeCalender = (props: any) => {
 
   const startOfMonth = (date: any) => {
     return new Date(date.getFullYear(), date.getMonth(), 1);
-  };
-
-  
+  };  
   useEffect(() => {
     // starting day of month
     let totaldays = new Date(dt.getFullYear(), dt.getMonth() + 1, 0).getDate();

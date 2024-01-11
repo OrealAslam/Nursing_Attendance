@@ -49,8 +49,8 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
       let lead_id = await get_async_data('lead_id');
       let user_id = await get_async_data('user_id');
       let obj = {
-        lead_id: 465, // lead_id,
-        staff_id: 1, //user_id,
+        lead_id: 465, // 465,
+        staff_id: 1, //1,
         blood_pressure: bloodpressure,
         pulse_rate: pulserate,
         remarks: remarks,
@@ -89,6 +89,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
   useEffect(() => {
     (async () => {
       let response = await get_vital_record();
+      console.log('get vital record',response)
       setrecord(response);
     })();
   }, [isFocused, loader]);

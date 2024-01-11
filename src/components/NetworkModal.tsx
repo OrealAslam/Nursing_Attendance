@@ -2,10 +2,10 @@ import {
   View,
   Text,
   ImageBackground,
-  BackHandler,
   TouchableOpacity,
   Image,
   Dimensions,
+  BackHandler,
 } from 'react-native';
 import React from 'react';
 import {NetworkModelStyle} from '../Helper/StyleHelper';
@@ -33,7 +33,7 @@ const NetworkModal = (props: any) => {
         <Text style={[NetworkModelStyle.description, {marginBottom: 10}]}>
           Please Try again later!
         </Text>
-        <TouchableOpacity onPress={() => BackHandler.exitApp()}>
+        <TouchableOpacity onPress={()=> BackHandler.exitApp()}>
           <Image
             style={{
               alignSelf: 'center',

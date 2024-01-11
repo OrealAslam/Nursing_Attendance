@@ -37,13 +37,13 @@ const CalenderBody = (props: any) => {
     // prepend days according to startdayofmonth of month
     for (let j = props.startdayofmonth; j > 0; j--) {
       // let emptystart = <Text style={styles.dateText}>X</Text>;
-      let emptystart = <Text style={styles.dateText}>--</Text>;
+      let emptystart = <Text style={styles.dateText}></Text>;
       days.unshift(emptystart);
     }
 
     // append days according to lastdayofmonth of month
     for (let k = props.lastdayofmonth; k < 6; k++) {
-      let emptyend = <Text style={styles.dateText}>--</Text>;
+      let emptyend = <Text style={styles.dateText}></Text>;
       days.push(emptyend);
     }
     setdaysdata(days);
@@ -80,7 +80,7 @@ const CalenderBody = (props: any) => {
               : {backgroundColor: 'transparent'},
           ]}
           key={index}>
-          <View style={[styles.mark,{backgroundColor: markColor}]}></View>
+          <View style={type != 'object'?[styles.mark,{backgroundColor: markColor}] : {}}></View>
           <Text
             style={[
               styles.dateText,
@@ -98,7 +98,7 @@ const CalenderBody = (props: any) => {
     let find = props.history.find((item: any) => item.created_at === date);
     if(find == undefined) {
       return '#FF3366';
-    } else if(find.status == 'Duty Time') {
+    } else if(find.status == 'Duty Time' || find.status == 'free Day') {
       return '#74CAE3';
     } else{ return '#6AD239'; }
   }

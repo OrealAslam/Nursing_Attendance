@@ -91,6 +91,20 @@ export const ContentStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  timerButtonFree: {
+    width: timerButton,
+    height: 786 * timerButtonRatio,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#477EDD',
+    borderRadius: 100
+  },
+  timerButtonText:{
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700'
+  },
   container: {
     justifyContent: 'center',
     alignItems: 'center',

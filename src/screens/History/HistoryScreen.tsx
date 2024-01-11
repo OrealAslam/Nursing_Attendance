@@ -8,12 +8,12 @@ import React, {useState, useEffect} from 'react';
 import HistoryHeader from './component/HistoryHeader';
 import HistoryContent from './component/HistoryContent';
 import {get_async_data, get_history} from '../../Helper/AppHelper';
-import {CardContainer} from './historystyles';
+// import {CardContainer} from './historystyles';
 import {useIsFocused} from '@react-navigation/native';
-import StopWatch from '../../components/Stopwatch';
-import moment from 'moment';
-import TimerHook from '../../components/TimerHook';
-import Label from './component/Label';
+// import StopWatch from '../../components/Stopwatch';
+// import moment from 'moment';
+// import TimerHook from '../../components/TimerHook';
+// import Label from './component/Label';
 
 const {width, height} = Dimensions.get('window');
 
@@ -25,6 +25,7 @@ const HistoryScreen = ({navigation}: {navigation: any}) => {
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
+
 
   useEffect(() => {
     (async () => {
