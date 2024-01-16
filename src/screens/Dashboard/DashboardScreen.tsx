@@ -8,16 +8,14 @@ import {useNetInfo} from '@react-native-community/netinfo';
 import StartTimerModel from '../../components/StartTimerModel';
 import {
   get_shift_status,
-  formatTimeDifference,
   end_shift,
   start_shift,
-  free_shift,
   get_async_data,
   get_history,
   set_async_data,
-  submit_offline_attendence_array,
   BASE_URL,
-  END_SHIFT,
+  update_history_array,
+  uploadLocalHistory,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -35,7 +33,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [shiftstarttime, setshiftstarttime] = useState('');
   const [workTime, setworkTime] = useState('');
   const [leadid, setleadid] = useState(null);
-  const [attendenceid, setattendenceid] = useState(null);
+  const [attendanceid, setattendanceid] = useState(null);
   const [latitude, setlatitude] = useState(0);
   const [longitude, setlongitude] = useState(0);
   const [shiftTime, setshiftTime] = useState('');
@@ -45,6 +43,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [totalwotking, settotalwotking] = useState('--:--');
   const [loader, setloader] = useState(true);
   const [showmodel, setshowmodel] = useState(false);
+  const [userid, setuserid] = useState(null);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -57,50 +56,55 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   };
 
   const checkingShiftStatus = async (click: string) => {
-    let leadid = await get_async_data('lead_id');
-    let user_id = await get_async_data('user_id');
-    let attendenceid = await get_async_data('attendance_id');
-    let shift_time = await get_async_data('shift_time');
-    let online_start_time = await get_async_data('online_start_time');
+    let shiftTime = await get_async_data('shift_time');
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
       // API call to start shift
       setloader(true);
-      setshiftstartat(moment().format('HH:mm'));
-      let start_date = moment().format('YYYY-MM-DD hh:mm:ss');
-
+      let start_time = moment().format('YYYY-MM-DD hh:mm:ss');
       if (isConnected) {
         let response = await start_shift(
           leadid,
           longitude,
           latitude,
-          start_date,
+          start_time,
           shiftTime,
         );
+        console.log('before if', response)
         if (response.status == 'success') {
-          await set_async_data('attendance_id', response.attendance_id);
-          await set_async_data('online_start_time', start_date);
+          let attendenceStatus = response.attendance_Status;
+          console.log('resonse success',response);
+          await set_async_data('start_time_submit_request', 'submitted');
           setshiftstatus('started');
-          setshiftendat('--:--');
+          setloader(false);
+          setattendanceid(response.attendaces_id);
           setshiftstartat(moment().format('hh:mm a'));
-          setloader(false);
+          console.log('ATT ID', response.attendaces_id)
+          console.log('-------------------------------------------------------------------------------------------')
+          await set_async_data(
+            'attendance_id',
+            response.attendaces_id,
+            );
+          await set_async_data('start_time', start_time);
+          await set_async_data('longitude', longitude);
+          await set_async_data('latitude', latitude);
+          setshiftendat('--:--');
           await totalWorkingHours();
-        }
-        if (response.status == 'error') {
-          setshiftstatus('ended');
-          Alert.alert('Error', response.message);
+        } else {
+          // trying to submit free attendance when already exists
+          settotalwotking('Free Today');
+          Alert.alert('Message', 'Your today attendance already exists.');
           setloader(false);
-          await totalWorkingHours();
         }
       } else {
-        setshiftstatus('started');
-        await set_async_data(
-          'start_time',
-          moment().format('YYYY-MM-DD hh:mm:ss'),
-        );
-        setshiftendat('--:--');
+        await set_async_data('start_time', start_time);
+        await set_async_data('longitude', longitude);
+        await set_async_data('latitude', latitude);
+        await set_async_data('start_time_submit_request', 'not submitted');
+        // await set_async_data('attendance_id', null);
         setshiftstartat(moment().format('hh:mm a'));
-        console.log('offline start ');
+        setshiftendat('--:--');
+        setshiftstatus('started');
         setloader(false);
       }
     }
@@ -111,74 +115,46 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     // trying to end shift
     if (shiftstatus == 'started' && click == 'yes') {
       // API call to end shift
+      setloader(true);
+      let endTime = moment().format('YYYY-MM-DD hh:mm:ss');
       if (isConnected) {
-        setloader(true);
-        let end_date = moment().format('YYYY-MM-DD hh:mm:ss');
-
+        console.log('try to end', attendanceid);
         let response = await end_shift(
           leadid,
-          attendenceid,
+          attendanceid,
           longitude,
           latitude,
-          end_date,
+          endTime,
           shiftTime,
         );
         if (response.status == 'success') {
-          await set_async_data('online_start_time', null);
+          console.log('ended', response);
+          await set_async_data('start_time', null);
+          await set_async_data('attendance_id', null);
           setshiftstatus('ended');
           setshiftendat(moment().format('hh:mm a'));
           setloader(false);
           await totalWorkingHours();
         } else {
-          setshiftstatus('started');
-          setloader(false);
-          await totalWorkingHours();
+          console.log('unable to end attendance online', response);
         }
+        setloader(false);
       } else {
-        setloader(true);
-        let end_date = moment().format('YYYY-MM-DD hh:mm:ss');
+        // check if already started
+        let alreadyStarted = await get_async_data('start_time');
+        let alreadySubmit = await get_async_data('start_time_submit_request');
+        if (alreadyStarted != null && alreadySubmit != 'submitted') {
+          let lead_id = await get_async_data('lead_id');
+          await update_history_array(
+            alreadyStarted,
+            endTime,
+            lead_id,
+            shiftTime,
+          );
+        }
         setshiftendat(moment().format('hh:mm a'));
-        await set_async_data('end_time', end_date);
-        // trying to end free shift
-        if (shift_time == 'free') {
-          await set_async_data(
-            'start_time',
-            moment().format('YYYY-MM-DD hh:mm:ss'),
-          );
-          setshiftstartat(moment().format('hh:mm a'));
-          setshiftstatus('ended');
-          setloader(false);
-        }
-        // check if start_time exists
-        // if exists its mean k checkIn/checkOut 2no hi without internet connectivty perform howa ha
-        let started = await get_async_data('start_time');
-        if (started != null) {
-          await set_async_data('end_time', end_date);
-          let arr = {
-            start: started,
-            end: end_date,
-            longitude: longitude,
-            latitude: latitude,
-            lead_id: leadid,
-            staff_id: user_id,
-            shift_status: shiftTime,
-          };
-          // console.log(JSON.stringify(arr))
-          let attendence_history = await get_async_data('attendence_history');
-          let attendence_history_data = JSON.parse(attendence_history);
-          console.log('OLD HISTORY', attendence_history_data);
-          attendence_history_data.pair.push(arr);
-
-          await set_async_data(
-            'attendence_history',
-            JSON.stringify(attendence_history_data),
-          );
-          console.log('UPDATED HISTORY', attendence_history_data);
-        }
-        // online start and offline end
-        if(online_start_time != null) {
-          setshiftendat('ended');
-        }
+        await set_async_data('end_time', endTime);
+        setshiftendat(moment().format('hh:mm a'));
         setshiftstatus('ended');
         setloader(false);
       }
@@ -194,7 +170,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
           title: 'Permission Required',
-          message: 'Nursing Attendence wants to access your location',
+          message: 'Nursing attendance wants to access your location',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
         },
@@ -219,159 +195,139 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
-  const submit_offline_started_attendence = async (started_offline: any) => {
-    // jb internet connect hoga then jo attendence start ki thi offline k time uski server to request share kry ge.
-    let leadid = await get_async_data('lead_id');
-    let shiftTime = await get_async_data('shift_time');
-    let free_attendence_offline = await get_async_data(
-      'free_attendence_offline',
-    );
-    if (free_attendence_offline == 'saved') {
-      // check for free shift offline attendence start
-      await free_shift(longitude, latitude, started_offline);
-    }
-
-    if (started_offline != null) {
-      let response = await start_shift(
-        leadid,
-        longitude,
-        latitude,
-        started_offline,
-        shiftTime,
-      );
-      if (response.status == 'success') {
-        await set_async_data('attendence_id', response.attendence_id);
-        setshiftstatus('started');
-        setshiftendat('--:--');
-        setshiftstartat(moment(started_offline).format('hh:mm a'));
-        await set_async_data('start_time', null);
-        await totalWorkingHours();
-      }
-    }
-  };
-
-  const submit_offline_ended_attendence = async () => {
-    // jb internet connect hoga then jo attendence end ki thi offline k time uski server to request send kry ge.
-    let end_date = await get_async_data('end_time');
-    let attendenceid = await get_async_data('attendence_id');
-    let shiftTime = await get_async_data('shift_time');
-    let lead_id = await get_async_data('lead_id');
-    setshiftendat(moment(end_date).format('hh:mm a'));
-    if (end_date != null) {
-      let response = await end_shift(
-        lead_id,
-        attendenceid,
-        longitude,
-        latitude,
-        end_date,
-        shiftTime,
-      );
-      if (response.status == 'success') {
-        console.log('submited offline attendence')
-        setshiftstatus('ended');
-        setloader(false);
-        await totalWorkingHours();
-      } else {
-        console.log('not able to submit offline attendence');
-      }
-    }
-  };
-
   useEffect(() => {
     (async () => {
-      setloader(true);
-      let online_start_time = await get_async_data('online_start_time');
-      let started_offline = await get_async_data('start_time');
-      let ended_offline = await get_async_data('end_time');
+      let start_time = await get_async_data('start_time');
+      let end_time = await get_async_data('end_time');
+      await access_device_location();
       if (isConnected) {
-        await access_device_location();
-        let id = await get_async_data('user_id');        
-        console.log('offline end', ended_offline)
-        if (started_offline != null) {
-          await submit_offline_started_attendence(started_offline);
-        }
-        if (ended_offline != null) {
-          await submit_offline_ended_attendence();
-        }
-
-        if (online_start_time != null) {
-          setshiftstatus('started');
-        }
-        totalWorkingHours();
+        await totalWorkingHours();
+        let user_id = await get_async_data('user_id');
+        setuserid(user_id);
         let request = await get_shift_status();
+        await uploadLocalHistory();
+
         if (request.status == 'success') {
-          await set_async_data('free_attendence_marked', null);
+          await set_async_data('free_attendance_marked', null);
           await set_async_data('lead_id', request.data.lead_id);
           await set_async_data('shift_time', request.data.shift_status);
-          await totalWorkingHours();
           let status = request.attendance_Status.status;
           setleadid(request.data.lead_id);
           if (status == 'started') {
-            setattendenceid(request.attendance_Status.attendance_id);
-            await set_async_data(
-              'attendance_id',
-              request.attendance_Status.attendance_id,
-            );
-            setshiftstartat(
-              moment(request.attendance_Status.start_time).format('hh:mm a'),
-            );
+            setattendanceid(request.attendance_Status.attendance_id);
+            await set_async_data('start_time_submit_request', 'submitted');
+            if (end_time != null) {
+              // check if user try to end attendance offline
+              let submit = await submit_offline_end_attendence(
+                end_time,
+                request.attendance_Status.attendance_id,
+              );
+              console.log('offline end request', submit);
+              if (submit.status == 'success') {
+                console.log('submitted offline ended attendance');
+                await set_async_data('attendence_id', null);
+                await set_async_data('start_time', null);
+                await set_async_data('end_time', null);
+                await set_async_data('start_time_submit_request', null);
+                setshiftstatus('ended');
+                setshiftstartat('--:--');
+              }
+            } else {
+              console.log(
+                'end time null',
+                request.attendance_Status.attendance_id,
+              );
+              await set_async_data(
+                'attendance_id',
+                request.attendance_Status.attendance_id,
+              );
+              await set_async_data(
+                'start_time',
+                request.attendance_Status.start_time,
+              );
+              setshiftstarttime(request.attendance_Status.start_time);
+              setshiftTime(request.data.shift_status);
+              setshiftstatus(status);
+              setshiftendat('--:--');
+              let attendanceNoted = request.attendance_Status.start_time;
+              let now = moment(new Date());
+              const totalDuration = moment.duration(now.diff(attendanceNoted));
+              settotalwotking(
+                formatTime(totalDuration.hours(), totalDuration.minutes()),
+              );
+              setshiftstartat(
+                moment(request.attendance_Status.start_time).format('hh:mm a'),
+              );
+            }
           }
+
           if (status == 'ended') {
-            setshiftstatus('ended');
-            setshiftendat('--:--');
+            if (start_time != null) {
+              // submit offline start attendance here
+              console.log('sending start request', start_time);
+              let request = await submit_offline_start_attendence(start_time);
+              console.log('REQUEST', request);
+              if (request.status == 'error') {
+                setshiftstatus('ended');
+                setshiftstartat('--:--');
+              } else {
+                console.log('GENERATED ID', request.attendaces_id);
+                setattendanceid(request.attendaces_id);
+                await set_async_data('start_time_submit_request', 'submitted');
+              }
+            } else {
+              setshiftstatus('ended');
+              await set_async_data('attendance_id', null);
+              setattendanceid(null);
+              setshiftendat('--:--');
+            }
           }
-          setshiftTime(request.data.shift_status);
-          if (status == 'ended') {
-            setshiftstatus('ended');
-            setshiftstartat('--:--');
-          } else {
-            setshiftstarttime(request.attendance_Status.start_time);
-            setshiftstatus(status);
-            setshiftendat('--:--');
-            let attendenceNoted = request.attendance_Status.start_time;
-            let now = moment(new Date());
-            const totalDuration = moment.duration(now.diff(attendenceNoted));
-            settotalwotking(
-              formatTime(totalDuration.hours(), totalDuration.minutes()),
-            );
-            // setworkTime(
-            //   formatTimeDifference(
-            //     totalDuration.hours(),
-            //     totalDuration.minutes(),
-            //     totalDuration.seconds(),
-            //   ),
-            // );
-          }
-          await check_for_offline_attendence();
-          setloader(false);
-        } else {
-          // free attendence
-          await set_async_data('shift_time', 'free');
-          setshiftTime('free');
-          setloader(false);
         }
-        await submit_offline_attendence_array();
+
+        if (request.status == 'error') {
+          // Nurse is free
+          setshiftTime('Free');
+        }
       } else {
-        await access_device_location();
-        setloader(false);
-        if (online_start_time != null) {
-          setshiftstatus('started');
-          setshiftstartat(moment(online_start_time).format('hh:mm a'))
-        }
-
-        if(started_offline != null) {
-          setshiftstatus('started');
-          setshiftstartat(moment(started_offline).format('hh:mm a'))
-        }
-
-        if(ended_offline != null) {
-          setshiftstatus('ended');
-          setshiftendat(moment(started_offline).format('hh:mm a'))
-        }
+        // change checkIn/Out according to start/end Time
+        await update_btn_state(start_time, end_time);
+        let localHistory = await get_async_data('attendence_history');
+        console.log('localHistory', localHistory);
       }
       setloader(false);
     })();
   }, [isFocused, isConnected]);
+
+  const submit_offline_start_attendence = async (startTime: any) => {
+    let shiftTime = await get_async_data('shift_time');
+    let leadid = await get_async_data('lead_id');
+    let request = await start_shift(
+      leadid,
+      longitude,
+      latitude,
+      startTime,
+      shiftTime,
+    );
+    return request;
+  };
+
+  const submit_offline_end_attendence = async (
+    endTime: any,
+    attendenceid: any,
+  ) => {
+    let shiftTime = await get_async_data('shift_time');
+    let leadid = await get_async_data('lead_id');
+
+    let request = await end_shift(
+      leadid,
+      attendenceid,
+      longitude,
+      latitude,
+      endTime,
+      shiftTime,
+    );
+    return request;
+  };
 
   const formatTime = (hours: any, minutes: any) => {
     let h = hours.toString();
@@ -384,6 +340,22 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       m = '0' + minutes;
     }
     return `${h}:${m}`;
+  };
+
+  const update_btn_state = async (start: any, end: any) => {
+    console.log('start', start);
+    console.log('end', end);
+    if (end != null && start != null) {
+      setshiftstatus('ended');
+      setshiftendat(moment(end).format('hh:mm a'));
+    }
+    if (start == null) {
+      setshiftstatus('ended');
+    }
+    if (start != null) {
+      setshiftstatus('started');
+      setshiftstartat(moment(start).format('hh:mm a'));
+    }
   };
 
   const totalWorkingHours = async () => {
@@ -400,30 +372,9 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     }
   };
 
-  const check_for_offline_attendence = async () => {
-    let end_time = await get_async_data('end_time');
-    let leadid = await get_async_data('lead_id');
-    let shiftTime = await get_async_data('shift_time');
-    let attendenceid = await get_async_data('attendance_id');
-
-    if (end_time != null) {
-      let response = await end_shift(
-        leadid,
-        attendenceid,
-        longitude,
-        latitude,
-        end_time,
-        shiftTime,
-      );
-      console.log('Response offline', response);
-      if (response.status == 'success') {
-        await totalWorkingHours();
-      }
-    }
-  };
-
-  const freeAttendence = async () => {
+  const freeattendance = async () => {
     let staff_id = await get_async_data('user_id');
+
     let obj = {
       status: 'free',
       id: null,
@@ -434,28 +385,22 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       start_time: moment().format('YYYY-MM-DD hh:mm:ss'),
       shift_status: 'Day Shift',
     };
-    if (isConnected) {
-      const request = await fetch(BASE_URL + 'attendance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify(obj),
-      });
-      const resposne = await request.json();
-      if (resposne.status == 'success') {
-        await set_async_data('free_attendence_marked', 'marked');
-      }
-      if (resposne.status == 'error') {
-        Alert.alert('Message', resposne.message);
-      }
-    } else {
-      await set_async_data(
-        'start_time',
-        moment().format('YYYY-MM-DD hh:mm:ss'),
-      );
-      await set_async_data('free_attendence_offline', 'saved');
+    console.log('Free Attendence Obj', obj);
+    const request = await fetch(BASE_URL + 'attendance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify(obj),
+    });
+    const resposne = await request.json();
+    console.log('Free Shift API Call', resposne);
+    if (resposne.status == 'success') {
+      await set_async_data('free_attendance_marked', 'marked');
+    }
+    if (resposne.status == 'error') {
+      Alert.alert('Message', resposne.message);
     }
   };
 
@@ -493,7 +438,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
       {showmodel && (
         <StartFreeTimer
-          freeAttendence={freeAttendence}
+          freeattendance={freeattendance}
           setshowmodel={setshowmodel}
         />
       )}

@@ -218,7 +218,6 @@ export const start_shift = async (
   };
 
   console.log('START SHIFT PARAMS', obj);
-
   const request = await fetch(START_SHIFT, {
     method: 'POST',
     headers: {
@@ -227,7 +226,6 @@ export const start_shift = async (
     },
     body: JSON.stringify(obj),
   });
-
   const resposne = await request.json();
   return resposne;
 };
@@ -611,10 +609,11 @@ export const add_nurse_note = async (note, shift_status) => {
   return response;
 };
 
-export const submit_offline_attendence_array = async () => {
+export const submit_offline_attendance_array = async () => {
   let history_data = await get_async_data('attendence_history');
   let data = JSON.parse(history_data);
   if (data.pair.length > 0) {
+    console.log('offline attendence history', data.pair);
     for (let i = 0; i < data.pair.length; i++) {
       let startobj = {
         status: 'start',
@@ -682,6 +681,115 @@ export const check_for_already_start_free_offline_attendence = async () => {
   }
 };
 // -----------------------------------------------------------------------------------------------------------------
+
+// Attendence Helper Functions
+export const update_history_array = async (
+  startTime,
+  endTime,
+  leadId,
+  shiftTime,
+) => {
+  let latitude = await get_async_data('latitude');
+  let longitude = await get_async_data('longitude');
+  let staff_id = await get_async_data('user_id');
+
+  let arr = {
+    start: startTime,
+    end: endTime,
+    longitude: longitude,
+    latitude: latitude,
+    lead_id: leadId,
+    staff_id: staff_id,
+    shift_status: shiftTime,
+  };
+  let attendence_history = await get_async_data('attendence_history');
+  let attendence_history_data = JSON.parse(attendence_history);
+  console.log('OLD HISTORY', attendence_history_data);
+  attendence_history_data.pair.push(arr);
+  console.log('NEW HISTORY', attendence_history_data)
+  await set_async_data(
+    'attendence_history',
+    JSON.stringify(attendence_history_data),
+  );
+  await set_async_data('end_time', null);
+  await set_async_data('start_time', null);
+};
+
+export const set_shiift_start_time = async start => {
+  await set_async_data('shift_start_time', start);
+};
+
+export const set_shiift_end_time = async end => {
+  await set_async_data('shift_end_time', end);
+};
+
+export const get_shift_end_time = async () => {
+  let end_time = await get_async_data('shift_end_time');
+  return end_time;
+};
+
+export const check_if_user_ended_attendance_offline = async () => {
+  let end_time = await get_shift_end_time();
+  if (end_time != null) {
+    return end_time;
+  }
+  return null;
+};
+
+export const check_if_user_started_attendance_offline = async () => {
+  let start_time = await et_async_data('shift_start_time');
+  if (start_time != null) {
+    return start_time;
+  }
+  return null;
+};
+
+export const totalWorkingHours = async () => {
+  const today = new Date().toISOString().slice(0, 10); // Get today's date in 'YYYY-MM-DD' format
+  let user_id = await get_async_data('user_id');
+  const response = await get_history(user_id);
+  if (response.status == 'success') {
+    if (response.data.length > 0) {
+      const objectsWithTodayDate = response.data.filter(
+        obj => obj.created_at.slice(0, 10) === today,
+      );
+      if (objectsWithTodayDate) {
+        return objectsWithTodayDate[0].time_duration;
+      }
+    }
+  }
+  return '00:00';
+};
+
+
+export const uploadLocalHistory = async () => {
+  let attendenceHistory = await get_async_data('attendence_history');
+  attendenceHistory = JSON.parse(attendenceHistory);
+  if( attendenceHistory.pair.length > 0) {
+    console.log('function called');
+    // for (let index = 0; index < attendenceHistory.pair.length; index++) {
+    //   console.log(`index:`+index+` : `, attendenceHistory.pair[index] );
+    // }
+    console.log('BEFORE SEND', JSON.stringify(attendenceHistory.pair));
+    try {
+      const request = await fetch (BASE_URL + 'offlineAttendace',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify(attendenceHistory.pair),
+      });
+      console.log('REQUESTED', request);
+      const response = await request.json();
+      console.log('RESPONSE :', response);
+
+    } catch(e) {
+      console.log('Catch Error', error);
+    }
+
+  }
+}
 
 // CUCTOM DATE PICKER HELPER FUNCTIONS
 

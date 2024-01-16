@@ -21,8 +21,8 @@ const StartFreeTimer = (props: any) => {
 
   const updateShift = async (status: any) => {
     if (status == 'yes') {
-      await props.freeAttendence();
-      await set_async_data('free_attendence_marked', 'marked');
+      await props.freeattendance();
+      await set_async_data('free_attendance_marked', 'marked');
       setloader(true);
     }
     props.setshowmodel(false);
@@ -52,7 +52,7 @@ const StartFreeTimer = (props: any) => {
           Verification
         </Text>
         <Text style={styles.heading}>
-          Are you sure you want to start your Attendence?
+          Are you sure you want to start your Attendance?
         </Text>
 
         <View style={styles.buttonContainer}>

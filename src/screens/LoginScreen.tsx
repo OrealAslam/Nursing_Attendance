@@ -46,6 +46,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
       setloader(true);
       if (phone.length < 11 || password.length < 5) {
         seterrormessage('Enter correct phone number or password');
+        setloader(false);
       } else {
         seterrormessage('');
         const request = await loginNurse(phone, password);

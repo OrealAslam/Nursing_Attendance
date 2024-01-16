@@ -4,7 +4,7 @@ import {containerStyle, InputStyle} from '../styles';
 import SelectDropdown from 'react-native-select-dropdown';
 import {searchBox} from '../../../../components/CalenderComponent/StyleHelper/Style';
 
-const PageContent = (props: any) => {
+const PageContent = (props) => {
   const [searchClientText, setsearchClientText] = useState('');
   const [searchStaffText, setsearchStaffText] = useState('');
   const [filteredClient, setfilteredClient] = useState([]);
@@ -12,9 +12,9 @@ const PageContent = (props: any) => {
   const [closeclientsuggestion, setcloseclientsuggestion] = useState(false);
   const [closestaffsuggestion, setclosestaffsuggestion] = useState(false);
 
-  const handleClientSearch = (text: any) => {
+  const handleClientSearch = (text) => {
     // Filter the data based on the search text
-    const filteredData = props.leads.filter((item: any) =>
+    const filteredData = props.leads.filter((item) =>
       item.client_name.toLowerCase().includes(text.toLowerCase()),
     );
     setsearchClientText(text);
@@ -23,9 +23,9 @@ const PageContent = (props: any) => {
     setfilteredClient(filteredData);
   };
 
-  const handleStaffSearch = (text: any) => {
+  const handleStaffSearch = (text) => {
     // Filter the data based on the search text
-    const filteredData = props.staff.filter((item: any) =>
+    const filteredData = props.staff.filter((item) =>
       item.name.toLowerCase().includes(text.toLowerCase()),
     );
     setsearchStaffText(text);

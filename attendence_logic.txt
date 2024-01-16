@@ -1,3 +1,0 @@
-1- offline time pr start to ni hoi attendence or agr start hoi then device dubara online hone pr attendene ko started rkhna or or jo start time async ma rkha howa usko server pr send krna
-2- offline time pr end to ni hoi attendence or agr end hoi then device dubara online hone pr attendene ko end rkhna or end time server pr send krna
-3- agr start or stop 2no hi offline mode ma perform howa (jo k multiple time bhi ho skta) sary Async object ko server pr send krna ha 

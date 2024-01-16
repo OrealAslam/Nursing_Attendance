@@ -18,7 +18,6 @@ const HistoryContent = (props: any) => {
     if (response != undefined) {
       console.log('RES', response)
       setresult(response);
-      console.log('pressed', response)
     } else {
       setresult({
         created_at: datepressed,
