@@ -1,4 +1,4 @@
-import {ScrollView, View, Dimensions, Alert, Platform, ActivityIndicator} from 'react-native';
+import {ScrollView, View, Dimensions, ToastAndroid, Platform, ActivityIndicator} from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
 import MainContent from './components/MainContent';
@@ -68,7 +68,13 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       .post(UPDATE_PROFILE, data, config)
       .then((res: any) => {
         if (res.status == 200) {
-          Alert.alert('Success', 'Profile Updated Successfully');
+          ToastAndroid.showWithGravityAndOffset(
+            'Profile Updated Successfully',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            5,
+            5,
+          );
         }
       })
       .catch((err: any) => {

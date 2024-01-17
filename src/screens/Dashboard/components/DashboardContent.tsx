@@ -89,6 +89,8 @@ const DashboardContent = (props: any) => {
     }
   }
 
+  console.log('TIME', props.shiftTime)
+
   return (
     <View style={ContentStyle.container}>
       {props.shiftTime != 'Free' && props.shiftTime != '' ? (

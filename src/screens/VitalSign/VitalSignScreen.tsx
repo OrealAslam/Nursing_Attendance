@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ToastAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import VitalHeader from './components/VitalHeader';
@@ -49,8 +50,8 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
       let lead_id = await get_async_data('lead_id');
       let user_id = await get_async_data('user_id');
       let obj = {
-        lead_id: 465, // lead_id,
-        staff_id: 1, //user_id,
+        lead_id: lead_id, // 465,
+        staff_id: user_id, //1,
         blood_pressure: bloodpressure,
         pulse_rate: pulserate,
         remarks: remarks,
@@ -63,7 +64,13 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
       if (response.status == 'success') {
         setloader(false);
         setnewrecord(false);
-        Alert.alert('Successful', 'Record added successfully');
+        ToastAndroid.showWithGravityAndOffset(
+          'Record Added Successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          5,
+          5,
+        );
       } else {
         console.log(response);
         setloader(false);

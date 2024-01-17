@@ -572,27 +572,29 @@ export const get_vital_record = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({lead_id: 465}), // 465
+    body: JSON.stringify({lead_id: lead_id}), // 465
   });
   const response = await request.json();
   return response;
 };
 
 export const get_nurse_note = async () => {
-  // let lead_id = await get_async_data('lead_id');
+  let lead_id = await get_async_data('lead_id');
   const request = await fetch(GET_NURSE_NOTES, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({lead_id: 465}),
+    body: JSON.stringify({lead_id: lead_id}),
   });
   const response = await request.json();
   return response;
 };
 
 export const add_nurse_note = async (note, shift_status) => {
+  let lead_id = await get_async_data('lead_id');
+  let staff_id = await get_async_data('user_id');
   const request = await fetch(ADD_NURSE_NOTES, {
     method: 'POST',
     headers: {
@@ -600,8 +602,8 @@ export const add_nurse_note = async (note, shift_status) => {
       'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify({
-      lead_id: 465,
-      staff_id: 1,
+      lead_id: lead_id,
+      staff_id: staff_id,
       notes: note,
       shift_status: shift_status,
     }),
@@ -779,8 +781,10 @@ export const uploadLocalHistory = async () => {
       });
       console.log('REQUESTED', request);
       const response = await request.json();
+      if(response.status == 'success') {
+        await set_async_data('attendence_history', {"pair":[]});
+      }
       console.log('RESPONSE :', response);
-
     } catch(e) {
       console.log('Catch Error', error);
     }

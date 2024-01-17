@@ -1,9 +1,14 @@
-import {ActivityIndicator, Dimensions, ImageBackground} from 'react-native';
-import React, { useState,useEffect } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  ImageBackground,
+  ToastAndroid,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import Header from './component/Header';
 import MainContent from './component/MainContent';
 import {useIsFocused} from '@react-navigation/native';
-import { get_nurse_note } from '../../Helper/AppHelper';
+import {get_nurse_note} from '../../Helper/AppHelper';
 
 const {width, height} = Dimensions.get('window');
 
@@ -21,8 +26,15 @@ const NurseNotesScreen = ({navigation}: {navigation: any}) => {
   useEffect(() => {
     (async () => {
       let requestData = await get_nurse_note();
-      if(requestData){
-        setloader(false)
+      if (requestData) {
+        setloader(false);
+        ToastAndroid.showWithGravityAndOffset(
+          'Record Added Successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          5,
+          5,
+        );
         setdata(requestData);
       }
     })();
@@ -32,8 +44,26 @@ const NurseNotesScreen = ({navigation}: {navigation: any}) => {
     <ImageBackground
       style={{width: width, height: height}}
       source={require('../../assets/appbackground.png')}>
-      <Header navigateScreen={navigateScreen} setshowaddicon={setshowaddicon} setdatestring={setdatestring} />
-      {loader == true ? (<ActivityIndicator size={'large'} color={'#ddd'} style={{alignSelf:'center'}} />) : (<MainContent datestring={datestring} showaddicon={showaddicon} data={data} setloader={setloader} loader={loader}/>)}
+      <Header
+        navigateScreen={navigateScreen}
+        setshowaddicon={setshowaddicon}
+        setdatestring={setdatestring}
+      />
+      {loader == true ? (
+        <ActivityIndicator
+          size={'large'}
+          color={'#ddd'}
+          style={{alignSelf: 'center'}}
+        />
+      ) : (
+        <MainContent
+          datestring={datestring}
+          showaddicon={showaddicon}
+          data={data}
+          setloader={setloader}
+          loader={loader}
+        />
+      )}
     </ImageBackground>
   );
 };

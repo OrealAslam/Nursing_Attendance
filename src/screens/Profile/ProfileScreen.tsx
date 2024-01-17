@@ -1,13 +1,13 @@
 import {
   View,
   Dimensions,
-  Alert,
   ImageBackground,
   Image,
   TouchableOpacity,
   ActivityIndicator,
   NativeModules,
   Platform,
+  ToastAndroid
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
@@ -91,7 +91,13 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       .post(UPDATE_PROFILE, data, config)
       .then((res: any) => {
         if (res.status == 200) {
-          Alert.alert('Success', 'Profile Updated Successfully');
+          ToastAndroid.showWithGravityAndOffset(
+            'Profile Updated Successfully',
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            5,
+            5,
+          );
         }
         setloader(false);
       })

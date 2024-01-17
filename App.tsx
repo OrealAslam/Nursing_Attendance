@@ -12,6 +12,7 @@ import AdminRoute from './src/routes/AdminRoute';
 // import NetworkModal from './src/components/NetworkModal';
 
 const App = () => {
+  LogBox.ignoreAllLogs();
   const {type, isConnected} = useNetInfo();
   const [splashClosed, setsplashClosed] = useState(false);
   const [userid, setuserid] = useState(null);

@@ -211,6 +211,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           await set_async_data('free_attendance_marked', null);
           await set_async_data('lead_id', request.data.lead_id);
           await set_async_data('shift_time', request.data.shift_status);
+          setshiftTime(request.data.shift_status);
           let status = request.attendance_Status.status;
           setleadid(request.data.lead_id);
           if (status == 'started') {
@@ -290,6 +291,8 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         }
       } else {
         // change checkIn/Out according to start/end Time
+        let shift = await get_async_data('shift_time');
+        setshiftTime(shift);
         await update_btn_state(start_time, end_time);
         let localHistory = await get_async_data('attendence_history');
         console.log('localHistory', localHistory);
