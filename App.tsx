@@ -11,8 +11,6 @@ import {PermissionsAndroid, Alert, LogBox} from 'react-native';
 import AdminRoute from './src/routes/AdminRoute';
 // import NetworkModal from './src/components/NetworkModal';
 
-LogBox.ignoreAllLogs();
-
 const App = () => {
   const {type, isConnected} = useNetInfo();
   const [splashClosed, setsplashClosed] = useState(false);
@@ -82,7 +80,6 @@ const App = () => {
                   // ) : usertype == 'Nurse' ? (
                   // <NurseRoute></NurseRoute>
                 ) : (
-                  // <ClientRoute></ClientRoute>
                   <NurseRoute></NurseRoute>
                 )
               ) : (

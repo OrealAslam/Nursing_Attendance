@@ -7,8 +7,8 @@ import Geolocation from '@react-native-community/geolocation';
 import DeviceInfo from 'react-native-device-info';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
-export const LOCAL_BASE_URL =
-  'http://192.168.10.14/MRL-Apps/MRL-Apps/public/api/update-locally';
+export const LOCAL_UPLOAD_IMAGE =
+  'http://192.168.10.5/MRL-Apps/MRL-Apps/public/api/update-locally';
 export const IMAGE_BASE_URL = 'https://portal.plancare.pk';
 export const WHATSAPP_NUMBER = '+923041111949';
 const ATTENDENCE_RECORD_ID = 3;
@@ -229,6 +229,7 @@ export const start_shift = async (
   const resposne = await request.json();
   return resposne;
 };
+
 export const free_shift = async (longitude, latitude, start_time) => {
   const user_id = await get_async_data('user_id');
 
@@ -766,10 +767,6 @@ export const uploadLocalHistory = async () => {
   let attendenceHistory = await get_async_data('attendence_history');
   attendenceHistory = JSON.parse(attendenceHistory);
   if( attendenceHistory.pair.length > 0) {
-    console.log('function called');
-    // for (let index = 0; index < attendenceHistory.pair.length; index++) {
-    //   console.log(`index:`+index+` : `, attendenceHistory.pair[index] );
-    // }
     console.log('BEFORE SEND', JSON.stringify(attendenceHistory.pair));
     try {
       const request = await fetch (BASE_URL + 'offlineAttendace',{
@@ -790,64 +787,3 @@ export const uploadLocalHistory = async () => {
 
   }
 }
-
-// CUCTOM DATE PICKER HELPER FUNCTIONS
-
-// export const getMonthName = dateString => {
-//   const months = [
-//     'Jan',
-//     'Feb',
-//     'Mar',
-//     'Apr',
-//     'May',
-//     'Jun',
-//     'Jul',
-//     'Aug',
-//     'Sep',
-//     'Oct',
-//     'Nov',
-//     'Dec',
-//   ];
-//   const parts = dateString.split('-');
-//   const monthNumber = parseInt(parts[1], 10);
-//   const day = parseInt(parts[2], 10);
-
-//   if (monthNumber >= 1 && monthNumber <= 12 && day >= 1 && day <= 31) {
-//     const monthName = months[monthNumber - 1];
-//     let name = monthName + ', ' + day;
-//     return name.toString();
-//   } else {
-//     return 'Invalid Date';
-//   }
-// };
-
-// export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-// export const globalDate = new Date();
-
-// export const months = [
-//   'January',
-//   'February',
-//   'March',
-//   'April',
-//   'May',
-//   'June',
-//   'July',
-//   'August',
-//   'September',
-//   'October',
-//   'November',
-//   'December',
-// ];
-
-// export const nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-// export const addMonth = month => {
-//   if (month == 11) {
-//   }
-// };
-
-// export const subMonth = month => {
-//   if (month == 1) {
-//   }
-// };

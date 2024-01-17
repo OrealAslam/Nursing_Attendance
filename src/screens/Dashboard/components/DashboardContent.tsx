@@ -71,7 +71,6 @@ const DashboardContent = (props: any) => {
   const updatedTime = useTimeUpdater(props.workTime.toString());
 
   const show_free_attendence_model = async () => {
-    // let check = await check_for_already_start_free_offline_attendence();
     let check = await get_async_data('free_attendance_marked');
     if(check == 'marked') {
       Alert.alert('Message', 'Attendence already started');
@@ -90,11 +89,9 @@ const DashboardContent = (props: any) => {
     }
   }
 
-  console.log('ttrtime', props.shiftTime)
-
   return (
     <View style={ContentStyle.container}>
-      {props.shiftTime != 'Free' ? (
+      {props.shiftTime != 'Free' && props.shiftTime != '' ? (
         <TouchableOpacity onPress={already_started_free_attendence}>
           <Image
             style={ContentStyle.timerButton}

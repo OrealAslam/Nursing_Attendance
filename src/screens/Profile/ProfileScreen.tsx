@@ -6,34 +6,34 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  LogBox,
-  NativeModules
+  NativeModules,
+  Platform,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
 import MainContent from './components/MainContent';
 import FooterComponent from './components/FooterComponent';
 import ChangePasswordModel from '../../components/ChangePasswordModel';
+import axios, {isCancel, AxiosError} from 'axios';
 import {
   IMAGE_BASE_URL,
+  LOCAL_UPLOAD_IMAGE,
+  UPDATE_PROFILE,
   editableProfileData,
   get_async_data,
-  update_user_profile,
 } from '../../Helper/AppHelper';
 import DocumentPicker, {types} from 'react-native-document-picker';
 import {ImagePicker, MainContainer} from './profilestyles';
 import {useIsFocused} from '@react-navigation/native';
-import messaging from '@react-native-firebase/messaging';
 
 const {width, height} = Dimensions.get('window');
+const {ImagePickerModule} = NativeModules;
 
-const { ImagePickerModule } = NativeModules;
+const data = new FormData();
 
 const ProfileScreen = ({navigation}: {navigation: any}) => {
-  // LogBox.ignoreLogs(['Warning: ...']);
   const isFocused = useIsFocused();
   const [model, setmodel] = useState(false);
-  const [uri, seturi] = useState(false);
   const [name, setname] = useState('');
   const [email, setemail] = useState('');
   const [dob, setdob] = useState('');
@@ -41,18 +41,11 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [hiringdate, sethiringdate] = useState('');
   const [address, setaddress] = useState('');
   const [profilepicture, setprofilepicture] = useState('');
-  const [imageData, setimageData] = useState(null);
+  const [uploadimage, setuploadimage] = useState(0);
   const [loader, setloader] = useState(true);
   const [postData, setpostData] = useState({});
-  const selectImage = async () => {
-    try {
-      const imagePath = await ImagePickerModule.selectImage();
-      console.log('Selected Image Path:', imagePath);
-      // You can handle the image path returned from the native module here
-    } catch (error) {
-      console.error('Image selection error:', error);
-    }
-  };
+  const [error, seterror] = useState(false);
+  const [pickedImage, setpickedImage] = useState('');
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -81,62 +74,55 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
   const updateRecord = async () => {
     setloader(true);
-    // const id = await get_async_data('user_id');
-
-    // let obj = {
-    //   id: id,
-    //   name: name,
-    //   dob: dob,
-    //   address: address,
-    //   profile_image: imageData !=null?imageData[0] : '',
-    //   upload_image: imageData !=null?1 : 0,
-    // };
-    console.log("POST DATA",postData)
-    // let response = await update_user_profile(postData);
-    // console.log('RES', response);
-    // if (response.status == 'success') {
-    //   console.log('AFTER UPDATE OBJ ', response);
-    //   setloader(false);
-    //   console.log('Success', response);
-    //   Alert.alert('Success', 'Profile Updated Successfully');
-    // } else {
-    //   setloader(false);
-    //   console.log('Error', response);
-    //   Alert.alert('Error', response.message);
-    // }
+    const id = await get_async_data('user_id');
+    data.append('id', id);
+    data.append('name', name);
+    data.append('dob', dob);
+    data.append('address', address);
+    data.append('upload_image', uploadimage);
+    var config = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+        // 'Content-Disposition': 'form-data; name="profile_image"',
+      },
+    };
+    axios
+      .post(UPDATE_PROFILE, data, config)
+      .then((res: any) => {
+        if (res.status == 200) {
+          Alert.alert('Success', 'Profile Updated Successfully');
+        }
+        setloader(false);
+      })
+      .catch((err: any) => {
+        console.log('Axios Error', err);
+      });
   };
-  const createFormData = (photo:any, body:any = {}) => {
-    const data = new FormData();
 
-    data.append("profile_image", {
-      name: photo.fileName,
-      type: photo.type,
-      uri: photo.uri,
-    } as any);
-
-    Object.keys(body).forEach((key) => {
-      data.append(key, body[key]);
-    });
-
-    return data;
-  };
-  
   const handleDocumentSelection = useCallback(async () => {
     try {
-      const response = await DocumentPicker.pick({
+      const file = await DocumentPicker.pick({
         presentationStyle: 'fullScreen',
         allowMultiSelection: false,
         type: [DocumentPicker.types.images],
       });
-      // setimageData(response);
-      const id = await get_async_data('user_id');
-      let postObject = createFormData(response, {
-        id: id,
-        name: name,
-        dob: dob,
-        address: address,
-      });
-      setpostData(postObject);
+
+      if (file && file[0]) {
+        data.append('profile_image', {
+          uri:
+            Platform.OS === 'android'
+              ? file[0].uri
+              : file[0].uri.replace('file://', ''),
+          name: file[0]?.name,
+          type: file[0]?.type,
+        });
+        setuploadimage(1);
+
+        Platform.OS === 'android'
+          ? setpickedImage(file[0].uri)
+          : setpickedImage(file[0].uri.replace('file://', ''));
+      }
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         console.log('cancel picker');
@@ -146,25 +132,6 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
     }
   }, []);
 
-  // const handleDocumentSelection = useCallback(async () => {
-  //   try {
-  //     const response = await DocumentPicker.pick({
-  //       presentationStyle: 'fullScreen',
-  //       allowMultiSelection: false,
-  //     });
-  //     setimageData(response);
-  //     seturi(true);
-  //     setprofilepicture(response[0].uri)
-  //   } catch (err) {
-  //     if (DocumentPicker.isCancel(err)) {
-  //       seturi(false);
-  //       console.log('cancel picker')
-  //     } else {
-  //       throw err;
-  //     }
-  //   }
-  // }, []);
-
   return (
     <ImageBackground
       style={{width: width, height: height}}
@@ -173,12 +140,17 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
       <View style={MainContainer.container}>
         <View style={ImagePicker.container}>
-          {profilepicture != '' ? (
-            <Image
+          {profilepicture != '' && error != true ? (
+            pickedImage != '' ? ( <Image
+              onError={() => seterror(true)}
+              style={ImagePicker.imageStyle}
+              source={{uri: pickedImage}}
+            />) : ( <Image
+              onError={() => seterror(true)}
               style={ImagePicker.imageStyle}
               source={{uri: IMAGE_BASE_URL + profilepicture}}
-              // source={{uri: uri== true ? profilepicture : IMAGE_BASE_URL + profilepicture}}
-            />
+            />)
+           
           ) : (
             <Image
               style={ImagePicker.imageStyle}

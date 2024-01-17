@@ -19,22 +19,28 @@ const ProfileHeader = (props: any) => {
         <Text style={HeaderStyle.heading}>Profile</Text>
       </View>
       <View style={ImagePicker.container}>
-        {/* {props.profilepicture != '' ? (
-          <Image
-            style={ImagePicker.imageStyle}
-            source={{uri: IMAGE_BASE_URL + props.profilepicture}}
-          />
-        ) : ( */}
+        {props.profilepicture != '' && props.error != true ? (
+          props.pickedImage != '' ? (
+            <Image
+              onError={() => props.seterror(true)}
+              style={ImagePicker.imageStyle}
+              source={{uri: props.pickedImage}}
+            />
+          ) : (
+            <Image
+              onError={() => props.seterror(true)}
+              style={ImagePicker.imageStyle}
+              source={{uri: IMAGE_BASE_URL + props.profilepicture}}
+            />
+          )
+        ) : (
           <Image
             style={ImagePicker.imageStyle}
             source={require('../../../../assets/defaultprofileimage.png')}
           />
-        {/* )} */}
-
+        )}
         <TouchableOpacity
-          onPress={() =>
-            console.log('nn')
-          }
+          onPress={props.handleDocumentSelection}
           style={ImagePicker.editButton}>
           <Image
             style={ImagePicker.editButtonImg}

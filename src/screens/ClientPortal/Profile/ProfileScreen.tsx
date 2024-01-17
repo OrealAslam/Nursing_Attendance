@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import ProfileHeader from './components/ProfileHeader';
@@ -13,14 +14,15 @@ import MainContent from './components/MainContent';
 import FooterComponent from './components/FooterComponent';
 import ChangePasswordModel from '../../../components/ChangePasswordModel';
 import {
-  IMAGE_BASE_URL,  editableProfileData,
+  IMAGE_BASE_URL,  UPDATE_PROFILE,  editableProfileData,
   get_async_data,
-  update_user_profile,
 } from '../../../Helper/AppHelper';
 import DocumentPicker, { types } from 'react-native-document-picker';
 import {ImagePicker, MainContainer} from './profilestyles';
+import axios from 'axios';
 
 const {width, height} = Dimensions.get('window');
+const data = new FormData();
 
 const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [model, setmodel] = useState(false);
@@ -33,6 +35,9 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
   const [profilepicture, setprofilepicture] = useState('');
   const [imageData, setimageData] = useState({});
   const [loader, setloader] = useState(false);
+  const [error, seterror] = useState(false);
+  const [pickedImage, setpickedImage] = useState('');
+  const [uploadimage, setuploadimage] = useState(0);
 
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
@@ -51,33 +56,63 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
     })();
   }, [loader]);
 
+
   const updateRecord = async () => {
     setloader(true);
     const id = await get_async_data('user_id');
-    let obj = {
-      id: id,
-      name: name,
-      dob: dob,
-      address: address,
-      image: imageData ? imageData : '',
+    data.append('id', id);
+    data.append('name', name);
+    data.append('dob', dob);
+    data.append('address', address);
+    data.append('upload_image', uploadimage);
+    var config = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+        // 'Content-Disposition': 'form-data; name="profile_image"',
+      },
     };
-    let response = await update_user_profile(obj);
-    if (response.status == 'success') {
-      setloader(false);
-    } else {
-      setloader(false);
-    }
+    axios
+      .post(UPDATE_PROFILE, data, config)
+      .then((res: any) => {
+        if (res.status == 200) {
+          Alert.alert('Success', 'Profile Updated Successfully');
+        }
+      })
+      .catch((err: any) => {
+        console.log('Axios Error', err);
+      });
   };
 
   const handleDocumentSelection = useCallback(async () => {
     try {
-      const response = await DocumentPicker.pick({
+      const file = await DocumentPicker.pick({
         presentationStyle: 'fullScreen',
         allowMultiSelection: false,
+        type: [DocumentPicker.types.images],
       });
-      setimageData(response[0]);
+
+      if (file && file[0]) {
+        data.append('profile_image', {
+          uri:
+            Platform.OS === 'android'
+              ? file[0].uri
+              : file[0].uri.replace('file://', ''),
+          name: file[0]?.name,
+          type: file[0]?.type,
+        });
+        setuploadimage(1);
+
+        Platform.OS === 'android'
+          ? setpickedImage(file[0].uri)
+          : setpickedImage(file[0].uri.replace('file://', ''));
+      }
     } catch (err) {
-      console.warn(err);
+      if (DocumentPicker.isCancel(err)) {
+        console.log('cancel picker');
+      } else {
+        throw err;
+      }
     }
   }, []);
 
@@ -94,26 +129,25 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
 
       <View style={MainContainer.container}>
         <View style={ImagePicker.container}>
-          {/* {profilepicture != '' ? (
-            <Image
+          {profilepicture != '' && error != true ? (
+            pickedImage != '' ? ( <Image
+              onError={() => seterror(true)}
+              style={ImagePicker.imageStyle}
+              source={{uri: pickedImage}}
+            />) : ( <Image
+              onError={() => seterror(true)}
               style={ImagePicker.imageStyle}
               source={{uri: IMAGE_BASE_URL + profilepicture}}
-            />
-          ) : ( */}
+            />)
+           
+          ) : (
             <Image
               style={ImagePicker.imageStyle}
               source={require('../../../assets/defaultprofileimage.png')}
             />
-          {/* )} */}
-
-          <TouchableOpacity style={ImagePicker.editButton}>
-            <Image
-              style={ImagePicker.editButtonImg}
-              source={require('../../../assets/editprofilepicbtn.png')}
-            />
-          </TouchableOpacity>
+          )}
           <TouchableOpacity
-            onPress={()=>{}}
+            onPress={handleDocumentSelection}
             style={ImagePicker.editButton}>
             <Image
               style={ImagePicker.editButtonImg}
