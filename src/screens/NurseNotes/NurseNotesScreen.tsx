@@ -2,7 +2,6 @@ import {
   ActivityIndicator,
   Dimensions,
   ImageBackground,
-  ToastAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Header from './component/Header';
@@ -28,13 +27,6 @@ const NurseNotesScreen = ({navigation}: {navigation: any}) => {
       let requestData = await get_nurse_note();
       if (requestData) {
         setloader(false);
-        ToastAndroid.showWithGravityAndOffset(
-          'Record Added Successfully!',
-          ToastAndroid.SHORT,
-          ToastAndroid.BOTTOM,
-          5,
-          5,
-        );
         setdata(requestData);
       }
     })();

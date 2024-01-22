@@ -27,7 +27,6 @@ import {ImagePicker, MainContainer} from './profilestyles';
 import {useIsFocused} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
-const {ImagePickerModule} = NativeModules;
 
 const data = new FormData();
 

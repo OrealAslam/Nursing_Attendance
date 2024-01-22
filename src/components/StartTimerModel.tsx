@@ -16,6 +16,7 @@ const timerImgWidth = width - 190;
 const timerImgRatio = timerImgWidth / 353;
 
 const StartTimerModel = (props: any) => {
+  console.log('timer model props', props);
   return (
     <View style={styles.container}>
       <View style={styles.modelContainer}>

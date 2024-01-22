@@ -124,7 +124,8 @@ export const CardStyle = StyleSheet.create({
   },
   tempText: {
     fontSize: 18,
-    fontWeight: '700'
+    fontWeight: '700',
+    color: '#353535'
   },
   row2: {
     flexDirection: 'row',

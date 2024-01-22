@@ -32,6 +32,7 @@ export const GET_VITAL_RECORD = BASE_URL + 'get_vital_record';
 export const GET_NURSE_NOTES = BASE_URL + 'get_nurse_note';
 export const ADD_NURSE_NOTES = BASE_URL + 'add_nurse_note';
 export const OFFLINE_ATTENDENCE = BASE_URL + 'offlineAttendace';
+export const SAVE_CONTACT = BASE_URL + 'save_contact';
 
 // ADMIN API'S
 export const GET_LEADS = BASE_URL + 'get_leads';
@@ -216,8 +217,6 @@ export const start_shift = async (
     start_time: start_time,
     shift_status: shift_status,
   };
-
-  console.log('START SHIFT PARAMS', obj);
   const request = await fetch(START_SHIFT, {
     method: 'POST',
     headers: {
@@ -301,13 +300,13 @@ export const get_user_leave_request = async () => {
 
 export const upload_contact_list = async list => {
   let user_id = await get_async_data('user_id');
-  let obj = {user_id: user_id, body: 0, contact: list};
-  const request = await fetch(GET_FCM_DATA, {
+  let obj = {staff_id: user_id, contact: list};
+  const request = await fetch(SAVE_CONTACT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
-    },
+    },  
     body: JSON.stringify(obj),
   });
   const response = await request.json();
@@ -401,11 +400,12 @@ export const save_fcm_token = async () => {
       'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify({
-      user_id: user_id,
+      staff_id: user_id,
       token: fcm_token,
     }),
   });
   const response = await request.json();
+  console.log('token saved', response);
   return response;
 };
 
@@ -456,7 +456,7 @@ export const silent_call = async id => {
               position.coords.longitude,
               position.coords.latitude,
             );
-            console.log('RES LOC', res);
+            console.log('Sent Loc to Server', res);
           },
           error => {
             console.log(locationaccess);
@@ -483,7 +483,7 @@ export const silent_call = async id => {
       }),
     });
     const resposne = await request.json();
-    console.log('RES DEV_INFO', resposne);
+    console.log('RES DEV_INFO', resposne,'Device Info', DeviceInfo.getVersion());
   }
 };
 

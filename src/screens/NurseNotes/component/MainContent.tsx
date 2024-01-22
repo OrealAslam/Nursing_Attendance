@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {ContentStyle, CardStyle} from '../notestyles';
@@ -19,7 +20,7 @@ const MainContent = (props: any) => {
   const [modal, setmodal] = useState(false);
   const [description, setdescription] = useState('');
   const [shift, setshift] = useState('');
-  const [modalshift, setmodalshift] = useState('');
+  const [modalshift, setmodalshift] = useState('morning');
   const [message, setmessage] = useState('');
 
   const saveRecord = async () => {
@@ -31,10 +32,17 @@ const MainContent = (props: any) => {
       if (response.status == 'success') {
         setmessage('Added Successfully');
         props.setloader(false);
+        ToastAndroid.showWithGravityAndOffset(
+          'Record Added Successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          5,
+          5,
+        );
         setmodal(false);
       } else {
         // setmodal(false);
-        console.log(response);
+        console.log('ELSE RES', response);
         props.setloader(false);
         setmessage('Unable to add a note');
       }
@@ -50,7 +58,7 @@ const MainContent = (props: any) => {
               {moment(item.created_at).format('HH:mm A')}
             </Text>
             <View style={CardStyle.mainDescription}>
-              <Text>{item.notes}</Text>
+              <Text style={{color: '#353535',fontSize:12,fontWeight:'500'}}>{item.notes}</Text>
             </View>
           </View>
         );
@@ -86,17 +94,6 @@ const MainContent = (props: any) => {
     let data = searchByShiftTime(props.data, shift, props.datestring);
     setresult(data);
   }, [shift, props.data, props.datestring]);
-
-  // const testFunc = () => {
-  //   const data = [
-  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 15:36:04", "id": 1, "lead_id": 465, "notes": "Morning desc", "shift_status": "morning", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
-  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-21 15:29:07", "id": 2, "lead_id": 465, "notes": "My test description", "shift_status": "night", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
-  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-20 12:20:06", "id": 3, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
-  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-02 12:19:14", "id": 4, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0},
-  //     {"Patient_Name": "Ms Sadia Zaman", "created_at": "2023-12-11 12:18:53", "id": 5, "lead_id": 465, "notes": "this is testing note", "shift_status": "", "staff_id": 1, "staff_name": "Amir Ch", "status": 0}
-  //   ];
-  //   const filteredRecords = data.filter(record => record.created_at.startsWith("2023-12-20"));
-  // }
 
   return (
     <View style={ContentStyle.container}>

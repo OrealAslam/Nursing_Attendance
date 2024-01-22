@@ -30,14 +30,7 @@ const App = () => {
       SplashScreen.hide();
     })();
   }, []);
-
-  // useEffect(() => {
-  //   if (isConnected) {
-  //     setNetworkModel(false);
-  //   } else {
-  //     setNetworkModel(true);
-  //   }
-  // }, [isConnected]);
+  
 
   async function requestUserPermission() {
     PermissionsAndroid.request(
@@ -53,19 +46,20 @@ const App = () => {
   }
 
   // Register background handler
-  messaging().setBackgroundMessageHandler(async remoteMessage => {
-    await silent_call(remoteMessage.notification?.body);
-  });
+  // messaging().setBackgroundMessageHandler(async remoteMessage => {
+  //   console.log(remoteMessage)
+  //   await silent_call(remoteMessage.notification?.body);
+  // });
 
   // foreground handler
-  messaging().onMessage(async remoteMessage => {
-    // console.log('notificatio recived', remoteMessage);
-    if (remoteMessage.notification?.body == '2') {
-      Alert.alert(`${remoteMessage.notification?.title}`);
-    } else {
-      await silent_call(remoteMessage.notification?.body);
-    }
-  });
+  // messaging().onMessage(async remoteMessage => {
+  //   if (remoteMessage.notification?.body == '2') {
+  //     Alert.alert(`${remoteMessage.notification?.title}`);
+  //     console.log(remoteMessage.notification)
+  //   } else {
+  //     await silent_call(remoteMessage.notification?.body);
+  //   }
+  // });
 
   return (
     <NavigationContainer>

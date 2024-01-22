@@ -17,7 +17,6 @@ import {
 import {
   get_async_data,
   save_fcm_token,
-  upload_contact_list,
 } from '../Helper/AppHelper';
 import {useNetInfo} from '@react-native-community/netinfo';
 import Contacts from 'react-native-contacts';
@@ -70,7 +69,9 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           await set_async_data('hiring_date', request.data.created_at);
           await set_async_data('profile_picture', request.data.image);
           await set_async_data('login_user', 'loggedin');
-          await save_fcm_token();
+
+          let saveFCM = await save_fcm_token();
+          console.log('saveFCM', saveFCM);
   
           let usertype = await get_async_data('usertype');
           // setTimeout(() => {

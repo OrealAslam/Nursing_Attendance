@@ -19,7 +19,6 @@ import {
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
-// import Geolocation from 'react-native-geolocation-service';
 import {useIsFocused} from '@react-navigation/native';
 import OverlayLoader from '../../components/OverlayLoader';
 import StartFreeTimer from '../../components/StartFreeTimer';
@@ -45,6 +44,8 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
   const [showmodel, setshowmodel] = useState(false);
   const [userid, setuserid] = useState(null);
 
+  // NotificationSetting.openAppNotificationSettings();
+
   const navigateScreen = (screenName: any) => {
     navigation.navigate(screenName);
   };
@@ -59,6 +60,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
     let shiftTime = await get_async_data('shift_time');
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
+      console.log('LEAD', leadid)
       // API call to start shift
       setloader(true);
       let start_time = moment().format('YYYY-MM-DD hh:mm:ss');
@@ -70,7 +72,6 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           start_time,
           shiftTime,
         );
-        console.log('before if', response)
         if (response.status == 'success') {
           let attendenceStatus = response.attendance_Status;
           console.log('resonse success',response);
@@ -176,13 +177,15 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         },
       );
       if (granted === 'granted') {
+        setlocationaccess(true);
         Geolocation.getCurrentPosition(
           position => {
+            console.log('POS ACCESSED', position);
             setlatitude(position.coords.latitude);
             setlongitude(position.coords.longitude);
-            setlocationaccess(true);
           },
           error => {
+            console.log('POS DENIED', error);
             setlocationaccess(false);
           },
         );
@@ -200,13 +203,14 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       let start_time = await get_async_data('start_time');
       let end_time = await get_async_data('end_time');
       await access_device_location();
+      let fcm_token = await get_async_data('fcm_token');
+      console.log('TOKEN', fcm_token);
       if (isConnected) {
-        await totalWorkingHours();
+        // await totalWorkingHours();
         let user_id = await get_async_data('user_id');
         setuserid(user_id);
         let request = await get_shift_status();
         await uploadLocalHistory();
-
         if (request.status == 'success') {
           await set_async_data('free_attendance_marked', null);
           await set_async_data('lead_id', request.data.lead_id);
@@ -289,6 +293,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           // Nurse is free
           setshiftTime('Free');
         }
+        await totalWorkingHours();
       } else {
         // change checkIn/Out according to start/end Time
         let shift = await get_async_data('shift_time');
@@ -363,14 +368,18 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
   const totalWorkingHours = async () => {
     const today = new Date().toISOString().slice(0, 10); // Get today's date in 'YYYY-MM-DD' format
+    
     let user_id = await get_async_data('user_id');
     const response = await get_history(user_id);
     if (response.status == 'success') {
       if (response.data.length > 0) {
         const objectsWithTodayDate = response.data.filter(
-          (obj: any) => obj.created_at.slice(0, 10) === today,
+          (obj: any) => obj.created_at === today,
+          // (obj: any) => obj.created_at.slice(0, 10) === today,
         );
         settotalwotking(objectsWithTodayDate[0].time_duration);
+      } else{
+        settotalwotking('00:00:00');
       }
     }
   };
