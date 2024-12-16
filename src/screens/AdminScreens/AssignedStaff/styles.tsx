@@ -27,6 +27,7 @@ export const InputStyle = StyleSheet.create({
     borderRadius: 14,
     marginTop: 7,
     paddingLeft: 10,
+    color: '#000'
   },
   searchBox:{
     width: (85 / 100) * width,

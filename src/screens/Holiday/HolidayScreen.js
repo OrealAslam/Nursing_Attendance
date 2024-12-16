@@ -42,13 +42,12 @@ const HolidayScreen = ({navigation}) => {
   };
 
   const submit_leave_request = async () => {
-    if (holidayHistory.length < 1) {
+    if (markedDates.length < 1) {
       Alert.alert(
         'Warning',
         'Select atleast single date to submit leave request',
       );
     } else {
-      console.log('markedDates', markedDates);
       setloader(true);
 
       let response = await leave_request(markedDates);
@@ -58,7 +57,7 @@ const HolidayScreen = ({navigation}) => {
       if (response.status == 'error') {
         Alert.alert(
           'Error',
-          'Unable to submit holiday request. Try again later!',
+          response.error,
         );
         setloader(false);
       }

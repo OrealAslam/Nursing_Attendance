@@ -23,7 +23,6 @@ const ClientDashboard = ({navigation}:{navigation:any}) => {
     <View style={styles.container}>
       <Header />
       <Cards vitalSign={vitalSign} nurseNotes={nurseNotes} profile={profile}/>
-
       <View style={styles.whatsappContainer}>
         <TouchableOpacity onPress={()=>Linking.openURL('https://wa.me/' + WHATSAPP_NUMBER)}>
           <Image style={styles.whatsappImage} source={require('../../../assets/whatsapp_helpline.png')}/>

@@ -56,7 +56,8 @@ const CalenderBody = (props: any) => {
       let type = typeof item;
       let highlight = false;
       let parsed = parseDate(props.currentyear, props.currentmonth + 1, item);
-      // let markedDate = markeddate(parsed);
+      let markedDate = markeddate(parsed);
+      
       // check for active date
       if (type == 'number') {
         if (props.highlightDate.includes(parsed)) {
@@ -64,10 +65,6 @@ const CalenderBody = (props: any) => {
         } else {
           highlight = false;
         }
-
-        // if(props.highlightDate.includes(markedDate.date)) {
-        //   highlight = true;
-        // }
       }
       return (
         <TouchableOpacity
@@ -82,7 +79,7 @@ const CalenderBody = (props: any) => {
           style={[
             styles.date,
             highlight == true
-              ? {backgroundColor: '#6AD239'}
+              ? markedDate.status == 1 ? {backgroundColor: '#ff471a'} : markedDate.status == 2 ? {backgroundColor: '#2eb8b8'} : {backgroundColor: '#6AD239'}
               : {backgroundColor: 'transparent'},
           ]}
           key={index}>

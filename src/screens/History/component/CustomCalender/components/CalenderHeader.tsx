@@ -10,7 +10,7 @@ const CalenderHeader = (props: any) => {
           source={require('../assets/prev_month.png')}
         />
       </TouchableOpacity>
-      <Text>{props.currentmonth}, {props.currentyear}</Text>
+      <Text style={{color: '#515151', fontWeight: '500'}}>{props.currentmonth}, {props.currentyear}</Text>
       <TouchableOpacity onPress={props.nextMonth} style={styles.button}>
         <Image
           style={styles.icon}

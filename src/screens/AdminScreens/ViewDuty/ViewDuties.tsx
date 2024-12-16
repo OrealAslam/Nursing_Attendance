@@ -155,7 +155,7 @@ const ViewDuties = ({navigation}: {navigation: any}) => {
                 <Text style={styles.label}>Shift Type</Text>
               </View>
             </View>
-            <ScrollView>{dislay_assigned_staff()}</ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false} alwaysBounceVertical style={{paddingBottom: 50}}>{dislay_assigned_staff()}</ScrollView>
           </View>
         </>
       )}

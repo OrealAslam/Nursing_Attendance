@@ -39,6 +39,7 @@ export const MainContent = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 35,
     borderTopRightRadius: 35,
+    // paddingHorizontal: 15
   },
   statusMessage: {
     textAlign: 'center',

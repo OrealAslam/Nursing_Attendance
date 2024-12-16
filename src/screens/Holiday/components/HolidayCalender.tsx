@@ -11,7 +11,7 @@ const HolidayCalender = (props: any) => {
       current={selected}
       allowRangeSelection={true}
       // Callback that gets called when the user selects a day
-      onDayPress={day => {
+      onDayPress={(day:any) => {
         props.check_for_already_selected(day.dateString);
       }}
       // Mark specific dates as marked

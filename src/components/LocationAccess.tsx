@@ -5,16 +5,19 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  BackHandler
+  BackHandler,
+  PermissionsAndroid
 } from 'react-native';
 import React from 'react';
+import Contacts from 'react-native-contacts';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const btnWidth = width / 2 - 50;
 const btnRatio = btnWidth / 460;
 
-const LocationAccess = (props:any) => {
+const LocationAccess = (props: any) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.footer}>
@@ -26,7 +29,7 @@ const LocationAccess = (props:any) => {
             paddingHorizontal: 15,
             lineHeight: 25,
           }}>
-          <Text style={{fontSize: 16, color: '#323232', fontWeight: '700'}}>
+          <Text style={{ fontSize: 16, color: '#323232', fontWeight: '700' }}>
             PlanCare
           </Text>{' '}
           collects the location data to mark your attendance when the app is
@@ -40,8 +43,7 @@ const LocationAccess = (props:any) => {
               source={require('../assets/deny.png')}
             />
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={()=>props.setshowoverlay(false)}>
+          <TouchableOpacity onPress={() => props.setshowoverlay(false)}>
             <Image
               style={styles.btnImage}
               source={require('../assets/accept.png')}

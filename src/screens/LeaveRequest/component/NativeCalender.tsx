@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 import CalenderHeader from './components/CalenderHeader';
 import CalenderBody from './components/CalenderBody';
 import moment from 'moment';
+import HolidayCalender from '../../Holiday/components/HolidayCalender';
 
 const NativeCalender = (props: any) => {
   const [dt, setdt] = useState(new Date());

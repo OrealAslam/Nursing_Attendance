@@ -45,21 +45,23 @@ const App = () => {
     }
   }
 
+
+
   // Register background handler
-  // messaging().setBackgroundMessageHandler(async remoteMessage => {
-  //   console.log(remoteMessage)
-  //   await silent_call(remoteMessage.notification?.body);
-  // });
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log(remoteMessage)
+    await silent_call(remoteMessage.notification?.body);
+  });
 
   // foreground handler
-  // messaging().onMessage(async remoteMessage => {
-  //   if (remoteMessage.notification?.body == '2') {
-  //     Alert.alert(`${remoteMessage.notification?.title}`);
-  //     console.log(remoteMessage.notification)
-  //   } else {
-  //     await silent_call(remoteMessage.notification?.body);
-  //   }
-  // });
+  messaging().onMessage(async remoteMessage => {
+    if (remoteMessage.notification?.body == '2') {
+      Alert.alert(`${remoteMessage.notification?.title}`);
+      console.log(remoteMessage.notification)
+    } else {
+      await silent_call(remoteMessage.notification?.body);
+    }
+  });
 
   return (
     <NavigationContainer>

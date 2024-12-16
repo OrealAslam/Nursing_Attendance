@@ -72,7 +72,13 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
           5,
         );
       } else {
-        console.log(response);
+        ToastAndroid.showWithGravityAndOffset(
+          'Error Adding Successfully!',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          5,
+          5,
+        );
         setloader(false);
       }
     }
@@ -96,6 +102,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
   useEffect(() => {
     (async () => {
       let response = await get_vital_record();
+      // console.log('get_vital_record :', response);
       setrecord(response);
     })();
   }, [isFocused, loader]);
@@ -126,7 +133,7 @@ const VitalSignScreen = ({navigation}: {navigation: any}) => {
           />
         ) : (
           <>
-            <ScrollView>
+            <ScrollView style={{paddingBottom: 50}} showsVerticalScrollIndicator={false} alwaysBounceVertical>
               <Card record={record} datestring={datestring} />
             </ScrollView>
             <View style={{position: 'absolute', bottom: 60}}>

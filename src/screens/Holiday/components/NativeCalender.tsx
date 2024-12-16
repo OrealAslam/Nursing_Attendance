@@ -6,8 +6,8 @@ import moment from 'moment';
 
 const NativeCalender = (props: any) => {
   const [dt, setdt] = useState(new Date());
-  const [currentyear, setcurrentyear] = useState(dt.getFullYear());
-  const [currentmonth, setcurrentmonth] = useState(dt.getMonth());
+  const [currentyear, setcurrentyear] = useState(new Date().getFullYear());
+  const [currentmonth, setcurrentmonth] = useState(new Date().getMonth());
   const [totaldaysinmonth, settotaldaysinmonth] = useState(0);
   const [startdayofmonth, setstartdayofmonth] = useState(0);
   const [lastdayofmonth, setlastdayofmonth] = useState(0);

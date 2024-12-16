@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "666621160562",
-    "project_id": "nursing-attendence",
-    "storage_bucket": "nursing-attendence.appspot.com"
+    "project_number": "677315585356",
+    "project_id": "nursing-attendance-by-plancare",
+    "storage_bucket": "nursing-attendance-by-plancare.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:666621160562:android:2e546306b0d5e26df8e6eb",
+        "mobilesdk_app_id": "1:677315585356:android:f492901c6c306438f65be9",
         "android_client_info": {
           "package_name": "com.nursingattendance"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBo9N_jy0P1K_kxNy0GJKA7g2823a07zi0"
+          "current_key": "AIzaSyBsSuxnknaM7Ytzet76-V_EIZeJwECxN2E"
         }
       ],
       "services": {

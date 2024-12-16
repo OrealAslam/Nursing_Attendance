@@ -1,10 +1,10 @@
-import {PermissionsAndroid, ImageBackground, Alert} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { PermissionsAndroid, ImageBackground, Alert, Platform, Linking } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
 import DashboardFooter from './components/DashboardFooter';
 import ShiftCompleteModel from '../../components/ShiftCompleteModel';
-import {useNetInfo} from '@react-native-community/netinfo';
+import { useNetInfo } from '@react-native-community/netinfo';
 import StartTimerModel from '../../components/StartTimerModel';
 import {
   get_shift_status,
@@ -16,16 +16,18 @@ import {
   BASE_URL,
   update_history_array,
   uploadLocalHistory,
+  UPLOAD_NURSE_MEDIA,
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import OverlayLoader from '../../components/OverlayLoader';
 import StartFreeTimer from '../../components/StartFreeTimer';
 
-const DashboardScreen = ({navigation}: {navigation: any}) => {
+
+const DashboardScreen = ({ navigation }: { navigation: any }) => {
   const isFocused = useIsFocused();
-  const {isConnected} = useNetInfo();
+  const { isConnected } = useNetInfo();
   const [starttimermodel, setstarttimermodel] = useState(false);
   const [showshiftcomplete, setshowshiftcomplete] = useState(false);
   const [shiftstatus, setshiftstatus] = useState('ended');
@@ -74,7 +76,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
         );
         if (response.status == 'success') {
           let attendenceStatus = response.attendance_Status;
-          console.log('resonse success',response);
+          console.log('resonse success', response);
           await set_async_data('start_time_submit_request', 'submitted');
           setshiftstatus('started');
           setloader(false);
@@ -85,7 +87,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           await set_async_data(
             'attendance_id',
             response.attendaces_id,
-            );
+          );
           await set_async_data('start_time', start_time);
           await set_async_data('longitude', longitude);
           await set_async_data('latitude', latitude);
@@ -176,6 +178,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           buttonPositive: 'OK',
         },
       );
+      console.log('ACCESS_FINE_LOCATION', granted)
       if (granted === 'granted') {
         setlocationaccess(true);
         Geolocation.getCurrentPosition(
@@ -204,11 +207,14 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
       let end_time = await get_async_data('end_time');
       await access_device_location();
       let fcm_token = await get_async_data('fcm_token');
-      console.log('TOKEN', fcm_token);
+      // console.log('FCM :', fcm_token)
+
       if (isConnected) {
         // await totalWorkingHours();
         let user_id = await get_async_data('user_id');
         setuserid(user_id);
+
+        console.log('USER ID :', user_id);
         let request = await get_shift_status();
         await uploadLocalHistory();
         if (request.status == 'success') {
@@ -368,7 +374,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
   const totalWorkingHours = async () => {
     const today = new Date().toISOString().slice(0, 10); // Get today's date in 'YYYY-MM-DD' format
-    
+
     let user_id = await get_async_data('user_id');
     const response = await get_history(user_id);
     if (response.status == 'success') {
@@ -378,7 +384,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
           // (obj: any) => obj.created_at.slice(0, 10) === today,
         );
         settotalwotking(objectsWithTodayDate[0].time_duration);
-      } else{
+      } else {
         settotalwotking('00:00:00');
       }
     }
@@ -418,7 +424,7 @@ const DashboardScreen = ({navigation}: {navigation: any}) => {
 
   return (
     <ImageBackground
-      style={{width: '100%', height: '100%'}}
+      style={{ width: '100%', height: '100%' }}
       source={require('../../assets/appbackground.png')}>
       <DashboardHeader navigateScreen={navigateScreen} />
 
