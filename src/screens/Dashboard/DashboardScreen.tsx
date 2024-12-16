@@ -207,7 +207,7 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
       let end_time = await get_async_data('end_time');
       await access_device_location();
       let fcm_token = await get_async_data('fcm_token');
-      // console.log('FCM :', fcm_token)
+      console.log('FCM :', fcm_token)
 
       if (isConnected) {
         // await totalWorkingHours();

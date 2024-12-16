@@ -20,7 +20,7 @@ global.DateArray = [];
 
 // CLIENT API'S
 // export const UPLOAD_NURSE_MEDIA = BASE_URL + 'saveGalaryInfo';
-export const UPLOAD_NURSE_MEDIA = 'http://192.168.0.117:8000/api/upload-media';
+export const UPLOAD_NURSE_MEDIA = 'http://192.168.1.132:8000/api/upload-media';
 const LOGIN_NURSE = BASE_URL + 'login_nurse';
 const GET_HISTORY = BASE_URL + 'get_history';
 const UPDATE_PASSWORD = BASE_URL + 'update_password';
