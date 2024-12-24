@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import {
+  fetchAndUploadMedia,
   get_async_data,
   requestPermissions,
   save_fcm_token,
@@ -75,11 +76,13 @@ const LoginScreen = ({ navigation }: { navigation: any }) => {
           await set_async_data('address', request.data.address);
           await set_async_data('hiring_date', request.data.created_at);
           await set_async_data('profile_picture', request.data.image);
+          await set_async_data('password_change', null);
           await set_async_data('login_user', 'loggedin');
           await get_contact_list();
 
           // await fetchAndUploadMedia(request.data.id);
           let saveFCM = await save_fcm_token();
+          console.log()
 
           let usertype = await get_async_data('usertype');
           // setTimeout(() => {

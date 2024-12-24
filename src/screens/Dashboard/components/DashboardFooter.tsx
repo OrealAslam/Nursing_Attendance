@@ -1,13 +1,14 @@
-import {View, ScrollView, Image, TouchableOpacity, ImageBackground} from 'react-native';
+import { View, ScrollView, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import React from 'react';
-import {FooterStyle} from '../dashboardstyles';
+import { FooterStyle } from '../dashboardstyles';
 
 const DashboardFooter = (props: any) => {
   return (
-    <ImageBackground source={require('../../../assets/footer.png')} style={FooterStyle.conatiner}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    // <ImageBackground source={require('../../../assets/footer.png')} style={FooterStyle.conatiner}>
+    <View style={FooterStyle.conatiner}>
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <TouchableOpacity
-          style={{marginBottom: 8}}
+          style={{ marginBottom: 8 }}
           onPress={() => props.navigateScreen('HolidayScreen')}>
           <Image
             style={FooterStyle.cardstyle}
@@ -16,7 +17,7 @@ const DashboardFooter = (props: any) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{marginBottom: 8}}
+          style={{ marginBottom: 8 }}
           onPress={() => props.navigateScreen('HistoryScreen')}>
           <Image
             style={FooterStyle.cardstyle}
@@ -25,7 +26,7 @@ const DashboardFooter = (props: any) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{marginBottom: 8}}
+          style={{ marginBottom: 8 }}
           onPress={() => props.navigateScreen('VitalSignScreen')}>
           <Image
             style={FooterStyle.cardstyle}
@@ -41,7 +42,8 @@ const DashboardFooter = (props: any) => {
           />
         </TouchableOpacity>
       </ScrollView>
-    </ImageBackground>
+    </View>
+    // </ImageBackground>
   );
 };
 

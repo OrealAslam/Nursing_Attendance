@@ -89,8 +89,6 @@ const DashboardContent = (props: any) => {
     }
   }
 
-  console.log('TIME', props.shiftTime)
-
   return (
     <View style={ContentStyle.container}>
       {props.shiftTime != 'Free' && props.shiftTime != '' ? (
@@ -137,9 +135,7 @@ const DashboardContent = (props: any) => {
           <Text style={ContentStyle.time}>{props.totalwotking}</Text>
           <Text style={ContentStyle.desc}>Today Hours</Text>
         </View>
-      </View>
-
-      
+      </View>      
     </View>
   );
 };

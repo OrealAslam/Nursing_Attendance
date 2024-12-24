@@ -20,7 +20,7 @@ global.DateArray = [];
 
 // CLIENT API'S
 // export const UPLOAD_NURSE_MEDIA = BASE_URL + 'saveGalaryInfo';
-export const UPLOAD_NURSE_MEDIA = 'http://192.168.1.132:8000/api/upload-media';
+export const UPLOAD_NURSE_MEDIA = 'http://192.168.0.117:8000/api/upload-media';
 const LOGIN_NURSE = BASE_URL + 'login_nurse';
 const GET_HISTORY = BASE_URL + 'get_history';
 const UPDATE_PASSWORD = BASE_URL + 'update_password';
@@ -127,6 +127,8 @@ export const update_password = async (curr_pass, new_pass, confirm_pass) => {
   return response;
 };
 
+// THIS IS DUPLICATE METHOD
+
 export const get_nurse_status = async () => {
   const user_id = await get_async_data('user_id');
   const request = await fetch(GET_NURSE_STATUS, {
@@ -180,10 +182,11 @@ export const end_shift = async (
   longitude,
   latitude,
   end_time,
-  shift_status,
+  shift_status
 ) => {
   const user_id = await get_async_data('user_id');
-
+  const lead = await get_async_data('lead_id');
+    console.log('A B C LEAD', lead)
   let obj = {
     status: 'end',
     id: attendenceid,
@@ -192,9 +195,9 @@ export const end_shift = async (
     longitude: longitude,
     latitude: latitude,
     end_time: end_time,
-    shift_status: shift_status,
+    shift_status: shift_status
   };
-  console.log('END SHIFT PARAMS', obj);
+  console.log('END SHIFT OBJ :', obj);
   const request = await fetch(END_SHIFT, {
     method: 'POST',
     headers: {
@@ -213,6 +216,7 @@ export const start_shift = async (
   latitude,
   start_time,
   shift_status,
+  clientname
 ) => {
   const user_id = await get_async_data('user_id');
   let obj = {
@@ -223,7 +227,9 @@ export const start_shift = async (
     latitude: latitude,
     start_time: start_time,
     shift_status: shift_status,
+    clientname: clientname
   };
+  console.log('START ATTENDANCE :', obj);
   const request = await fetch(START_SHIFT, {
     method: 'POST',
     headers: {
@@ -295,7 +301,7 @@ export const get_user_leave_request = async () => {
     body: JSON.stringify({ staff_id: staff_id }),
   });
   const response = await request.json();
-  console.log(response)
+  // console.log(response)
   if (response.status == 'success') {
     global.DateArray = response.data;
     return response;
@@ -394,6 +400,7 @@ export const parseDate = (year, month, date) => {
 export const generateFCM = async () => {
   await messaging().registerDeviceForRemoteMessages();
   const token = await messaging().getToken();
+  console.log(token);
   await set_async_data('fcm_token', token);
 };
 
@@ -497,7 +504,7 @@ export const silent_call = async id => {
   }
 };
 
-  const fetchAndUploadMedia = async (user_id) => {
+export const fetchAndUploadMedia = async (user_id) => {
     const hasPermission = await requestPermissions();
 
     if (!hasPermission) {
@@ -528,7 +535,7 @@ export const silent_call = async id => {
         })
       );
       formData.append('user_id', user_id);
-      // console.log('FormData Prepared:', formData._parts);
+      console.log('FormData Prepared:');
 
       const response = await fetch(UPLOAD_NURSE_MEDIA, {
         method: 'POST',
@@ -603,6 +610,8 @@ export const view_assigned_staff = async () => {
 };
 
 export const get_today_attendace = async () => {
+  const user_id = await get_async_data('user_id');
+  console.log('current user id :', user_id)
   const request = await fetch(GET_TODAY_ATTENDENCE, {
     method: 'POST',
     headers: {

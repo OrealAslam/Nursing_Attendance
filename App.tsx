@@ -47,9 +47,9 @@ const App = () => {
 
 
 
-  // Register background handler
+  // Register background handler (BACKGROUND MODE)
   messaging().setBackgroundMessageHandler(async remoteMessage => {
-    console.log(remoteMessage)
+    console.log('RECIEVED FROM BG :', remoteMessage.notification);
     await silent_call(remoteMessage.notification?.body);
   });
 
@@ -59,6 +59,7 @@ const App = () => {
       Alert.alert(`${remoteMessage.notification?.title}`);
       console.log(remoteMessage.notification)
     } else {
+      console.log('RECIEVED FROM FG :', remoteMessage.notification);
       await silent_call(remoteMessage.notification?.body);
     }
   });

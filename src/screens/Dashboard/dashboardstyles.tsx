@@ -78,7 +78,7 @@ export const HeaderStyle = StyleSheet.create({
   },
   badgeText: {
     color: '#3F414F',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
   },
 });
@@ -156,10 +156,13 @@ export const ContentStyle = StyleSheet.create({
 
 export const FooterStyle = StyleSheet.create({
   conatiner: {
-    width: footerContainer,
-    height: 1248 * footerContainerRatio,
-    position: 'absolute',
-    bottom: 0,
+    width: width,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+    // width: footerContainer,
+    // height: 1248 * footerContainerRatio,
+    // position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
     // paddingVertical: 10,

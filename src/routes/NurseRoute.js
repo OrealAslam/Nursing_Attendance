@@ -7,12 +7,19 @@ import LeaveRequest from '../screens/LeaveRequest/LeaveRequest';
 import HistoryScreen from '../screens/History/HistoryScreen';
 import VitalSignScreen from '../screens/VitalSign/VitalSignScreen';
 import NurseNotesScreen from '../screens/NurseNotes/NurseNotesScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+
 
 const Stack = createNativeStackNavigator();
 
 export default function NurseRoute() {
   return (
     <Stack.Navigator>
+      <Stack.Screen
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+        options={{headerShown: false, animationenabled: false}}
+      />
       <Stack.Screen
         name="DashboardScreen"
         component={DashboardScreen}

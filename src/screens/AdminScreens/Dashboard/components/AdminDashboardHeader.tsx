@@ -21,7 +21,7 @@ const AdminDashboardHeader = (props: any) => {
   return (
     <View style={HeaderStyle.headerContainer}>
       <View style={HeaderStyle.topHeader}>
-        <View>
+        {/* <View>
           {
             profilepicture != '' ? ( <Image
               style={HeaderStyle.adminPhoto}
@@ -37,7 +37,7 @@ const AdminDashboardHeader = (props: any) => {
             style={HeaderStyle.editButtonImg}
             source={require('../../../../assets/editprofilepicbtn.png')}
           />
-        </View>
+        </View> */}
 
         <View>
           <TouchableOpacity

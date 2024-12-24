@@ -68,6 +68,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       .post(UPDATE_PROFILE, data, config)
       .then((res: any) => {
         if (res.status == 200) {
+          setloader(false);
           ToastAndroid.showWithGravityAndOffset(
             'Profile Updated Successfully',
             ToastAndroid.SHORT,
@@ -79,6 +80,7 @@ const ProfileScreen = ({navigation}: {navigation: any}) => {
       })
       .catch((err: any) => {
         console.log('Axios Error', err);
+        setloader(false);
       });
   };
 

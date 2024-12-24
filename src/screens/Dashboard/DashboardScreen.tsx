@@ -1,4 +1,4 @@
-import { PermissionsAndroid, ImageBackground, Alert, Platform, Linking } from 'react-native';
+import { PermissionsAndroid, ImageBackground, Alert, Platform, Linking, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardContent from './components/DashboardContent';
@@ -17,6 +17,8 @@ import {
   update_history_array,
   uploadLocalHistory,
   UPLOAD_NURSE_MEDIA,
+  get_nurse_status,
+  get_leads
 } from '../../Helper/AppHelper';
 import moment from 'moment';
 import Geolocation from '@react-native-community/geolocation';
@@ -46,6 +48,12 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
   const [showmodel, setshowmodel] = useState(false);
   const [userid, setuserid] = useState(null);
 
+  const [leads, setleads] = useState([]);
+  const [lockheader, setlockheader] = useState(false);
+  const [selectedValue, setSelectedValue] = useState('Day Shift');
+  const [clientname, setclientname] = useState('');
+  const [client, setclient] = useState({ address: null, city: null, client_name: null, created_at: null, id: null, patient_name: null, phone_number: null });
+
   // NotificationSetting.openAppNotificationSettings();
 
   const navigateScreen = (screenName: any) => {
@@ -59,10 +67,8 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
   };
 
   const checkingShiftStatus = async (click: string) => {
-    let shiftTime = await get_async_data('shift_time');
     // trying to start shift
     if (shiftstatus == 'ended' && click == 'yes') {
-      console.log('LEAD', leadid)
       // API call to start shift
       setloader(true);
       let start_time = moment().format('YYYY-MM-DD hh:mm:ss');
@@ -72,18 +78,16 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
           longitude,
           latitude,
           start_time,
-          shiftTime,
+          selectedValue,
+          clientname
         );
         if (response.status == 'success') {
-          let attendenceStatus = response.attendance_Status;
-          console.log('resonse success', response);
+          setlockheader(true);
           await set_async_data('start_time_submit_request', 'submitted');
           setshiftstatus('started');
           setloader(false);
           setattendanceid(response.attendaces_id);
           setshiftstartat(moment().format('hh:mm a'));
-          console.log('ATT ID', response.attendaces_id)
-          console.log('-------------------------------------------------------------------------------------------')
           await set_async_data(
             'attendance_id',
             response.attendaces_id,
@@ -91,6 +95,9 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
           await set_async_data('start_time', start_time);
           await set_async_data('longitude', longitude);
           await set_async_data('latitude', latitude);
+          await set_async_data('lead_id', leadid);
+          await set_async_data('shift_time', selectedValue);
+          await set_async_data('clientname', clientname);
           setshiftendat('--:--');
           await totalWorkingHours();
         } else {
@@ -119,21 +126,26 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
     if (shiftstatus == 'started' && click == 'yes') {
       // API call to end shift
       setloader(true);
+      let leadid = await get_async_data('lead_id');
+      console.log('end time lead_id', leadid)
       let endTime = moment().format('YYYY-MM-DD hh:mm:ss');
       if (isConnected) {
-        console.log('try to end', attendanceid);
         let response = await end_shift(
           leadid,
           attendanceid,
           longitude,
           latitude,
           endTime,
-          shiftTime,
+          selectedValue
         );
         if (response.status == 'success') {
+          setlockheader(false);
           console.log('ended', response);
           await set_async_data('start_time', null);
           await set_async_data('attendance_id', null);
+          await set_async_data('lead_id', null);
+          await set_async_data('shift_time', null);
+          await set_async_data('clientname', null);
           setshiftstatus('ended');
           setshiftendat(moment().format('hh:mm a'));
           setloader(false);
@@ -152,7 +164,8 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
             alreadyStarted,
             endTime,
             lead_id,
-            shiftTime,
+            // shiftTime,
+            selectedValue
           );
         }
         setshiftendat(moment().format('hh:mm a'));
@@ -183,7 +196,6 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
         setlocationaccess(true);
         Geolocation.getCurrentPosition(
           position => {
-            console.log('POS ACCESSED', position);
             setlatitude(position.coords.latitude);
             setlongitude(position.coords.longitude);
           },
@@ -203,28 +215,38 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
 
   useEffect(() => {
     (async () => {
+      await access_device_location();
       let start_time = await get_async_data('start_time');
       let end_time = await get_async_data('end_time');
-      await access_device_location();
+      let lead_id = await get_async_data('lead_id');
+      let clientName = await get_async_data('clientname');
+      let shift = await get_async_data('shift_time');
       let fcm_token = await get_async_data('fcm_token');
-      console.log('FCM :', fcm_token)
+      let user_id = await get_async_data('user_id');
+      setuserid(user_id);
+      setleadid(lead_id);
+      setclientname(clientName);
+      setshiftstartat(start_time);
+      setSelectedValue(shift);
 
       if (isConnected) {
-        // await totalWorkingHours();
-        let user_id = await get_async_data('user_id');
-        setuserid(user_id);
-
-        console.log('USER ID :', user_id);
         let request = await get_shift_status();
         await uploadLocalHistory();
+
+        let leadsData = await get_leads();
+        setleads(leadsData.data || []); // Ensure an array is set
+
         if (request.status == 'success') {
           await set_async_data('free_attendance_marked', null);
-          await set_async_data('lead_id', request.data.lead_id);
-          await set_async_data('shift_time', request.data.shift_status);
-          setshiftTime(request.data.shift_status);
           let status = request.attendance_Status.status;
-          setleadid(request.data.lead_id);
+
+          // await set_async_data('lead_id', request.data.lead_id);
+          // await set_async_data('shift_time', request.data.shift_status);
+          setshiftTime(request.data.shift_status);
+          // console.log('CLIENT NAME :- ', request.data.clent_name)
+          // setleadid(request.data.lead_id);
           if (status == 'started') {
+            setlockheader(true);
             setattendanceid(request.attendance_Status.attendance_id);
             await set_async_data('start_time_submit_request', 'submitted');
             if (end_time != null) {
@@ -240,6 +262,8 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
                 await set_async_data('start_time', null);
                 await set_async_data('end_time', null);
                 await set_async_data('start_time_submit_request', null);
+                await set_async_data('clientname', null);
+                await set_async_data('lead_id', null);
                 setshiftstatus('ended');
                 setshiftstartat('--:--');
               }
@@ -273,7 +297,15 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
           }
 
           if (status == 'ended') {
+            setlockheader(false);
+            setleadid(request.data.lead_id);
+            setclientname(request.data.clent_name);
+            setSelectedValue(request.data.shift_status);
+            await set_async_data('lead_id', request.data.lead_id);
+            await set_async_data('shift_time', request.data.shift_status);
+            await set_async_data('clientname', request.data.clent_name);
             if (start_time != null) {
+              let leadsData = await get_leads();
               // submit offline start attendance here
               console.log('sending start request', start_time);
               let request = await submit_offline_start_attendence(start_time);
@@ -306,7 +338,6 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
         setshiftTime(shift);
         await update_btn_state(start_time, end_time);
         let localHistory = await get_async_data('attendence_history');
-        console.log('localHistory', localHistory);
       }
       setloader(false);
     })();
@@ -315,12 +346,14 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
   const submit_offline_start_attendence = async (startTime: any) => {
     let shiftTime = await get_async_data('shift_time');
     let leadid = await get_async_data('lead_id');
+    let clientname = await get_async_data('clientname');
     let request = await start_shift(
       leadid,
       longitude,
       latitude,
       startTime,
       shiftTime,
+      clientname
     );
     return request;
   };
@@ -331,6 +364,7 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
   ) => {
     let shiftTime = await get_async_data('shift_time');
     let leadid = await get_async_data('lead_id');
+    let clientname = await get_async_data('clientname');
 
     let request = await end_shift(
       leadid,
@@ -338,7 +372,7 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
       longitude,
       latitude,
       endTime,
-      shiftTime,
+      shiftTime
     );
     return request;
   };
@@ -423,10 +457,18 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <ImageBackground
-      style={{ width: '100%', height: '100%' }}
-      source={require('../../assets/appbackground.png')}>
-      <DashboardHeader navigateScreen={navigateScreen} />
+    <View style={{ flex: 1, backgroundColor: `rgba(96,96,247,1)` }}>
+      <DashboardHeader navigateScreen={navigateScreen}
+        selectedValue={selectedValue}
+        clientname={clientname}
+        setclientname={setclientname}
+        setSelectedValue={setSelectedValue}
+        setclient={setclient}
+        client={client}
+        lockheader={lockheader}
+        availableLeads={leads}
+        setleadid={setleadid}
+      />
 
       <DashboardContent
         shiftstatus={shiftstatus}
@@ -439,7 +481,6 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
         setshowmodel={setshowmodel}
         shiftTime={shiftTime}
       />
-
       <DashboardFooter navigateScreen={navigateScreen} />
       {showshiftcomplete && (
         <ShiftCompleteModel setshowshiftcomplete={setshowshiftcomplete} />
@@ -462,7 +503,7 @@ const DashboardScreen = ({ navigation }: { navigation: any }) => {
       )}
 
       {loader && <OverlayLoader />}
-    </ImageBackground>
+    </View>
   );
 };
 export default DashboardScreen;

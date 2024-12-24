@@ -145,7 +145,7 @@ const PageContent = (props: any) => {
               <Text style={styles.label}>Attendence</Text>
             </View>
           </View>
-          <ScrollView showsVerticalScrollIndicator={false} style={{maxHeight: 75/100 * height}}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false} style={{maxHeight: 75/100 * height}}>
             {display_attendence_record()}
           </ScrollView>
         </>
